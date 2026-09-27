@@ -12,7 +12,10 @@
 
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1300px; margin: auto; overflow-x: hidden; }
+        
         .main-container { display: flex; gap: 40px; flex-wrap: wrap; align-items: center; justify-content: center; min-height: 85vh; }
+        
+        /* Left GPA Card */
         .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 300px; max-width: 380px; z-index: 10; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         .btn-action { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
@@ -20,6 +23,7 @@
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
         .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
 
+        /* --- 3D CALCULATOR VIEWPORT WRAPPER --- */
         .calculator-wrapper {
             position: relative;
             width: 440px;
@@ -31,9 +35,16 @@
             overflow: hidden;
         }
 
-        #webgl-container { width: 100%; height: 100%; cursor: grab; }
-        #webgl-container:active { cursor: grabbing; }
+        #webgl-container {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        #webgl-container:active {
+            cursor: grabbing;
+        }
 
+        /* Live GPA Overlay aligned to display on top of the model screen */
         .calc-lcd-overlay {
             position: absolute;
             top: 160px;
@@ -55,23 +66,6 @@
         }
         .lcd-main-row { font-size: 0.8rem; font-weight: bold; text-align: right; }
         .lcd-gpa-row { font-size: 0.85rem; font-weight: bold; color: #8b0000; text-align: right; }
-
-        /* Status banner printed directly on the page */
-        #status-banner {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: #3498db;
-            z-index: 20;
-            border: 1px solid #444;
-            text-align: center;
-            max-width: 90%;
-        }
 
         .instruction-badge { 
             position: absolute; 
@@ -123,7 +117,6 @@
 
         <!-- RIGHT: Real 3D Casio Model Viewer -->
         <div class="calculator-wrapper">
-            <div id="status-banner">Initializing 3D Viewer...</div>
             <div id="webgl-container"></div>
             
             <!-- Live Screen Data -->
@@ -138,6 +131,7 @@
 
     <!-- JavaScript Execution Engine -->
     <script>
+        // --- GPA LOGIC ---
         let totalPoints = 0;
         let totalCredits = 0;
 
@@ -154,12 +148,16 @@
 
             totalPoints += (points * credits);
             totalCredits += credits;
+
             const gpa = (totalPoints / totalCredits).toFixed(2);
             
             document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
             document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
+
+            // Update calculator screen feedback
             document.getElementById('calcFormula').innerText = `${totalPoints} Pts / ${totalCredits} Cr`;
             document.getElementById('calcAnswer').innerText = `SEM GPA: ${gpa}`;
+
             nameField.value = '';
         }
 
@@ -168,13 +166,13 @@
             totalCredits = 0;
             document.getElementById('courseList').innerHTML = '';
             document.getElementById('result').innerHTML = '';
+            
             document.getElementById('calcFormula').innerText = "Sum(Pts×Cr)/Sum(Cr)";
             document.getElementById('calcAnswer').innerText = "GPA: 0.00";
         }
 
-        // --- THREE.JS 3D SETUP ---
+        // --- THREE.JS 3D MODEL RENDERER ---
         const container = document.getElementById('webgl-container');
-        const statusBanner = document.getElementById('status-banner');
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -185,15 +183,28 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
+        // Configure OrbitControls
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
+        controls.minDistance = 2;
+        controls.maxDistance = 8;
+        
+        controls.mouseButtons = {
+            LEFT: THREE.MOUSE.ROTATE,
+            MIDDLE: THREE.MOUSE.DOLLY,
+            RIGHT: THREE.MOUSE.PAN
+        };
 
-        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        dirLight.position.set(5, 10, 7);
-        scene.add(dirLight);
+        // Lighting to illuminate the model clearly
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        scene.add(ambientLight);
 
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        directionalLight.position.set(5, 10, 7);
+        scene.add(directionalLight);
+
+        // Continuous Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -201,28 +212,17 @@
         }
         animate();
 
-        // --- ATTEMPT TO LOAD MODEL WITH SCREEN FEEDBACK ---
-        statusBanner.innerText = "Attempting to load: models/casio3d.glb";
-
+        // Load your casio3d.glb file correctly from the root folder
         const loader = new THREE.GLTFLoader();
-        loader.load('models/casio3d.glb', function (gltf) {
-            statusBanner.innerText = "Model loaded successfully!";
-            statusBanner.style.color = "#2ecc71";
-            
+        loader.load('casio3d.glb', function (gltf) {
             const calculatorMesh = gltf.scene;
+            
             calculatorMesh.scale.set(1.5, 1.5, 1.5);
             calculatorMesh.position.set(0, -0.5, 0);
+            
             scene.add(calculatorMesh);
         }, undefined, function (error) {
-            statusBanner.innerText = "FAILED to load model! Check folder path.";
-            statusBanner.style.color = "#e74c3c";
-            console.error('GLTF Load Error:', error);
-
-            // Fallback: Add a bright red cube so you know 3D rendering works
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-            const cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
+            console.error('Error loading 3D model file:', error);
         });
 
         window.addEventListener('resize', () => {
