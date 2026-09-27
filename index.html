@@ -315,7 +315,6 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
-            // Shorten lengthy function names for cleaner display on keys
             let displayText = text;
             if (text === 'Math.sqrt(') displayText = '√';
             else if (text === 'Math.log10(') displayText = 'log';
@@ -334,7 +333,7 @@
             return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.4 });
         }
 
-        // Color definitions for key categories
+        // Color definitions
         const colKey = '#2c3036';
         const colShift = '#d35400';
         const colAlpha = '#884ea0';
@@ -343,58 +342,35 @@
         const colEq = '#27ae60';
         const colOp = '#202226';
 
-        // Button layout definitions matching the CATIGA CS-991EX keypad
+        // Complete Keypad Layout definition
         const layout = [
-            // Top control buttons row
-            [{label:'SHIFT', w:0.65, h:0.2, col:colShift}, {label:'ALPHA', w:0.65, h:0.2, col:colAlpha}, {label:'MENU', w:0.65, h:0.2, col:colMenu}],
-            // Replay row
-            [{label:'▲', w:0.35, h:0.16, col:colKey}, {label:'▼', w:0.35, h:0.16, col:colKey}],
-            // Function Grid
-            [
-                {label:'Math.sqrt(', w:0.45, h:0.18, col:colOp}, {label:'**3', w:0.45, h:0.18, col:colOp}, {label:'**', w:0.45, h:0.18, col:colOp}, {label:'Math.log10(', w:0.45, h:0.18, col:colOp}
-            ],
-            [
-                {label:'Math.log(', w:0.45, h:0.18, col:colOp}, {label:'(-1)*', w:0.45, h:0.18, col:colOp}, {label:'Math.sin(', w:0.45, h:0.18, col:colOp}, {label:'Math.cos(', w:0.45, h:0.18, col:colOp}
-            ],
-            [
-                {label:'Math.tan(', w:0.45, h:0.18, col:colOp}, {label:'(', w:0.45, h:0.18, col:colOp}, {label:')', w:0.45, h:0.18, col:colOp}, {label:'/', w:0.45, h:0.18, col:colOp}
-            ],
-            // Number / Action Keypad Rows
-            [
-                {label:'7', w:0.45, h:0.18, col:colKey}, {label:'8', w:0.45, h:0.18, col:colKey}, {label:'9', w:0.45, h:0.18, col:colKey}, {label:'DEL', w:0.45, h:0.18, col:colShift}
-            ],
-            [
-                {label:'4', w:0.45, h:0.18, col:colKey}, {label:'5', w:0.45, h:0.18, col:colKey}, {label:'6', w:0.45, h:0.18, col:colKey}, {label:'AC', w:0.45, h:0.18, col:colAC}
-            ],
-            [
-                {label:'1', w:0.45, h:0.18, col:colKey}, {label:'2', w:0.45, h:0.18, col:colKey}, {label:'3', w:0.45, h:0.18, col:colKey}, {label:'*', w:0.45, h:0.18, col:colOp}
-            ],
-            [
-                {label:'0', w:0.45, h:0.18, col:colKey}, {label:'.', w:0.45, h:0.18, col:colKey}, {label:'Math.PI', w:0.45, h:0.18, col:colOp}, {label:'-', w:0.45, h:0.18, col:colOp}
-            ],
-            [
-                {label:'Ans', w:0.45, h:0.18, col:colKey}, {label:'/100', w:0.45, h:0.18, col:colOp}, {label:'=', w:0.45, h:0.18, col:colEq}, {label:'+', w:0.45, h:0.18, col:colOp}
-            ]
+            [{label:'SHIFT', w:0.65, h:0.15, col:colShift}, {label:'ALPHA', w:0.65, h:0.15, col:colAlpha}, {label:'MENU', w:0.65, h:0.15, col:colMenu}],
+            [{label:'▲', w:0.35, h:0.13, col:colKey}, {label:'▼', w:0.35, h:0.13, col:colKey}],
+            [{label:'Math.sqrt(', w:0.45, h:0.15, col:colOp}, {label:'**3', w:0.45, h:0.15, col:colOp}, {label:'**', w:0.45, h:0.15, col:colOp}, {label:'Math.log10(', w:0.45, h:0.15, col:colOp}],
+            [{label:'Math.log(', w:0.45, h:0.15, col:colOp}, {label:'(-1)*', w:0.45, h:0.15, col:colOp}, {label:'Math.sin(', w:0.45, h:0.15, col:colOp}, {label:'Math.cos(', w:0.45, h:0.15, col:colOp}],
+            [{label:'Math.tan(', w:0.45, h:0.15, col:colOp}, {label:'(', w:0.45, h:0.15, col:colOp}, {label:')', w:0.45, h:0.15, col:colOp}, {label:'/', w:0.45, h:0.15, col:colOp}],
+            [{label:'7', w:0.45, h:0.15, col:colKey}, {label:'8', w:0.45, h:0.15, col:colKey}, {label:'9', w:0.45, h:0.15, col:colKey}, {label:'DEL', w:0.45, h:0.15, col:colShift}],
+            [{label:'4', w:0.45, h:0.15, col:colKey}, {label:'5', w:0.45, h:0.15, col:colKey}, {label:'6', w:0.45, h:0.15, col:colKey}, {label:'AC', w:0.45, h:0.15, col:colAC}],
+            [{label:'1', w:0.45, h:0.15, col:colKey}, {label:'2', w:0.45, h:0.15, col:colKey}, {label:'3', w:0.45, h:0.15, col:colKey}, {label:'*', w:0.45, h:0.15, col:colOp}],
+            [{label:'0', w:0.45, h:0.15, col:colKey}, {label:'.', w:0.45, h:0.15, col:colKey}, {label:'Math.PI', w:0.45, h:0.15, col:colOp}, {label:'-', w:0.45, h:0.15, col:colOp}],
+            [{label:'Ans', w:0.45, h:0.15, col:colKey}, {label:'/100', w:0.45, h:0.15, col:colOp}, {label:'=', w:0.45, h:0.15, col:colEq}, {label:'+', w:0.45, h:0.15, col:colOp}]
         ];
 
         const interactiveButtons = [];
 
-        // Generate 3D button meshes with visible text labels and perfect spacing
+        // Generate 3D button meshes with safe vertical distribution mapping
         layout.forEach((row, rIndex) => {
-            let rowWidth = row.reduce((acc, item) => acc + item.w + 0.04, -0.04);
+            let rowWidth = row.reduce((acc, item) => acc + item.w + 0.03, -0.03);
             let startX = -rowWidth / 2 + row[0].w / 2;
 
             row.forEach((btnData, cIndex) => {
-                let xPos = startX + cIndex * (btnData.w + 0.05);
+                let xPos = startX + cIndex * (btnData.w + 0.04);
                 let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.05);
                 let mat = createButtonMaterial(btnData.label, btnData.col);
                 let btnMesh = new THREE.Mesh(btnGeo, mat);
                 
-                // Vertical positioning curve matching the faceplate bounds
-                let yOffset = 1.35 - (rIndex * 0.22);
-                if (rIndex >= 2) {
-                    yOffset = 0.72 - ((rIndex - 2) * 0.21);
-                }
+                // Perfectly balanced vertical scaling spacing across the 4.25 faceplate height
+                let yOffset = 1.25 - (rIndex * 0.19);
 
                 btnMesh.position.set(xPos, yOffset, 0.04);
                 btnMesh.userData = { value: btnData.label };
