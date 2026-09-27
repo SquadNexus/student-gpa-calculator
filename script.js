@@ -33,50 +33,114 @@ function resetGPA() {
 let expression = "";
 let lastAns = "0";
 
-// Canvas texture for the calculator screen built *directly* onto the 3D phone model
-const screenCanvas = document.createElement('canvas');
-screenCanvas.width = 512;
-screenCanvas.height = 256;
-const screenCtx = screenCanvas.getContext('2d');
-const screenTexture = new THREE.CanvasTexture(screenCanvas);
+// Button definition array for the interactive screen touch UI
+const buttonsData = [
+    { label: 'SHIFT', x: 30, y: 150, w: 105, h: 45, bg: '#d35400' },
+    { label: 'ALPHA', x: 145, y: 150, w: 105, h: 45, bg: '#884ea0' },
+    { label: 'MODE', x: 260, y: 150, w: 105, h: 45, bg: '#2471a3' },
+    { label: '▲', x: 375, y: 150, w: 105, h: 45, bg: '#2c3036' },
 
-function updateScreenTexture() {
-    // Draw LCD Style Screen background
-    screenCtx.fillStyle = '#b5bec3';
-    screenCtx.fillRect(0, 0, screenCanvas.width, screenCanvas.height);
-    
-    // Border inset shadow
-    screenCtx.strokeStyle = '#555c63';
-    screenCtx.lineWidth = 8;
-    screenCtx.strokeRect(0, 0, screenCanvas.width, screenCanvas.height);
+    { label: '√', val: 'Math.sqrt(', x: 30, y: 205, w: 105, h: 45, bg: '#202226' },
+    { label: 'x³', val: '**3', x: 145, y: 205, w: 105, h: 45, bg: '#202226' },
+    { label: 'x^y', val: '**', x: 260, y: 205, w: 105, h: 45, bg: '#202226' },
+    { label: '▼', x: 375, y: 205, w: 105, h: 45, bg: '#2c3036' },
 
-    // Top icons
-    screenCtx.fillStyle = '#222';
-    screenCtx.font = 'bold 20px monospace';
-    screenCtx.fillText("M S Setup", 25, 35);
-    screenCtx.fillText("5G DEG", 390, 35);
+    { label: 'ln', val: 'Math.log(', x: 30, y: 260, w: 105, h: 45, bg: '#202226' },
+    { label: '(-)', val: '(-1)*', x: 145, y: 260, w: 105, h: 45, bg: '#202226' },
+    { label: 'sin', val: 'Math.sin(', x: 260, y: 260, w: 105, h: 45, bg: '#202226' },
+    { label: 'cos', val: 'Math.cos(', x: 375, y: 260, w: 105, h: 45, bg: '#202226' },
 
-    // Divider line
-    screenCtx.beginPath();
-    screenCtx.moveTo(20, 50);
-    screenCtx.lineTo(492, 50);
-    screenCtx.strokeStyle = '#9aa5ab';
-    screenCtx.lineWidth = 2;
-    screenCtx.stroke();
+    { label: 'tan', val: 'Math.tan(', x: 30, y: 315, w: 105, h: 45, bg: '#202226' },
+    { label: '(', val: '(', x: 145, y: 315, w: 105, h: 45, bg: '#202226' },
+    { label: ')', val: ')', x: 260, y: 315, w: 105, h: 45, bg: '#202226' },
+    { label: '/', val: '/', x: 375, y: 315, w: 105, h: 45, bg: '#202226' },
 
-    // Expression / Result text
-    screenCtx.fillStyle = '#111';
-    screenCtx.font = 'bold 42px monospace';
-    screenCtx.textAlign = 'right';
+    { label: '7', val: '7', x: 30, y: 370, w: 105, h: 50, bg: '#2c3036' },
+    { label: '8', val: '8', x: 145, y: 370, w: 105, h: 50, bg: '#2c3036' },
+    { label: '9', val: '9', x: 260, y: 370, w: 105, h: 50, bg: '#2c3036' },
+    { label: 'DEL', val: 'DEL', x: 375, y: 370, w: 105, h: 50, bg: '#d35400' },
+
+    { label: '4', val: '4', x: 30, y: 430, w: 105, h: 50, bg: '#2c3036' },
+    { label: '5', val: '5', x: 145, y: 430, w: 105, h: 50, bg: '#2c3036' },
+    { label: '6', val: '6', x: 260, y: 430, w: 105, h: 50, bg: '#2c3036' },
+    { label: 'AC', val: 'AC', x: 375, y: 430, w: 105, h: 50, bg: '#c0392b' },
+
+    { label: '1', val: '1', x: 30, y: 490, w: 105, h: 50, bg: '#2c3036' },
+    { label: '2', val: '2', x: 145, y: 490, w: 105, h: 50, bg: '#2c3036' },
+    { label: '3', val: '3', x: 260, y: 490, w: 105, h: 50, bg: '#2c3036' },
+    { label: '*', val: '*', x: 375, y: 490, w: 105, h: 50, bg: '#202226' },
+
+    { label: '0', val: '0', x: 30, y: 550, w: 105, h: 50, bg: '#2c3036' },
+    { label: '.', val: '.', x: 145, y: 550, w: 105, h: 50, bg: '#2c3036' },
+    { label: 'π', val: 'Math.PI', x: 260, y: 550, w: 105, h: 50, bg: '#202226' },
+    { label: '-', val: '-', x: 375, y: 550, w: 105, h: 50, bg: '#202226' },
+
+    { label: 'Ans', val: 'Ans', x: 30, y: 610, w: 105, h: 50, bg: '#2c3036' },
+    { label: '%', val: '/100', x: 145, y: 610, w: 105, h: 50, bg: '#202226' },
+    { label: '=', val: '=', x: 260, y: 610, w: 220, h: 50, bg: '#27ae60' }
+];
+
+// High-resolution UI Canvas Texture mapped directly onto the phone screen surface
+const phoneCanvas = document.createElement('canvas');
+phoneCanvas.width = 512;
+phoneCanvas.height = 720;
+const pCtx = phoneCanvas.getContext('2d');
+const phoneTexture = new THREE.CanvasTexture(phoneCanvas);
+
+function redrawPhoneUI() {
+    // 1. Phone App Background Wallpaper
+    pCtx.fillStyle = '#0f1115';
+    pCtx.fillRect(0, 0, phoneCanvas.width, phoneCanvas.height);
+
+    // 2. Status Bar
+    pCtx.fillStyle = '#ffffff';
+    pCtx.font = 'bold 16px sans-serif';
+    pCtx.fillText("10:41", 35, 30);
+    pCtx.fillText("5G  100%", 410, 30);
+
+    // 3. Calculator LCD Display Box
+    pCtx.fillStyle = '#b5bec3';
+    pCtx.roundRect(30, 50, 452, 80, 8);
+    pCtx.fill();
+    pCtx.strokeStyle = '#555c63';
+    pCtx.lineWidth = 3;
+    pCtx.stroke();
+
+    // Screen info icons
+    pCtx.fillStyle = '#222';
+    pCtx.font = 'bold 15px monospace';
+    pCtx.fillText("M S Setup", 45, 75);
+    pCtx.fillText("DEG", 420, 75);
+
+    // Expression/Result output
+    pCtx.fillStyle = '#111';
+    pCtx.font = 'bold 36px monospace';
+    pCtx.textAlign = 'right';
     let displayText = expression === "" ? "0" : expression;
-    if (displayText.length > 14) {
-        displayText = displayText.slice(-14); // Keep text inside screen bounds
-    }
-    screenCtx.fillText(displayText, 480, 160);
-    
-    screenTexture.needsUpdate = true;
+    if (displayText.length > 12) displayText = displayText.slice(-12);
+    pCtx.fillText(displayText, 465, 118);
+    pCtx.textAlign = 'left'; // reset
+
+    // 4. Draw Touch Screen Calculator Buttons
+    buttonsData.forEach(btn => {
+        pCtx.fillStyle = btn.bg;
+        pCtx.roundRect(btn.x, btn.y, btn.w, btn.h, 10);
+        pCtx.fill();
+        pCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+        pCtx.lineWidth = 2;
+        pCtx.stroke();
+
+        // Button label text
+        pCtx.fillStyle = '#ffffff';
+        pCtx.font = 'bold 20px Arial, sans-serif';
+        pCtx.textAlign = 'center';
+        pCtx.textBaseline = 'middle';
+        pCtx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2);
+    });
+
+    phoneTexture.needsUpdate = true;
 }
-updateScreenTexture();
+redrawPhoneUI();
 
 function handleCalcInput(val) {
     if (val === 'AC') {
@@ -85,8 +149,8 @@ function handleCalcInput(val) {
         expression = expression.slice(0, -1);
     } else if (val === 'Ans') {
         expression += lastAns;
-    } else if (['SHIFT', 'ALPHA', 'MENU', '▲', '▼'].includes(val)) {
-        // Function keys handler placeholder
+    } else if (['SHIFT', 'ALPHA', 'MODE', '▲', '▼'].includes(val)) {
+        // Mode/Setup switcher placeholder
     } else {
         if (expression === "0" && val !== '.') {
             expression = val;
@@ -94,7 +158,7 @@ function handleCalcInput(val) {
             expression += val;
         }
     }
-    updateScreenTexture();
+    redrawPhoneUI();
 }
 
 function handleCalculate() {
@@ -105,7 +169,7 @@ function handleCalculate() {
     } catch (err) {
         expression = "Syntax Error";
     }
-    updateScreenTexture();
+    redrawPhoneUI();
 }
 
 // Three.js Setup
@@ -130,8 +194,8 @@ controls.minDistance = 3.5;
 controls.maxDistance = 7;
 
 // Studio Lighting
-scene.add(new THREE.AmbientLight(0xffffff, 1.3));
-const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
+scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+const dirLight = new THREE.DirectionalLight(0xffffff, 2.2);
 dirLight.position.set(5, 10, 7);
 scene.add(dirLight);
 
@@ -140,136 +204,78 @@ const phoneGroup = new THREE.Group();
 phoneGroup.rotation.x = 0.05;
 phoneGroup.rotation.y = 0;
 
-// 1. Realistic Samsung S25 Ultra Chassis Body (Sharper Titanium Corners & Flat Display Edges)
+// 1. Realistic Samsung S25 Ultra Titanium Chassis Body
 const phoneGeometry = new THREE.BoxGeometry(2.35, 4.7, 0.16);
 const titaniumMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x272a30, // Titanium Gray 
+    color: 0x272a30, // Titanium Gray Finish
     roughness: 0.25,
     metalness: 0.85 
 });
 const phoneBody = new THREE.Mesh(phoneGeometry, titaniumMaterial);
 phoneGroup.add(phoneBody);
 
-// 2. Front Screen Glass Panel
-const glassGeo = new THREE.PlaneGeometry(2.22, 4.58);
-const glassMat = new THREE.MeshStandardMaterial({ color: 0x090a0c, roughness: 0.1, metalness: 0.9 });
-const frontGlass = new THREE.Mesh(glassGeo, glassMat);
-frontGlass.position.z = 0.082;
-phoneGroup.add(frontGlass);
-
-// 3. Built-in Calculator Screen Mesh (Embedded directly onto the 3D phone screen!)
-const screenGeo = new THREE.PlaneGeometry(2.0, 0.95);
-const screenMat = new THREE.MeshBasicMaterial({ map: screenTexture });
+// 2. Front Screen Glass with Calculator Touch UI Screen Texture
+const screenGeo = new THREE.PlaneGeometry(2.22, 4.58);
+const screenMat = new THREE.MeshBasicMaterial({ map: phoneTexture });
 const screenMesh = new THREE.Mesh(screenGeo, screenMat);
-screenMesh.position.set(0, 1.45, 0.085);
+screenMesh.position.z = 0.082;
 phoneGroup.add(screenMesh);
 
-// 4. Punch-hole Selfie Camera Dot on the screen
-const punchHoleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.01, 16);
+// 3. Punch-hole Selfie Camera Dot on top of screen
+const punchHoleGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.01, 16);
 const punchHoleMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 const punchHole = new THREE.Mesh(punchHoleGeo, punchHoleMat);
 punchHole.rotation.x = Math.PI / 2;
-punchHole.position.set(0, 2.12, 0.086);
+punchHole.position.set(0, 2.22, 0.086);
 phoneGroup.add(punchHole);
 
-// 5. Back Panel & S25 Ultra Camera Lenses (Visible when rotated to the back!)
+// 4. Realistic S25 Ultra Back Panel & Pro Camera System
 const backPanelGeo = new THREE.PlaneGeometry(2.25, 4.6);
-const backMat = new THREE.MeshStandardMaterial({ color: 0x141619, roughness: 0.35, metalness: 0.4 });
+const backMat = new THREE.MeshStandardMaterial({ color: 0x141619, roughness: 0.3, metalness: 0.5 });
 const backPanel = new THREE.Mesh(backPanelGeo, backMat);
 backPanel.position.z = -0.082;
 backPanel.rotation.y = Math.PI; 
 phoneGroup.add(backPanel);
 
-// Pro Triple Camera Rings + Laser Autofocus on the Back
-const lensGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.03, 32);
-const lensMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.2, metalness: 0.9 });
+// Camera Island Glass Base plate on the back
+const camIslandGeo = new THREE.BoxGeometry(0.65, 1.6, 0.015);
+const camIslandMat = new THREE.MeshStandardMaterial({ color: 0x1c1e22, roughness: 0.2, metalness: 0.8 });
+const camIsland = new THREE.Mesh(camIslandGeo, camIslandMat);
+camIsland.position.set(-0.5, 1.3, -0.091);
+phoneGroup.add(camIsland);
+
+// 4 Pro Ultra Camera Lenses + Flash Sensor with Silver Metallic Rings
+const lensBaseGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.03, 32);
+const ringMat = new THREE.MeshStandardMaterial({ color: 0xd8d8d8, roughness: 0.15, metalness: 0.95 });
+const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.9 });
+
 for (let i = 0; i < 4; i++) {
-    const lens = new THREE.Mesh(lensGeo, lensMat);
-    lens.rotation.x = Math.PI / 2;
-    if (i < 3) {
-        lens.position.set(-0.52, 1.6 - (i * 0.45), -0.098); // Main vertical camera cluster
-    } else {
-        lens.scale.set(0.6, 0.6, 0.6);
-        lens.position.set(-0.25, 1.6, -0.098); // Periscope / sensor dot
+    // Silver metal ring trim
+    const ring = new THREE.Mesh(lensBaseGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    
+    // Dark glass inside ring
+    const glassLens = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.035, 32), innerLensMat);
+    glassLens.rotation.x = Math.PI / 2;
+
+    let posX = -0.5;
+    let posY = 1.7 - (i * 0.45);
+    
+    // Align S25 Ultra realistic staggered sensor layout
+    if (i === 3) {
+        posX = -0.22; // Side flash/laser sensor dot
+        posY = 1.7;
     }
-    phoneGroup.add(lens);
+
+    ring.position.set(posX, posY, -0.10);
+    glassLens.position.set(posX, posY, -0.10);
+    phoneGroup.add(ring);
+    phoneGroup.add(glassLens);
 }
-
-// Helper to generate Canvas textures for the 3D buttons
-function createButtonMaterial(text, bgColor, textColor = '#ffffff') {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = textColor;
-    ctx.font = 'bold 22px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    let displayText = text;
-    if (text === 'Math.sqrt(') displayText = '√';
-    else if (text === 'Math.log(') displayText = 'ln';
-    else if (text === 'Math.sin(') displayText = 'sin';
-    else if (text === 'Math.cos(') displayText = 'cos';
-    else if (text === 'Math.tan(') displayText = 'tan';
-    else if (text === '**3') displayText = 'x³';
-    else if (text === '**') displayText = 'x^y';
-    else if (text === '(-1)*') displayText = '(-)';
-    else if (text === '/100') displayText = '%';
-
-    ctx.fillText(displayText, canvas.width / 2, canvas.height / 2);
-    const texture = new THREE.CanvasTexture(canvas);
-    return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.4 });
-}
-
-// Keypad layout definition
-const colKey = '#2c3036';
-const colShift = '#d35400';
-const colAlpha = '#884ea0';
-const colMenu = '#2471a3';
-const colAC = '#c0392b';
-const colEq = '#27ae60';
-const colOp = '#202226';
-
-const layout = [
-    [{label:'SHIFT', w:0.50, h:0.13, col:colShift}, {label:'ALPHA', w:0.50, h:0.13, col:colAlpha}, {label:'MENU', w:0.50, h:0.13, col:colMenu}, {label:'▲', w:0.35, h:0.13, col:colKey}],
-    [{label:'Math.sqrt(', w:0.43, h:0.13, col:colOp}, {label:'**3', w:0.43, h:0.13, col:colOp}, {label:'**', w:0.43, h:0.13, col:colOp}, {label:'▼', w:0.35, h:0.13, col:colKey}],
-    [{label:'Math.log(', w:0.43, h:0.13, col:colOp}, {label:'(-1)*', w:0.43, h:0.13, col:colOp}, {label:'Math.sin(', w:0.43, h:0.13, col:colOp}, {label:'Math.cos(', w:0.43, h:0.13, col:colOp}],
-    [{label:'Math.tan(', w:0.43, h:0.13, col:colOp}, {label:'(', w:0.43, h:0.13, col:colOp}, {label:')', w:0.43, h:0.13, col:colOp}, {label:'/', w:0.43, h:0.13, col:colOp}],
-    [{label:'7', w:0.43, h:0.13, col:colKey}, {label:'8', w:0.43, h:0.13, col:colKey}, {label:'9', w:0.43, h:0.13, col:colKey}, {label:'DEL', w:0.43, h:0.13, col:colShift}],
-    [{label:'4', w:0.43, h:0.13, col:colKey}, {label:'5', w:0.43, h:0.13, col:colKey}, {label:'6', w:0.43, h:0.13, col:colKey}, {label:'AC', w:0.43, h:0.13, col:colAC}],
-    [{label:'1', w:0.43, h:0.13, col:colKey}, {label:'2', w:0.43, h:0.13, col:colKey}, {label:'3', w:0.43, h:0.13, col:colKey}, {label:'*', w:0.43, h:0.13, col:colOp}],
-    [{label:'0', w:0.43, h:0.13, col:colKey}, {label:'.', w:0.43, h:0.13, col:colKey}, {label:'Math.PI', w:0.43, h:0.13, col:colOp}, {label:'-', w:0.43, h:0.13, col:colOp}],
-    [{label:'Ans', w:0.43, h:0.13, col:colKey}, {label:'/100', w:0.43, h:0.13, col:colOp}, {label:'=', w:0.43, h:0.13, col:colEq}, {label:'+', w:0.43, h:0.13, col:colOp}]
-];
-
-const interactiveButtons = [];
-
-layout.forEach((row, rIndex) => {
-    let rowWidth = row.reduce((acc, item) => acc + item.w + 0.02, -0.02);
-    let startX = -rowWidth / 2 + row[0].w / 2;
-
-    row.forEach((btnData, cIndex) => {
-        let xPos = startX + cIndex * (btnData.w + 0.03);
-        let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.03);
-        let mat = createButtonMaterial(btnData.label, btnData.col);
-        let btnMesh = new THREE.Mesh(btnGeo, mat);
-        
-        let yOffset = 0.75 - (rIndex * 0.15);
-
-        btnMesh.position.set(xPos, yOffset, 0.088);
-        btnMesh.userData = { value: btnData.label };
-        phoneGroup.add(btnMesh);
-        interactiveButtons.push(btnMesh);
-    });
-});
 
 scene.add(phoneGroup);
 
-// Raycasting to click buttons directly on the 3D phone screen
+// Raycasting to accurately click touch buttons on the 3D phone screen
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -285,19 +291,29 @@ window.addEventListener('pointerdown', (event) => {
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(interactiveButtons);
+        const intersects = raycaster.intersectObject(screenMesh);
 
         if (intersects.length > 0) {
-            const clickedButton = intersects[0].object;
-            const val = clickedButton.userData.value;
+            // Get exact UV coordinates where the user clicked on the screen plane
+            const uv = intersects[0].uv;
+            const clickX = uv.x * phoneCanvas.width;
+            const clickY = (1 - uv.y) * phoneCanvas.height;
 
-            clickedButton.position.z -= 0.01;
-            setTimeout(() => { clickedButton.position.z += 0.01; }, 120);
-
-            if (val === '=') {
-                handleCalculate();
-            } else {
-                handleCalcInput(val);
+            // Check which button was tapped
+            for (let btn of buttonsData) {
+                if (
+                    clickX >= btn.x &&
+                    clickX <= btn.x + btn.w &&
+                    clickY >= btn.y &&
+                    clickY <= btn.y + btn.h
+                ) {
+                    if (btn.val === '=') {
+                        handleCalculate();
+                    } else if (btn.val) {
+                        handleCalcInput(btn.val);
+                    }
+                    break;
+                }
             }
         }
     }
