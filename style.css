@@ -9,9 +9,9 @@ body {
 
 .main-container { 
     display: flex; 
-    gap: 30px; 
+    gap: 40px; 
     flex-wrap: wrap; 
-    align-items: flex-start; 
+    align-items: center; 
     justify-content: center; 
 }
 
@@ -70,83 +70,115 @@ button:hover { background: #0056b3; }
     font-size: 0.85rem; 
 }
 
-/* Right 3D Calculator Viewport Wrapper Styles */
-.calculator-3d-wrapper {
-    position: relative;
-    width: 380px;
-    height: 640px;
-    background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
-    border-radius: 16px;
-    border: 2px solid #33363d;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-    overflow: hidden;
-    flex-shrink: 0;
+/* --- 3D PERSPECTIVE CALCULATOR SCENE --- */
+.calculator-scene {
+    perspective: 1200px;
+    padding: 20px;
 }
 
-#webgl-container { 
-    width: 100%; 
-    height: 100%; 
-    display: block;
-    cursor: grab; 
+/* 3D Body container rotated for a realistic 3D isometric angle */
+.calculator-3d-body {
+    width: 340px;
+    background: linear-gradient(145deg, #22252a, #15171a);
+    padding: 22px;
+    border-radius: 18px;
+    border: 3px solid #3b4048;
+    box-shadow: 
+        0 25px 50px rgba(0,0,0,0.8),
+        inset 0 2px 5px rgba(255,255,255,0.15),
+        /* Simulated 3D Side Depth Layers */
+        1px 1px 0 #0d0e10,
+        2px 2px 0 #0d0e10,
+        3px 3px 0 #0d0e10,
+        4px 4px 0 #0d0e10,
+        5px 5px 0 #0d0e10,
+        6px 6px 0 #0d0e10,
+        8px 15px 30px rgba(0,0,0,0.9);
+    transform: rotateX(8deg) rotateY(-10deg) rotateZ(1deg);
+    transition: transform 0.4s ease;
 }
 
-#webgl-container:active { cursor: grabbing; }
+.calculator-3d-body:hover {
+    transform: rotateX(2deg) rotateY(-3deg) rotateZ(0deg);
+}
 
-/* Accurate 2D LCD Screen Overlay aligned to 3D Model Screen slot */
-.calc-lcd-overlay {
-    position: absolute;
-    top: 58px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 310px;
-    height: 72px;
+.calc-brand {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #99aab5;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.model-sub {
+    font-size: 0.65rem;
+    color: #66757f;
+}
+
+/* Integrated 3D LCD Screen */
+.calc-lcd-screen {
     background: #b5bec3;
     color: #111;
-    padding: 8px 10px;
-    border-radius: 6px;
     border: 3px solid #555c63;
-    box-sizing: border-box;
-    font-family: monospace;
-    pointer-events: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 16px;
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.lcd-top-row {
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
-    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
-    z-index: 10;
-}
-
-.lcd-top-icons { 
-    font-size: 0.55rem; 
-    color: #333; 
-    display: flex; 
-    justify-content: space-between; 
-    border-bottom: 1px solid #9aa5ab; 
-    padding-bottom: 2px; 
-    font-weight: bold; 
-}
-
-.lcd-screen-main { 
-    font-size: 1.1rem; 
-    min-height: 30px; 
-    text-align: right; 
-    font-weight: bold; 
-    text-shadow: 0 1px 0 rgba(255,255,255,0.4); 
-    white-space: nowrap; 
-    overflow: hidden; 
-}
-
-.instruction-badge {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
-    padding: 6px 14px;
-    border-radius: 15px;
-    font-size: 0.7rem;
-    color: #3498db;
+    font-size: 0.55rem;
     font-weight: bold;
-    pointer-events: none;
-    border: 1px solid #444;
-    z-index: 10;
+    color: #333;
+    border-bottom: 1px solid #9aa5ab;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
 }
+
+.lcd-main-display {
+    font-family: monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: right;
+    min-height: 30px;
+    overflow-x: auto;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+}
+
+/* 3D Tactile Keypad Grid */
+.calc-keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.calc-keypad-grid button {
+    padding: 11px 0;
+    font-size: 0.85rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    margin-top: 0;
+    box-shadow: 0 4px 0 #111, 0 5px 8px rgba(0,0,0,0.4);
+    transition: all 0.1s ease;
+}
+
+.calc-keypad-grid button:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #111, 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* Key Colors matching professional scientific calculators */
+.btn-num { background: #2c3036; color: #fff; }
+.btn-op { background: #202226; color: #3498db; }
+.btn-action { background: #d35400; color: #fff; font-size: 0.7rem; }
+.btn-menu { background: #2471a3; color: #fff; font-size: 0.7rem; }
+.btn-nav { background: #2c3036; color: #f1c40f; }
+.btn-del { background: #b9770e; color: #fff; font-size: 0.75rem; }
+.btn-ac { background: #c0392b; color: #fff; font-size: 0.75rem; }
+.btn-eq { background: #27ae60; color: #fff; }
