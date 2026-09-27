@@ -182,7 +182,7 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // Configure OrbitControls: Left-Click Rotate, Scroll Zoom, Right-Click Pan (Shift)
+        // Configure OrbitControls
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
@@ -190,9 +190,9 @@
         controls.maxDistance = 8;
         
         controls.mouseButtons = {
-            LEFT: THREE.MOUSE.ROTATE,   // Rotates the 3D model
-            MIDDLE: THREE.MOUSE.DOLLY,  // Zooms via scroll wheel
-            RIGHT: THREE.MOUSE.PAN      // Shifts/pans model when right-clicked and dragged
+            LEFT: THREE.MOUSE.ROTATE,
+            MIDDLE: THREE.MOUSE.DOLLY,
+            RIGHT: THREE.MOUSE.PAN
         };
 
         // Lighting to illuminate the model clearly
@@ -202,6 +202,14 @@
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
         directionalLight.position.set(5, 10, 7);
         scene.add(directionalLight);
+
+        // Continuous Animation Loop (Runs independently of the model loading state)
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
 
         // Load your downloaded casio3d.glb file
         const loader = new THREE.GLTFLoader();
@@ -213,15 +221,8 @@
             calculatorMesh.position.set(0, -0.5, 0);
             
             scene.add(calculatorMesh);
-
-            function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }
-            animate();
         }, undefined, function (error) {
-            console.error('Error loading 3D model file (Ensure casio3d.glb is in the same directory):', error);
+            console.error('Error loading 3D model file (Ensure casio3d.glb is in the same directory and served via a local server):', error);
         });
 
         window.addEventListener('resize', () => {
