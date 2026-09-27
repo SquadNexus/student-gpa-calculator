@@ -3,95 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA & 3D Interactive Casio Calculator</title>
+    <title>Advanced GPA & Scientific Calculator Hub</title>
     
-    <!-- Load Three.js and OrbitControls -->
+    <!-- Load Three.js and OrbitControls for 3D elements -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1300px; margin: auto; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1400px; margin: auto; }
         
-        .main-container { display: flex; gap: 40px; flex-wrap: wrap; align-items: center; justify-content: center; min-height: 85vh; }
+        .main-layout { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
         
-        /* Left GPA Card */
-        .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 300px; max-width: 380px; z-index: 10; }
+        /* Cards */
+        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 320px; max-width: 400px; }
+        h2 { margin-top: 0; color: #3498db; font-size: 1.4rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
+        
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        .btn-action { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-action { background: #007bff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 8px; }
         .btn-action:hover { background: #0056b3; }
-        #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
-        .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
+        
+        /* Scientific Calculator Panel */
+        .calc-body { background: #2c2f33; border-radius: 10px; padding: 15px; border: 2px solid #444; margin-top: 15px; }
+        .calc-screen { width: 100%; height: 50px; background: #9ead99; color: #111; font-family: monospace; font-size: 1.2rem; text-align: right; padding: 8px; box-sizing: border-box; border-radius: 4px; margin-bottom: 12px; border: inset 2px #3b423d; overflow: hidden; }
+        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .key { padding: 10px; background: #3c4043; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .key:hover { background: #5f6368; }
+        .key.op { background: #e67e22; }
+        .key.op:hover { background: #d35400; }
+        .key.equals { background: #27ae60; grid-column: span 2; }
+        .key.equals:hover { background: #219653; }
+        .key.clear { background: #c0392b; }
+        .key.clear:hover { background: #962d22; }
 
-        /* --- 3D CALCULATOR VIEWPORT WRAPPER --- */
-        .calculator-wrapper {
-            position: relative;
-            width: 440px;
-            height: 650px;
-            background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
-            border-radius: 20px;
-            border: 2px solid #333;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            overflow: hidden;
-        }
+        /* History Log Panel */
+        .history-box { background: #18191a; border: 1px solid #333; border-radius: 6px; padding: 10px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #a4b0be; margin-top: 10px; }
+        .history-item { padding: 4px 0; border-bottom: 1px dashed #2f3542; }
 
-        #webgl-container {
-            width: 100%;
-            height: 100%;
-            cursor: grab;
-        }
-        #webgl-container:active {
-            cursor: grabbing;
-        }
-
-        /* Live GPA Overlay aligned precisely over the 3D model's LCD screen */
-        .calc-lcd-overlay {
-            position: absolute;
-            top: 130px;
-            left: 95px;
-            width: 250px;
-            height: 75px;
-            background: #9ead99;
-            color: #111;
-            border-radius: 4px;
-            padding: 8px;
-            box-sizing: border-box;
-            font-family: monospace;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
-            z-index: 5;
-            border: 2px solid #3b423d;
-        }
-        .lcd-main-row { font-size: 0.8rem; font-weight: bold; text-align: right; }
-        .lcd-gpa-row { font-size: 0.9rem; font-weight: bold; color: #8b0000; text-align: right; }
-
-        .instruction-badge { 
-            position: absolute; 
-            bottom: 15px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: rgba(0, 0, 0, 0.8); 
-            padding: 8px 15px; 
-            border-radius: 20px; 
-            font-size: 0.75rem; 
-            color: #f1c40f; 
-            font-weight: bold; 
-            pointer-events: none;
-            border: 1px solid #444;
-            text-align: center;
-        }
+        /* 3D Visual Box */
+        .viewport-box { position: relative; width: 100%; height: 350px; background: radial-gradient(circle, #1a1c23 0%, #111215 100%); border-radius: 10px; overflow: hidden; border: 1px solid #333; margin-top: 15px; }
+        #webgl-container { width: 100%; height: 100%; cursor: grab; }
+        
+        .result-text { margin-top: 15px; font-size: 1.1rem; text-align: center; color: #2ecc71; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <!-- LEFT: GPA Calculator Form -->
+    <h1 style="text-align: center; margin-bottom: 25px;">MUST Student Calculator Hub</h1>
+
+    <div class="main-layout">
+        
+        <!-- CARD 1: GPA Calculator -->
         <div class="card">
             <h2>GPA Calculator</h2>
-            <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
-            
             <label>Course Name / Code</label>
             <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
             
@@ -108,36 +71,95 @@
             <label>Credit Hours / Units</label>
             <input type="number" id="credits" value="3" min="1" max="10">
 
-            <button class="btn-action" onclick="addCourse()">Add Course</button>
+            <button class="btn-action" onclick="addCourse()">Add Course to GPA</button>
             <button class="btn-action" style="background:#c0392b;" onclick="resetGPA()">Reset GPA</button>
             
-            <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #ccc;"></div>
-            <div id="result"></div>
+            <div id="result" class="result-text"></div>
+            <div id="courseList" style="margin-top: 10px; font-size: 0.85rem; color: #ccc; max-height: 120px; overflow-y: auto;"></div>
         </div>
 
-        <!-- RIGHT: Custom 3D Programmatic Casio Model Viewer -->
-        <div class="calculator-wrapper">
-            <div id="webgl-container"></div>
-            
-            <!-- Live Screen Data -->
-            <div class="calc-lcd-overlay">
-                <div class="lcd-main-row" id="calcFormula">Sum(Pts×Cr)/Sum(Cr)</div>
-                <div class="lcd-gpa-row" id="calcAnswer">GPA: 0.00</div>
+        <!-- CARD 2: Real Scientific Calculator Panel -->
+        <div class="card">
+            <h2>Casio Scientific Pad</h2>
+            <div class="calc-body">
+                <div id="calcScreen" class="calc-screen">0</div>
+                <div class="keypad">
+                    <button class="key clear" onclick="clearCalc()">AC</button>
+                    <button class="key op" onclick="appendCalc('(')">(</button>
+                    <button class="key op" onclick="appendCalc(')')">)</button>
+                    <button class="key op" onclick="appendCalc('/')">÷</button>
+                    
+                    <button class="key" onclick="appendCalc('7')">7</button>
+                    <button class="key" onclick="appendCalc('8')">8</button>
+                    <button class="key" onclick="appendCalc('9')">9</button>
+                    <button class="key op" onclick="appendCalc('*')">×</button>
+                    
+                    <button class="key" onclick="appendCalc('4')">4</button>
+                    <button class="key" onclick="appendCalc('5')">5</button>
+                    <button class="key" onclick="appendCalc('6')">6</button>
+                    <button class="key op" onclick="appendCalc('-')">-</button>
+                    
+                    <button class="key" onclick="appendCalc('1')">1</button>
+                    <button class="key" onclick="appendCalc('2')">2</button>
+                    <button class="key" onclick="appendCalc('3')">3</button>
+                    <button class="key op" onclick="appendCalc('+')">+</button>
+                    
+                    <button class="key" onclick="appendCalc('0')">0</button>
+                    <button class="key" onclick="appendCalc('.')">.</button>
+                    <button class="key equals" onclick="calculateResult()">=</button>
+                </div>
             </div>
-
-            <div class="instruction-badge">🖱️ Left-Click: Rotate | Scroll: Zoom | Right-Click: Shift</div>
+            
+            <h3 style="font-size: 1rem; margin-top: 15px; color:#f1c40f;">Scientific Operations</h3>
+            <div style="display: flex; gap: 5px;">
+                <button class="key op" style="flex:1;" onclick="applyScientific('Math.sqrt(')">√x</button>
+                <button class="key op" style="flex:1;" onclick="applyScientific('**2')">x²</button>
+                <button class="key op" style="flex:1;" onclick="applyScientific('Math.sin(')">sin</button>
+                <button class="key op" style="flex:1;" onclick="applyScientific('Math.cos(')">cos</button>
+                <button class="key op" style="flex:1;" onclick="applyScientific('Math.tan(')">tan</button>
+            </div>
         </div>
+
+        <!-- CARD 3: Calculation History Log -->
+        <div class="card">
+            <h2>Calculations Log</h2>
+            <p style="font-size: 0.85rem; color: #aaa;">All arithmetic computations and GPA updates are tracked here:</p>
+            <div id="historyBox" class="history-box">
+                <div class="history-item">System ready. No calculations yet.</div>
+            </div>
+            <button class="btn-action" style="background: #444; margin-top: 15px;" onclick="clearHistory()">Clear History Log</button>
+            
+            <!-- 3D Mini Viewport Accent -->
+            <div class="viewport-box">
+                <div id="webgl-container"></div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- JavaScript Execution Engine -->
+    <!-- JavaScript Calculation and 3D Engine -->
     <script>
+        // --- HISTORY LOG SYSTEM ---
+        function logHistory(text) {
+            const box = document.getElementById('historyBox');
+            if (box.innerHTML.includes("System ready")) {
+                box.innerHTML = "";
+            }
+            const time = new Date().toLocaleTimeString();
+            box.innerHTML = `<div class="history-item">[${time}] ${text}</div>` + box.innerHTML;
+        }
+
+        function clearHistory() {
+            document.getElementById('historyBox').innerHTML = '<div class="history-item">History cleared.</div>';
+        }
+
         // --- GPA LOGIC ---
         let totalPoints = 0;
         let totalCredits = 0;
 
         function addCourse() {
             const nameField = document.getElementById('courseName');
-            const name = nameField.value || "Course";
+            const name = nameField.value || "Unnamed Course";
             const points = parseFloat(document.getElementById('gradePoints').value);
             const credits = parseFloat(document.getElementById('credits').value);
 
@@ -148,137 +170,101 @@
 
             totalPoints += (points * credits);
             totalCredits += credits;
-
             const gpa = (totalPoints / totalCredits).toFixed(2);
+
+            document.getElementById('result').innerHTML = `Semester GPA: ${gpa}`;
+            document.getElementById('courseList').innerHTML += `<div>✔️ ${name} (${credits} Cr, Pts: ${points})</div>`;
             
-            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
-            document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
-
-            // Update calculator 3D overlay screen feedback
-            document.getElementById('calcFormula').innerText = `${totalPoints} Pts / ${totalCredits} Cr`;
-            document.getElementById('calcAnswer').innerText = `SEM GPA: ${gpa}`;
-
+            logHistory(`GPA Added: ${name} | Credits: ${credits}, Points: ${points} | New GPA: ${gpa}`);
             nameField.value = '';
         }
 
         function resetGPA() {
             totalPoints = 0;
             totalCredits = 0;
-            document.getElementById('courseList').innerHTML = '';
             document.getElementById('result').innerHTML = '';
-            
-            document.getElementById('calcFormula').innerText = "Sum(Pts×Cr)/Sum(Cr)";
-            document.getElementById('calcAnswer').innerText = "GPA: 0.00";
+            document.getElementById('courseList').innerHTML = '';
+            logHistory("GPA Calculator reset.");
         }
 
-        // --- THREE.JS 3D PROCEDURAL CASIO CALCULATOR RENDERER ---
-        const container = document.getElementById('webgl-container');
+        // --- SCIENTIFIC CALCULATOR LOGIC ---
+        let calcDisplay = document.getElementById('calcScreen');
 
+        function appendCalc(val) {
+            if (calcDisplay.innerText === '0' || calcDisplay.innerText === 'Error') {
+                calcDisplay.innerText = val;
+            } else {
+                calcDisplay.innerText += val;
+            }
+        }
+
+        function clearCalc() {
+            calcDisplay.innerText = '0';
+        }
+
+        function applyScientific(func) {
+            if (calcDisplay.innerText === '0' || calcDisplay.innerText === 'Error') {
+                calcDisplay.innerText = func;
+            } else {
+                calcDisplay.innerText = func + calcDisplay.innerText + ')';
+            }
+        }
+
+        function calculateResult() {
+            try {
+                let expression = calcDisplay.innerText;
+                // Evaluate expression securely via Function
+                let result = eval(expression);
+                if (isNaN(result) || !isFinite(result)) throw new Error();
+                
+                logHistory(`Calc: ${expression} = ${result}`);
+                calcDisplay.innerText = result;
+            } catch (err) {
+                logHistory(`Calc Error on: ${calcDisplay.innerText}`);
+                calcDisplay.innerText = 'Error';
+            }
+        }
+
+        // --- 3D MINI CASIO ACCENT RENDERER ---
+        const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 0, 6.5);
+        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 5;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // OrbitControls
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 3;
-        controls.maxDistance = 9;
 
-        // Lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
-        // --- BUILD 3D CALCULATOR GROUP ---
-        const calculatorGroup = new THREE.Group();
+        // Procedural 3D Calculator Mesh
+        const calcGroup = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 3.5, 0.25), new THREE.MeshStandardMaterial({color: 0x1c1e21}));
+        const face = new THREE.Mesh(new THREE.BoxGeometry(2.0, 3.3, 0.28), new THREE.MeshStandardMaterial({color: 0xdcdde1}));
+        calcGroup.add(body);
+        calcGroup.add(face);
+        scene.add(calcGroup);
 
-        // 1. Main Body Casing (Dark Matte Plastic)
-        const bodyGeo = new THREE.BoxGeometry(3.0, 4.8, 0.35);
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1c1e21, roughness: 0.4, metalness: 0.1 });
-        const body = new THREE.Mesh(bodyGeo, bodyMat);
-        calculatorGroup.add(body);
-
-        // 2. Inner Faceplate (Classic Grey/Silver Scientific Panel)
-        const faceGeo = new THREE.BoxGeometry(2.7, 4.5, 0.38);
-        const faceMat = new THREE.MeshStandardMaterial({ color: 0xdcdde1, roughness: 0.6 });
-        const faceplate = new THREE.Mesh(faceGeo, faceMat);
-        faceplate.position.z = 0.02;
-        calculatorGroup.add(faceplate);
-
-        // 3. LCD Screen Bezel / Recess
-        const screenGeo = new THREE.BoxGeometry(2.3, 0.9, 0.40);
-        const screenMat = new THREE.MeshStandardMaterial({ color: 0x2f3640, roughness: 0.2 });
-        const screenBezel = new THREE.Mesh(screenGeo, screenMat);
-        screenBezel.position.set(0, 1.55, 0.04);
-        calculatorGroup.add(screenBezel);
-
-        // 4. Directional Pad / Navigation Ring
-        const dPadGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.08, 32);
-        const dPadMat = new THREE.MeshStandardMaterial({ color: 0x485460, roughness: 0.3 });
-        const dPad = new THREE.Mesh(dPadGeo, dPadMat);
-        dPad.rotation.x = Math.PI / 2;
-        dPad.position.set(0, 0.85, 0.05);
-        calculatorGroup.add(dPad);
-
-        // 5. Grid of Scientific Buttons
-        const buttonMat = new THREE.MeshStandardMaterial({ color: 0x2f3640, roughness: 0.5 });
-        const accentButtonMat = new THREE.MeshStandardMaterial({ color: 0xe056fd, roughness: 0.3 }); // Shift/Alpha keys
-        const equalsButtonMat = new THREE.MeshStandardMaterial({ color: 0x0984e3, roughness: 0.3 }); // Equal key
-
-        const rows = 6;
-        const cols = 4;
-        const btnWidth = 0.45;
-        const btnHeight = 0.22;
-        const startX = -0.9;
-        const startY = 0.35;
-
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                let mat = buttonMat;
-                if (r === 0 && c === 3) mat = accentButtonMat;
-                if (r === rows - 1 && c === cols - 1) mat = equalsButtonMat;
-
-                const btnGeo = new THREE.BoxGeometry(btnWidth, btnHeight, 0.08);
-                const button = new THREE.Mesh(btnGeo, mat);
-                
-                const posX = startX + c * (btnWidth + 0.15);
-                const posY = startY - r * (btnHeight + 0.12);
-                
-                button.position.set(posX, posY, 0.06);
-                calculatorGroup.add(button);
-            }
-        }
-
-        scene.add(calculatorGroup);
-
-        // Gentle floating rotation idle effect
         let clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            
-            // Subtle tilt animation loop
-            const elapsedTime = clock.getElapsedTime();
-            calculatorGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.15;
-            calculatorGroup.rotation.x = Math.cos(elapsedTime * 0.4) * 0.08;
-
+            calcGroup.rotation.y = clock.getElapsedTime() * 0.5;
             controls.update();
             renderer.render(scene, camera);
         }
         animate();
 
         window.addEventListener('resize', () => {
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            camera.aspect = width / height;
+            camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
+            renderer.setSize(container.clientWidth, container.clientHeight);
         });
     </script>
 </body>
