@@ -3,101 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA & Scientific Calculator</title>
+    <title>Student GPA & Interactive 3D CATIGA Calculator</title>
+    
+    <!-- Load Three.js and OrbitControls for 3D Interaction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1150px; margin: auto; }
-        
-        .main-container { display: flex; gap: 30px; flex-wrap: wrap; align-items: flex-start; justify-content: center; perspective: 1000px; }
-        
-        /* Left GPA Card */
-        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 400px; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { background: #0056b3; }
-        #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
-        .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
-
-        /* RIGHT: True 3D Real-World Physical Calculator Styling */
-        .sci-calc-body { 
-            background: linear-gradient(145deg, #1f2124, #121315); 
-            border: 2px solid #33363d; 
-            padding: 18px; 
-            border-radius: 16px; 
-            width: 360px; 
-            /* Heavy 3D desk shadow + subtle card tilt */
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.8), 
-                inset 0 2px 3px rgba(255, 255, 255, 0.1), 
-                inset 0 -4px 6px rgba(0, 0, 0, 0.6); 
-            transform: rotateX(2deg) rotateY(-2deg);
-            flex-shrink: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
-        
-        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .calc-brand-title { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 0.5px; text-shadow: 0 1px 1px #000; }
-        .solar-panel { background: #0b0c0e; border: 1px solid #222; width: 90px; height: 18px; display: flex; justify-content: space-around; align-items: center; padding: 1px; border-radius: 3px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.9); }
-        .solar-cell { background: linear-gradient(90deg, #1a2a40, #2c4a75); width: 20px; height: 14px; border: 1px solid #000; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); }
-
-        /* 3D Beveled LCD Screen */
-        .calc-lcd { 
-            background: #b5bec3; 
-            color: #111; 
-            padding: 10px; 
-            border-radius: 6px; 
-            border: 3px solid;
-            border-color: #555c63 #2a2f33 #2a2f33 #555c63; /* 3D groove inset look */
-            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
-            margin-bottom: 12px; 
-            font-family: monospace; 
-        }
-        .lcd-top-icons { font-size: 0.6rem; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 2px; margin-bottom: 4px; font-weight: bold; }
-        .lcd-screen-main { font-size: 1.2rem; min-height: 35px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
-
-        /* Control & Replay Cluster */
-        .control-row-top { display: flex; gap: 6px; margin-bottom: 8px; }
-        .btn-sft { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
-        .btn-alp { background: linear-gradient(to bottom, #af7ac5, #884ea0); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
-        .btn-mod { background: linear-gradient(to bottom, #3498db, #2471a3); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
-
-        /* Replay Pad 3D Effect */
-        .replay-container { display: flex; justify-content: center; margin-bottom: 10px; }
-        .replay-pad { background: linear-gradient(145deg, #18191c, #26292e); border: 1px solid #3a3f44; border-radius: 20px; padding: 4px 14px; display: flex; gap: 12px; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
-        .replay-btn { background: linear-gradient(to bottom, #3498db, #1b4f72); color: #fff; border: none; font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 3px rgba(0,0,0,0.4); }
-        .replay-label { font-size: 0.6rem; color: #777; font-weight: bold; letter-spacing: 1px; }
-
-        /* 3D Tactile Buttons Grid */
-        .calc-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .skey { 
-            background: linear-gradient(to bottom, #2c3036, #202226); 
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #121212; 
             color: #fff; 
-            border: 1px solid #3c424a; 
-            border-bottom: 2px solid #111;
-            padding: 8px 0; 
-            font-size: 0.75rem; 
+            padding: 20px; 
+            max-width: 1150px; 
+            margin: auto; 
+        }
+        
+        .main-container { 
+            display: flex; 
+            gap: 30px; 
+            flex-wrap: wrap; 
+            align-items: flex-start; 
+            justify-content: center; 
+        }
+        
+        /* Left GPA Card Styling */
+        .card { 
+            background: #1e1e1e; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+            flex: 1; 
+            min-width: 300px; 
+            max-width: 400px; 
+        }
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 8px 0; 
+            background: #2a2a2a; 
+            border: 1px solid #444; 
+            color: #fff; 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
             border-radius: 5px; 
             cursor: pointer; 
             font-weight: bold; 
-            text-align: center; 
-            box-shadow: 0 3px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
-            transition: all 0.05s ease;
+            margin-top: 10px; 
         }
-        .skey:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.6); }
-        .skey:hover { background: linear-gradient(to bottom, #363b42, #26292e); }
-        
-        .skey span { display: block; font-size: 0.5rem; color: #3498db; margin-top: 2px; }
-        .skey span.shift-hint { color: #f39c12; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
+        .course-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #2a2a2a; 
+            padding: 6px 10px; 
+            margin-top: 5px; 
+            border-radius: 4px; 
+            font-size: 0.85rem; 
+        }
 
-        .skey.op { color: #5dade2; }
-        .skey.del { background: linear-gradient(to bottom, #e67e22, #ba4a00); border-color: #d35400; color: #fff; }
-        .skey.ac { background: linear-gradient(to bottom, #e74c3c, #b03a2e); border-color: #c0392b; color: #fff; }
-        .skey.eq { background: linear-gradient(to bottom, #2ecc71, #27ae60); border-color: #219653; color: #fff; font-size: 0.9rem; }
+        /* Right 3D Calculator Viewport Wrapper */
+        .calculator-3d-wrapper {
+            position: relative;
+            width: 380px;
+            height: 640px;
+            background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
+            border-radius: 16px;
+            border: 2px solid #33363d;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #webgl-container { width: 100%; height: 100%; cursor: grab; }
+        #webgl-container:active { cursor: grabbing; }
+
+        /* Accurate 2D LCD Screen Overlay aligned to 3D Model Screen slot */
+        .calc-lcd-overlay {
+            position: absolute;
+            top: 58px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 310px;
+            height: 72px;
+            background: #b5bec3;
+            color: #111;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 3px solid #555c63;
+            box-sizing: border-box;
+            font-family: monospace;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+        .lcd-top-icons { font-size: 0.55rem; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 2px; font-weight: bold; }
+        .lcd-screen-main { font-size: 1.1rem; min-height: 30px; text-align: right; font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; }
+
+        .instruction-badge {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            color: #3498db;
+            font-weight: bold;
+            pointer-events: none;
+            border: 1px solid #444;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <!-- LEFT: GPA Calculator -->
+        
+        <!-- LEFT: GPA Calculator Card -->
         <div class="card">
             <h2>GPA Calculator</h2>
             <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
@@ -125,18 +161,12 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: True 3D Physical Catiga Calculator -->
-        <div class="sci-calc-body">
-            <div class="calc-header">
-                <div class="calc-brand-title">CATIGA CS-991EX</div>
-                <div class="solar-panel">
-                    <div class="solar-cell"></div>
-                    <div class="solar-cell"></div>
-                    <div class="solar-cell"></div>
-                </div>
-            </div>
-
-            <div class="calc-lcd">
+        <!-- RIGHT: True 3D Interactive CATIGA CS-991EX Calculator -->
+        <div class="calculator-3d-wrapper">
+            <div id="webgl-container"></div>
+            
+            <!-- Real-time Interactive Screen Overlay -->
+            <div class="calc-lcd-overlay">
                 <div class="lcd-top-icons">
                     <span>M S Setup</span>
                     <span>DEG</span>
@@ -144,65 +174,14 @@
                 <div class="lcd-screen-main" id="csScreen">0</div>
             </div>
 
-            <div class="control-row-top">
-                <button class="btn-sft" onclick="csInput('SHIFT')">SHIFT</button>
-                <button class="btn-alp" onclick="csInput('ALPHA')">ALPHA</button>
-                <button class="btn-mod" onclick="csInput('MODE')">MENU</button>
-            </div>
-
-            <div class="replay-container">
-                <div class="replay-pad">
-                    <span class="replay-label">REPLAY</span>
-                    <button class="replay-btn" onclick="csInput('▲')">▲</button>
-                    <button class="replay-btn" onclick="csInput('▼')">▼</button>
-                </div>
-            </div>
-
-            <div class="calc-keypad">
-                <button class="skey op" onclick="csInput('Math.sqrt(')">√<span class="shift-hint">x²</span></button>
-                <button class="skey op" onclick="csInput('**3')">x³<span class="shift-hint">∛</span></button>
-                <button class="skey op" onclick="csInput('**')">x^<span class="shift-hint">x√</span></button>
-                <button class="skey op" onclick="csInput('Math.log10(')">log<span class="shift-hint">10ˣ</span></button>
-
-                <button class="skey op" onclick="csInput('Math.log(')">ln<span class="shift-hint">eˣ</span></button>
-                <button class="skey op" onclick="csInput('(-1)*')">(-)<span class="shift-hint">° ’ ”</span></button>
-                <button class="skey op" onclick="csInput('Math.sin(')">sin<span class="shift-hint">sin⁻¹</span></button>
-                <button class="skey op" onclick="csInput('Math.cos(')">cos<span class="shift-hint">cos⁻¹</span></button>
-
-                <button class="skey op" onclick="csInput('Math.tan(')">tan<span class="shift-hint">tan⁻¹</span></button>
-                <button class="skey op" onclick="csInput('(')">(<span class="shift-hint">i</span></button>
-                <button class="skey op" onclick="csInput(')')">)<span class="shift-hint">X</span></button>
-                <button class="skey op" onclick="csInput('/')">÷</button>
-
-                <button class="skey" onclick="csInput('7')">7<span class="shift-hint">CONST</span></button>
-                <button class="skey" onclick="csInput('8')">8<span class="shift-hint">CONV</span></button>
-                <button class="skey" onclick="csInput('9')">9<span class="shift-hint">CLR</span></button>
-                <button class="skey del" onclick="csInput('DEL')">DEL</button>
-
-                <button class="skey" onclick="csInput('4')">4<span class="shift-hint">matrix</span></button>
-                <button class="skey" onclick="csInput('5')">5<span class="shift-hint">vector</span></button>
-                <button class="skey" onclick="csInput('6')">6<span class="shift-hint">stats</span></button>
-                <button class="skey ac" onclick="csInput('AC')">AC</button>
-
-                <button class="skey" onclick="csInput('1')">1<span class="shift-hint">STAT</span></button>
-                <button class="skey" onclick="csInput('2')">2<span class="shift-hint">CMPLX</span></button>
-                <button class="skey" onclick="csInput('3')">3<span class="shift-hint">BASE</span></button>
-                <button class="skey op" onclick="csInput('*')">×</button>
-
-                <button class="skey" onclick="csInput('0')">0<span class="shift-hint">RND</span></button>
-                <button class="skey" onclick="csInput('.')">.<span class="shift-hint">Int</span></button>
-                <button class="skey op" onclick="csInput('Math.PI')">π<span class="shift-hint">e</span></button>
-                <button class="skey op" onclick="csInput('-')">-</button>
-
-                <button class="skey" onclick="csInput('Ans')">Ans<span class="shift-hint">DRG</span></button>
-                <button class="skey op" onclick="csInput('/100')">%<span class="shift-hint">;</span></button>
-                <button class="skey eq" onclick="csCalculate()">=</button>
-                <button class="skey op" onclick="csInput('+')">+</button>
-            </div>
+            <div class="instruction-badge">🖱️ Drag to Rotate | Click 3D Keys to Calculate</div>
         </div>
+
     </div>
 
+    <!-- Application Script Logic -->
     <script>
+        // --- GPA CALCULATOR LOGIC ---
         let totalPoints = 0;
         let totalCredits = 0;
 
@@ -233,10 +212,11 @@
             document.getElementById('result').innerHTML = '';
         }
 
+        // --- 3D CATIGA CS-991EX CALCULATOR ENGINE (THREE.JS) ---
         let csExpression = "";
         let csLastAns = "0";
 
-        function csInput(val) {
+        function handleCalcInput(val) {
             const screen = document.getElementById('csScreen');
 
             if (val === 'AC') {
@@ -253,8 +233,8 @@
 
             if (val === 'Ans') {
                 csExpression += csLastAns;
-            } else if (['SHIFT', 'ALPHA', 'MODE', '▲', '▼'].includes(val)) {
-                return;
+            } else if (['SHIFT', 'ALPHA', 'MENU', '▲', '▼'].includes(val)) {
+                return; // Non-input navigation keys
             } else {
                 if (csExpression === "0" && val !== '.') {
                     csExpression = val;
@@ -265,7 +245,7 @@
             screen.innerText = csExpression;
         }
 
-        function csCalculate() {
+        function handleCalculate() {
             const screen = document.getElementById('csScreen');
             try {
                 let evaluated = eval(csExpression.replace(/Math\.PI/g, Math.PI));
@@ -277,6 +257,175 @@
                 csExpression = "";
             }
         }
+
+        // Three.js Setup
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 0, 5.7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 4;
+        controls.maxDistance = 7.5;
+
+        // Lighting Setup
+        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(5, 10, 7);
+        scene.add(dirLight);
+
+        // Build CATIGA Model Group with subtle realistic pitch/tilt
+        const catigaGroup = new THREE.Group();
+        catigaGroup.rotation.x = 0.05;
+        catigaGroup.rotation.y = -0.05;
+
+        // 1. Casing Body
+        const body = new THREE.Mesh(
+            new THREE.BoxGeometry(2.4, 4.4, 0.22),
+            new THREE.MeshStandardMaterial({ color: 0x181a1d, roughness: 0.4 })
+        );
+        catigaGroup.add(body);
+
+        // 2. Faceplate Panel
+        const faceplate = new THREE.Mesh(
+            new THREE.BoxGeometry(2.25, 4.25, 0.24),
+            new THREE.MeshStandardMaterial({ color: 0x22252a, roughness: 0.5 })
+        );
+        faceplate.position.z = 0.01;
+        catigaGroup.add(faceplate);
+
+        // Materials for buttons
+        const matKey = new THREE.MeshStandardMaterial({ color: 0x2c3036, roughness: 0.4 });
+        const matShift = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
+        const matAlpha = new THREE.MeshStandardMaterial({ color: 0x884ea0, roughness: 0.3 });
+        const matMenu = new THREE.MeshStandardMaterial({ color: 0x2471a3, roughness: 0.3 });
+        const matDel = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
+        const matAC = new THREE.MeshStandardMaterial({ color: 0xc0392b, roughness: 0.3 });
+        const matEq = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.3 });
+        const matOp = new THREE.MeshStandardMaterial({ color: 0x202226, roughness: 0.5 });
+
+        // Button layout definitions matching the CATIGA CS-991EX keypad
+        const layout = [
+            // Top control buttons row
+            [{label:'SHIFT', w:0.65, h:0.2, mat:matShift}, {label:'ALPHA', w:0.65, h:0.2, mat:matAlpha}, {label:'MENU', w:0.65, h:0.2, mat:matMenu}],
+            // Replay row
+            [{label:'▲', w:0.35, h:0.16, mat:matKey}, {label:'▼', w:0.35, h:0.16, mat:matKey}],
+            // Function Grid
+            [
+                {label:'Math.sqrt(', w:0.45, h:0.18, mat:matOp}, {label:'**3', w:0.45, h:0.18, mat:matOp}, {label:'**', w:0.45, h:0.18, mat:matOp}, {label:'Math.log10(', w:0.45, h:0.18, mat:matOp}
+            ],
+            [
+                {label:'Math.log(', w:0.45, h:0.18, mat:matOp}, {label:'(-1)*', w:0.45, h:0.18, mat:matOp}, {label:'Math.sin(', w:0.45, h:0.18, mat:matOp}, {label:'Math.cos(', w:0.45, h:0.18, mat:matOp}
+            ],
+            [
+                {label:'Math.tan(', w:0.45, h:0.18, mat:matOp}, {label:'(', w:0.45, h:0.18, mat:matOp}, {label:')', w:0.45, h:0.18, mat:matOp}, {label:'/', w:0.45, h:0.18, mat:matOp}
+            ],
+            // Number / Action Keypad Rows
+            [
+                {label:'7', w:0.45, h:0.2, mat:matKey}, {label:'8', w:0.45, h:0.2, mat:matKey}, {label:'9', w:0.45, h:0.2, mat:matKey}, {label:'DEL', w:0.45, h:0.2, mat:matDel}
+            ],
+            [
+                {label:'4', w:0.45, h:0.2, mat:matKey}, {label:'5', w:0.45, h:0.2, mat:matKey}, {label:'6', w:0.45, h:0.2, mat:matKey}, {label:'AC', w:0.45, h:0.2, mat:matAC}
+            ],
+            [
+                {label:'1', w:0.45, h:0.2, mat:matKey}, {label:'2', w:0.45, h:0.2, mat:matKey}, {label:'3', w:0.45, h:0.2, mat:matKey}, {label:'*', w:0.45, h:0.2, mat:matOp}
+            ],
+            [
+                {label:'0', w:0.45, h:0.2, mat:matKey}, {label:'.', w:0.45, h:0.2, mat:matKey}, {label:'Math.PI', w:0.45, h:0.2, mat:matOp}, {label:'-', w:0.45, h:0.2, mat:matOp}
+            ],
+            [
+                {label:'Ans', w:0.45, h:0.2, mat:matKey}, {label:'/100', w:0.45, h:0.2, mat:matOp}, {label:'=', w:0.45, h:0.2, mat:matEq}, {label:'+', w:0.45, h:0.2, mat:matOp}
+            ]
+        ];
+
+        const interactiveButtons = [];
+
+        // Generate 3D button meshes from layout configuration
+        let startY = 0.95;
+        layout.forEach((row, rIndex) => {
+            let rowWidth = row.reduce((acc, item) => acc + item.w + 0.05, -0.05);
+            let startX = -rowWidth / 2 + row[0].w / 2;
+
+            row.forEach((btnData, cIndex) => {
+                let xPos = startX + cIndex * (btnData.w + 0.06);
+                let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.05);
+                let btnMesh = new THREE.Mesh(btnGeo, btnData.mat);
+                
+                let yOffset = rIndex === 0 ? 1.45 : (rIndex === 1 ? 1.15 : startY - (rIndex - 2) * 0.24);
+                if (rIndex > 1) {
+                    // Shift standard numpad down slightly
+                    yOffset = 0.75 - ((rIndex - 2) * 0.24);
+                }
+
+                btnMesh.position.set(xPos, yOffset, 0.04);
+                btnMesh.userData = { value: btnData.label };
+                catigaGroup.add(btnMesh);
+                interactiveButtons.push(btnMesh);
+            });
+        });
+
+        scene.add(catigaGroup);
+
+        // Raycasting handler for clicking 3D keys
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('pointerdown', (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            if (
+                event.clientX >= rect.left &&
+                event.clientX <= rect.right &&
+                event.clientY >= rect.top &&
+                event.clientY <= rect.bottom
+            ) {
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(interactiveButtons);
+
+                if (intersects.length > 0) {
+                    const clickedButton = intersects[0].object;
+                    const val = clickedButton.userData.value;
+
+                    // Tactile press depression animation
+                    clickedButton.position.z -= 0.02;
+                    setTimeout(() => {
+                        clickedButton.position.z += 0.02;
+                    }, 120);
+
+                    if (val === '=') {
+                        handleCalculate();
+                    } else {
+                        handleCalcInput(val);
+                    }
+                }
+            }
+        });
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive resize handling
+        window.addEventListener('resize', () => {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
     </script>
 </body>
 </html>
