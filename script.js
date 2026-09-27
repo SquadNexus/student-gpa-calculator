@@ -29,11 +29,11 @@ function resetGPA() {
     document.getElementById('result').innerHTML = '';
 }
 
-// --- CALCES CALCULATOR ENGINE & INTERACTIVE UI ---
+// --- CALCES CALCULATOR INTERACTIVE ENGINE ---
 let expression = "4÷100";
 let resultOutput = "1\n25"; 
 
-// CalcES Layout Keypad definitions
+// Full CalcES Keypad Definitions
 const calcButtons = [
     // Top Utility Header Row
     { label: '☰', x: 20, y: 145, w: 42, h: 36, bg: '#2b263b', col: '#fff' },
@@ -45,7 +45,7 @@ const calcButtons = [
     { label: 'MORE', x: 344, y: 145, w: 65, h: 36, bg: '#2b263b', col: '#bbb' },
     { label: '📷', x: 415, y: 145, w: 75, h: 36, bg: '#2b263b', col: '#bbb' },
 
-    // Row 1: SHIFT, ALPHA, Navigation, MODE, 2nd
+    // Row 1
     { label: 'SHIFT', val: 'SHIFT', x: 20, y: 190, w: 72, h: 42, bg: '#f1a80a', col: '#000' },
     { label: 'ALPHA', val: 'ALPHA', x: 97, y: 190, w: 72, h: 42, bg: '#8a4fb5', col: '#fff' },
     { label: '◀', val: 'LEFT', x: 175, y: 190, w: 48, h: 42, bg: '#2b2836', col: '#fff' },
@@ -126,7 +126,7 @@ function redrawPhoneUI() {
     pCtx.fillStyle = '#17141f';
     pCtx.fillRect(0, 0, phoneCanvas.width, phoneCanvas.height);
 
-    // 2. Status Bar Header Info (NORM MATH FRAC)
+    // 2. Status Bar Header Info
     pCtx.fillStyle = '#9c95af';
     pCtx.font = 'bold 12px sans-serif';
     pCtx.fillText("NORM   MATH   FRAC", 20, 20);
@@ -144,14 +144,13 @@ function redrawPhoneUI() {
     pCtx.font = 'bold 26px monospace';
     pCtx.fillText(expression, 28, 65);
 
-    // Result Output line (Right Aligned, Natural textbook style fraction output matching screenshot)
+    // Result Output line
     pCtx.font = 'bold 30px monospace';
     pCtx.textAlign = 'right';
     if (resultOutput.includes('\n')) {
         let lines = resultOutput.split('\n');
         pCtx.fillText(lines[0], 480, 85);
         pCtx.fillText(lines[1], 480, 120);
-        // Fraction dividing bar
         pCtx.strokeStyle = '#1a1a1a';
         pCtx.lineWidth = 2;
         pCtx.beginPath();
@@ -161,7 +160,7 @@ function redrawPhoneUI() {
     } else {
         pCtx.fillText(resultOutput, 480, 105);
     }
-    pCtx.textAlign = 'left'; // reset
+    pCtx.textAlign = 'left';
 
     // 4. Draw CalcES Keypad Buttons
     calcButtons.forEach(btn => {
@@ -172,7 +171,6 @@ function redrawPhoneUI() {
         pCtx.lineWidth = 1.5;
         pCtx.stroke();
 
-        // Button label text
         pCtx.fillStyle = btn.col || '#ffffff';
         pCtx.font = 'bold 15px Arial, sans-serif';
         pCtx.textAlign = 'center';
@@ -191,7 +189,6 @@ function handleCalcInput(val) {
     } else if (val === 'DEL') {
         expression = expression.slice(0, -1);
     } else if (val === 'SD') {
-        // Toggle decimal / fraction view
         resultOutput = "0.16";
     } else {
         if (expression === "4÷100") expression = "";
@@ -205,7 +202,7 @@ function handleCalculate() {
         let evalStr = expression.replace(/÷/g, '/').replace(/×/g, '*');
         let evaluated = eval(evalStr);
         if (evaluated === 0.04 || evaluated === 4/100) {
-            resultOutput = "1\n25"; // Exact CalcES fraction format matching screenshot
+            resultOutput = "1\n25"; 
         } else {
             resultOutput = Number.isFinite(evaluated) ? evaluated.toString() : "Math Error";
         }
@@ -229,23 +226,21 @@ renderer.setSize(width, height);
 renderer.setPixelRatio(window.devicePixelRatio);
 container.appendChild(renderer.domElement);
 
-// OrbitControls let you rotate the phone 360 degrees around all sides!
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.minDistance = 3.5;
 controls.maxDistance = 7;
 
-// Studio Lighting
 scene.add(new THREE.AmbientLight(0xffffff, 1.4));
 const dirLight = new THREE.DirectionalLight(0xffffff, 2.2);
 dirLight.position.set(5, 10, 7);
 scene.add(dirLight);
 
-// Build Samsung S25 ULTRA 3D Phone Group (Ultra Specific Sharp Corner Chassis & Pro Camera Island)
+// Build Silver Samsung S25 Ultra 3D Phone Group
 const phoneGroup = new THREE.Group();
 
-// 1. Samsung S25 Ultra Body with distinct sharp titanium corners
+// 1. Silver Titanium Chassis Body
 const phoneShape = new THREE.Shape();
 const x = -1.18, y = -2.38, w = 2.36, h = 4.76, radius = 0.22;
 phoneShape.moveTo(x, y + radius);
@@ -260,23 +255,23 @@ phoneShape.quadraticCurveTo(x, y, x, y + radius);
 
 const extrudeSettings = { depth: 0.17, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.02, bevelThickness: 0.02 };
 const phoneGeo = new THREE.ExtrudeGeometry(phoneShape, extrudeSettings);
-const titaniumMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x2b2e35, // S25 Ultra Titanium Gray Frame
-    roughness: 0.2,
-    metalness: 0.9 
+const silverTitaniumMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0xdcdfe3, // Polished Silver Titanium Frame
+    roughness: 0.15,
+    metalness: 0.95 
 });
-const phoneBody = new THREE.Mesh(phoneGeo, titaniumMaterial);
+const phoneBody = new THREE.Mesh(phoneGeo, silverTitaniumMaterial);
 phoneBody.position.z = -0.085;
 phoneGroup.add(phoneBody);
 
-// 2. Front Glass Screen with CalcES Calculator Interface Texture
+// 2. Front Glass Screen with Live CalcES App Texture
 const screenGeo = new THREE.PlaneGeometry(2.24, 4.64);
 const screenMat = new THREE.MeshBasicMaterial({ map: phoneTexture });
 const screenMesh = new THREE.Mesh(screenGeo, screenMat);
 screenMesh.position.z = 0.088;
 phoneGroup.add(screenMesh);
 
-// 3. Punch-hole Selfie Camera Dot on top of screen
+// 3. Punch-hole Selfie Camera
 const punchHoleGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.01, 16);
 const punchHoleMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 const punchHole = new THREE.Mesh(punchHoleGeo, punchHoleMat);
@@ -284,28 +279,28 @@ punchHole.rotation.x = Math.PI / 2;
 punchHole.position.set(0, 2.22, 0.092);
 phoneGroup.add(punchHole);
 
-// 4. Realistic S25 Ultra Back Panel & Professional Quad Camera Island
+// 4. Silver S25 Ultra Back Panel & 5 Camera Lenses
 const backPanelGeo = new THREE.PlaneGeometry(2.3, 4.7);
-const backMat = new THREE.MeshStandardMaterial({ color: 0x16181c, roughness: 0.25, metalness: 0.6 });
+const backMat = new THREE.MeshStandardMaterial({ color: 0xe6e9ec, roughness: 0.2, metalness: 0.5 });
 const backPanel = new THREE.Mesh(backPanelGeo, backMat);
 backPanel.position.z = -0.088;
 backPanel.rotation.y = Math.PI; 
 phoneGroup.add(backPanel);
 
-// Pro S25 Ultra Individual Floating Camera Lenses (Directly embedded in back glass without massive bump plate)
+// 5 Camera Lenses configuration
 const lensBaseGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.03, 32);
-const ringMat = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.1, metalness: 0.98 });
+const ringMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.99 });
 const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x040404, roughness: 0.05, metalness: 0.95 });
 
-// S25 Ultra Camera Arrangement (3 main vertical lenses + 1 sensor on the right)
 const cameraPositions = [
-    { x: -0.6, y: 1.7 },  // Main Ultra Camera
-    { x: -0.6, y: 1.25 }, // Periscope Telephoto
-    { x: -0.6, y: 0.8 },  // Ultrawide
-    { x: -0.28, y: 1.7 }  // Laser Autofocus / Flash Sensor
+    { x: -0.6, y: 1.7 },  // Lens 1
+    { x: -0.6, y: 1.25 }, // Lens 2
+    { x: -0.6, y: 0.8 },  // Lens 3
+    { x: -0.28, y: 1.7 }, // Lens 4
+    { x: -0.28, y: 1.25 } // Lens 5
 ];
 
-cameraPositions.forEach((pos, idx) => {
+cameraPositions.forEach((pos) => {
     const ring = new THREE.Mesh(lensBaseGeo, ringMat);
     ring.rotation.x = Math.PI / 2;
     
@@ -321,7 +316,7 @@ cameraPositions.forEach((pos, idx) => {
 
 scene.add(phoneGroup);
 
-// Raycasting to accurately click touch buttons on the 3D phone screen
+// Interactive 3D Screen Tapping (Clicking phone buttons in browser)
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -340,12 +335,10 @@ window.addEventListener('pointerdown', (event) => {
         const intersects = raycaster.intersectObject(screenMesh);
 
         if (intersects.length > 0) {
-            // Get exact UV coordinates where the user clicked on the screen plane
             const uv = intersects[0].uv;
             const clickX = uv.x * phoneCanvas.width;
             const clickY = (1 - uv.y) * phoneCanvas.height;
 
-            // Check which CalcES button was tapped
             for (let btn of calcButtons) {
                 if (
                     clickX >= btn.x &&
