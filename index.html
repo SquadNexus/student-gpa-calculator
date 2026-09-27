@@ -5,57 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student GPA Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 600px; margin: auto; }
-        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 950px; margin: auto; }
+        
+        /* Two-column wrapper container */
+        .main-container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+        
+        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; }
+        
+        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         button:hover { background: #0056b3; }
+        
+        .btn-danger { background: #dc3545; margin-top: 5px; }
+        .btn-danger:hover { background: #b02a37; }
+
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
+        
+        /* Side calculation panel styling */
+        .side-calc-panel { background: #161616; border: 1px solid #333; padding: 20px; border-radius: 10px; flex: 1; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .side-calc-panel h3 { margin-top: 0; color: #3498db; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .math-step-row { font-family: monospace; font-size: 0.85rem; color: #aaa; margin-top: 10px; word-break: break-all; background: #1e1e1e; padding: 10px; border-radius: 5px; border-left: 3px solid #007bff; }
+        
+        .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>GPA Calculator</h2>
-        <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
-        
-        <label>Course Name / Code</label>
-        <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
-        
-        <label>Grade & Points</label>
-        <select id="gradePoints">
-            <option value="5">A (5 Points)</option>
-            <option value="4">B+ (4 Points)</option>
-            <option value="3">B (3 Points)</option>
-            <option value="2">C (2 Points)</option>
-            <option value="1">D (1 Point)</option>
-            <option value="0">F (0 Points)</option>
-        </select>
 
-        <label>Credit Hours / Units</label>
-        <input type="number" id="credits" value="3" min="1" max="10">
+    <div class="main-container">
+        <!-- LEFT COLUMN: Your original interface unchanged -->
+        <div class="card">
+            <h2>GPA Calculator</h2>
+            <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
+            
+            <label>Course Name / Code</label>
+            <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
+            
+            <label>Grade & Points</label>
+            <select id="gradePoints">
+                <option value="5">A (5 Points)</option>
+                <option value="4">B+ (4 Points)</option>
+                <option value="3">B (3 Points)</option>
+                <option value="2">C (2 Points)</option>
+                <option value="1">D (1 Point)</option>
+                <option value="0">F (0 Points)</option>
+            </select>
 
-        <button onclick="addCourse()">Add Course</button>
-        
-        <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #ccc;"></div>
-        <div id="result"></div>
+            <label>Credit Hours / Units</label>
+            <input type="number" id="credits" value="3" min="1" max="10">
+
+            <button onclick="addCourse()">Add Course</button>
+            <button class="btn-danger" onclick="resetCalculator()">Reset Calculator</button>
+            
+            <div id="courseList" style="margin-top: 15px;"></div>
+            <div id="result"></div>
+        </div>
+
+        <!-- RIGHT COLUMN: The new side calculation breakdown panel -->
+        <div class="side-calc-panel">
+            <h3>🧮 Live Calculation Breakdown</h3>
+            <p style="color: #aaa; font-size: 0.85rem;">Formula: GPA = Σ(Points × Credits) / Σ(Credits)</p>
+            
+            <div class="math-step-row" id="breakdownContent">
+                No calculation steps yet. Add a course to see the math breakdown.
+            </div>
+        </div>
     </div>
 
     <script>
-        let totalPoints = 0;
-        let totalCredits = 0;
+        // Array to store course data dynamically
+        let courses = [];
 
         function addCourse() {
-            const name = document.getElementById('courseName').value || "Course";
+            const nameInput = document.getElementById('courseName');
+            const name = nameInput.value.trim() || "Course";
             const points = parseFloat(document.getElementById('gradePoints').value);
             const credits = parseFloat(document.getElementById('credits').value);
 
-            totalPoints += (points * credits);
-            totalCredits += credits;
+            if (isNaN(credits) || credits <= 0) {
+                alert("Please enter valid credit hours.");
+                return;
+            }
+
+            // Save course object
+            courses.push({ name, points, credits });
+            nameInput.value = ''; // Clear input
+
+            updateUI();
+        }
+
+        function deleteCourse(index) {
+            courses.splice(index, 1);
+            updateUI();
+        }
+
+        function resetCalculator() {
+            courses = [];
+            updateUI();
+        }
+
+        function updateUI() {
+            const courseListEl = document.getElementById('courseList');
+            const resultEl = document.getElementById('result');
+            const breakdownEl = document.getElementById('breakdownContent');
+
+            courseListEl.innerHTML = '';
+
+            if (courses.length === 0) {
+                resultEl.innerHTML = '';
+                breakdownEl.innerHTML = 'No calculation steps yet. Add a course to see the math breakdown.';
+                return;
+            }
+
+            let totalPoints = 0;
+            let totalCredits = 0;
+            let numeratorParts = [];
+            let denominatorParts = [];
+
+            courses.forEach((c, index) => {
+                let product = c.points * c.credits;
+                totalPoints += product;
+                totalCredits += c.credits;
+
+                // Render item in original list with a small delete option
+                courseListEl.innerHTML += `
+                    <div class="course-row">
+                        <span>✔️ ${c.name} (${c.credits} Credits) - Pts: ${c.points}</span>
+                        <span style="color:#ff6b6b; cursor:pointer; font-weight:bold;" onclick="deleteCourse(${index})">✕</span>
+                    </div>`;
+
+                numeratorParts.push(`(${c.points} × ${c.credits})`);
+                denominatorParts.push(c.credits);
+            });
 
             const gpa = (totalPoints / totalCredits).toFixed(2);
-            
-            document.getElementById('courseList').innerHTML += `<div>✔️ ${name} (${credits} Credits) - Points: ${points}</div>`;
-            document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
+
+            // Display result on left card
+            resultEl.innerHTML = `Current Semester GPA: ${gpa}`;
+
+            // Display detailed math steps on the side panel
+            breakdownEl.innerHTML = `
+                <div style="margin-bottom:8px;"><strong>Quality Points (Numerator):</strong><br>${numeratorParts.join(' + ')} = <strong>${totalPoints}</strong></div>
+                <div style="margin-bottom:8px;"><strong>Total Credits (Denominator):</strong><br>${denominatorParts.join(' + ')} = <strong>${totalCredits}</strong></div>
+                <div style="color: #2ecc71;"><strong>Computation:</strong> ${totalPoints} / ${totalCredits} = <strong>${gpa}</strong></div>
+            `;
         }
     </script>
 </body>
