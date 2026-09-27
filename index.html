@@ -425,16 +425,17 @@
         backPanel.rotation.y = Math.PI;
         phoneGroup.add(backPanel);
 
-        // Correct S25 Ultra Quad-Camera Layout (4 Lenses + Flash)
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.15, metalness: 0.99 });
+        // CORRECT S25 ULTRA CAMERA CLUSTER (Upper-Right when looking at the back)
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.15, metalness: 0.99 });
         const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.05, metalness: 0.95 });
         const flashMat = new THREE.MeshBasicMaterial({ color: 0xffffee });
 
+        // Accurate placement matching the S25 Ultra reference layout on the upper-right area of the back panel
         const cameraLayout = [
-            { x: -0.55, y: 1.65, r: 0.13 }, // Left Top (Ultrawide)
-            { x: -0.55, y: 1.15, r: 0.13 }, // Left Middle (Main)
-            { x: -0.55, y: 0.65, r: 0.13 }, // Left Bottom (Telephoto)
-            { x: -0.05, y: 1.40, r: 0.13 }  // Right Periscope Telephoto Lens
+            { x: 0.52, y: 1.70, r: 0.14 }, // Top Right Lens
+            { x: 0.18, y: 1.70, r: 0.14 }, // Top Middle Lens
+            { x: -0.16, y: 1.70, r: 0.14 }, // Top Left Lens (Periscope)
+            { x: 0.18, y: 1.25, r: 0.11 }  // Bottom Right Lens
         ];
 
         cameraLayout.forEach((pos) => {
@@ -449,11 +450,16 @@
             phoneGroup.add(glassLens);
         });
 
-        // Flash/Sensor dot
-        const flash = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16), flashMat);
+        // Flash and Sensor in the correct gap position
+        const flash = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), flashMat);
         flash.rotation.x = Math.PI / 2;
-        flash.position.set(-0.05, 0.85, -0.125);
+        flash.position.set(-0.16, 1.25, -0.125);
         phoneGroup.add(flash);
+
+        const sensor = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), innerLensMat);
+        sensor.rotation.x = Math.PI / 2;
+        sensor.position.set(-0.16, 1.00, -0.125);
+        phoneGroup.add(sensor);
 
         scene.add(phoneGroup);
 
