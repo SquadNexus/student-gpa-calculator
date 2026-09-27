@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced GPA & Scientific Calculator Hub</title>
+    <title>Interactive 3D Casio fx-82ES PLUS & GPA Hub</title>
     
-    <!-- Load Three.js and OrbitControls for 3D elements -->
+    <!-- Load Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
@@ -15,40 +15,79 @@
         .main-layout { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
         
         /* Cards */
-        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 320px; max-width: 400px; }
-        h2 { margin-top: 0; color: #3498db; font-size: 1.4rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 340px; max-width: 420px; }
+        h2 { margin-top: 0; color: #3498db; font-size: 1.3rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
         
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         .btn-action { background: #007bff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 8px; }
         .btn-action:hover { background: #0056b3; }
         
-        /* Scientific Calculator Panel */
-        .calc-body { background: #2c2f33; border-radius: 10px; padding: 15px; border: 2px solid #444; margin-top: 15px; }
-        .calc-screen { width: 100%; height: 50px; background: #9ead99; color: #111; font-family: monospace; font-size: 1.2rem; text-align: right; padding: 8px; box-sizing: border-box; border-radius: 4px; margin-bottom: 12px; border: inset 2px #3b423d; overflow: hidden; }
-        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .key { padding: 10px; background: #3c4043; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .key:hover { background: #5f6368; }
-        .key.op { background: #e67e22; }
-        .key.op:hover { background: #d35400; }
-        .key.equals { background: #27ae60; grid-column: span 2; }
-        .key.equals:hover { background: #219653; }
-        .key.clear { background: #c0392b; }
-        .key.clear:hover { background: #962d22; }
-
         /* History Log Panel */
-        .history-box { background: #18191a; border: 1px solid #333; border-radius: 6px; padding: 10px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #a4b0be; margin-top: 10px; }
+        .history-box { background: #18191a; border: 1px solid #333; border-radius: 6px; padding: 10px; height: 280px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #a4b0be; margin-top: 10px; }
         .history-item { padding: 4px 0; border-bottom: 1px dashed #2f3542; }
 
-        /* 3D Visual Box */
-        .viewport-box { position: relative; width: 100%; height: 350px; background: radial-gradient(circle, #1a1c23 0%, #111215 100%); border-radius: 10px; overflow: hidden; border: 1px solid #333; margin-top: 15px; }
+        /* 3D Calculator Viewport Wrapper */
+        .calculator-wrapper {
+            position: relative;
+            width: 100%;
+            height: 560px;
+            background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
+            border-radius: 12px;
+            border: 2px solid #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
         #webgl-container { width: 100%; height: 100%; cursor: grab; }
-        
+        #webgl-container:active { cursor: grabbing; }
+
+        /* LCD Screen Overlay matching the Casio fx-82ES PLUS screen position */
+        .calc-lcd-overlay {
+            position: absolute;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 230px;
+            height: 62px;
+            background: #9ead99;
+            color: #111;
+            border-radius: 3px;
+            padding: 5px 8px;
+            box-sizing: border-box;
+            font-family: monospace;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
+            border: 2px solid #3b423d;
+            z-index: 5;
+        }
+        .lcd-main-row { font-size: 0.75rem; font-weight: bold; text-align: right; white-space: nowrap; overflow: hidden; }
+        .lcd-ans-row { font-size: 0.95rem; font-weight: bold; color: #8b0000; text-align: right; }
+
+        .instruction-badge { 
+            position: absolute; 
+            bottom: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(0, 0, 0, 0.8); 
+            padding: 5px 12px; 
+            border-radius: 15px; 
+            font-size: 0.7rem; 
+            color: #f1c40f; 
+            font-weight: bold; 
+            pointer-events: none;
+            border: 1px solid #444;
+        }
+
         .result-text { margin-top: 15px; font-size: 1.1rem; text-align: center; color: #2ecc71; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align: center; margin-bottom: 25px;">MUST Student Calculator Hub</h1>
+    <h1 style="text-align: center; margin-bottom: 25px;">MUST Student 3D Casio fx-82ES PLUS Hub</h1>
 
     <div class="main-layout">
         
@@ -75,74 +114,45 @@
             <button class="btn-action" style="background:#c0392b;" onclick="resetGPA()">Reset GPA</button>
             
             <div id="result" class="result-text"></div>
-            <div id="courseList" style="margin-top: 10px; font-size: 0.85rem; color: #ccc; max-height: 120px; overflow-y: auto;"></div>
+            <div id="courseList" style="margin-top: 10px; font-size: 0.85rem; color: #ccc; max-height: 150px; overflow-y: auto;"></div>
         </div>
 
-        <!-- CARD 2: Real Scientific Calculator Panel -->
-        <div class="card">
-            <h2>Casio Scientific Pad</h2>
-            <div class="calc-body">
-                <div id="calcScreen" class="calc-screen">0</div>
-                <div class="keypad">
-                    <button class="key clear" onclick="clearCalc()">AC</button>
-                    <button class="key op" onclick="appendCalc('(')">(</button>
-                    <button class="key op" onclick="appendCalc(')')">)</button>
-                    <button class="key op" onclick="appendCalc('/')">÷</button>
-                    
-                    <button class="key" onclick="appendCalc('7')">7</button>
-                    <button class="key" onclick="appendCalc('8')">8</button>
-                    <button class="key" onclick="appendCalc('9')">9</button>
-                    <button class="key op" onclick="appendCalc('*')">×</button>
-                    
-                    <button class="key" onclick="appendCalc('4')">4</button>
-                    <button class="key" onclick="appendCalc('5')">5</button>
-                    <button class="key" onclick="appendCalc('6')">6</button>
-                    <button class="key op" onclick="appendCalc('-')">-</button>
-                    
-                    <button class="key" onclick="appendCalc('1')">1</button>
-                    <button class="key" onclick="appendCalc('2')">2</button>
-                    <button class="key" onclick="appendCalc('3')">3</button>
-                    <button class="key op" onclick="appendCalc('+')">+</button>
-                    
-                    <button class="key" onclick="appendCalc('0')">0</button>
-                    <button class="key" onclick="appendCalc('.')">.</button>
-                    <button class="key equals" onclick="calculateResult()">=</button>
-                </div>
-            </div>
+        <!-- CARD 2: Interactive 3D Casio fx-82ES PLUS Calculator Viewport -->
+        <div class="card" style="max-width: 440px;">
+            <h2>3D Casio fx-82ES PLUS Model</h2>
+            <p style="font-size: 0.8rem; color: #aaa; margin: 5px 0;">Click the physical scientific keys directly on the 3D model below!</p>
             
-            <h3 style="font-size: 1rem; margin-top: 15px; color:#f1c40f;">Scientific Operations</h3>
-            <div style="display: flex; gap: 5px;">
-                <button class="key op" style="flex:1;" onclick="applyScientific('Math.sqrt(')">√x</button>
-                <button class="key op" style="flex:1;" onclick="applyScientific('**2')">x²</button>
-                <button class="key op" style="flex:1;" onclick="applyScientific('Math.sin(')">sin</button>
-                <button class="key op" style="flex:1;" onclick="applyScientific('Math.cos(')">cos</button>
-                <button class="key op" style="flex:1;" onclick="applyScientific('Math.tan(')">tan</button>
+            <div class="calculator-wrapper">
+                <div id="webgl-container"></div>
+                
+                <!-- Live Screen Overlay -->
+                <div class="calc-lcd-overlay">
+                    <div class="lcd-main-row" id="calcExpression">0</div>
+                    <div class="lcd-ans-row" id="calcResult">Ans: 0</div>
+                </div>
+
+                <div class="instruction-badge">🖱️ Drag to Rotate | Click 3D Keys to Calculate</div>
             </div>
         </div>
 
-        <!-- CARD 3: Calculation History Log -->
+        <!-- CARD 3: Calculations Log -->
         <div class="card">
-            <h2>Calculations Log</h2>
-            <p style="font-size: 0.85rem; color: #aaa;">All arithmetic computations and GPA updates are tracked here:</p>
+            <h2>Calculations History Log</h2>
+            <p style="font-size: 0.85rem; color: #aaa;">All 3D scientific button presses, computations, and GPA updates are recorded here:</p>
             <div id="historyBox" class="history-box">
-                <div class="history-item">System ready. No calculations yet.</div>
+                <div class="history-item">System initialized. Click 3D Casio keys to compute.</div>
             </div>
             <button class="btn-action" style="background: #444; margin-top: 15px;" onclick="clearHistory()">Clear History Log</button>
-            
-            <!-- 3D Mini Viewport Accent -->
-            <div class="viewport-box">
-                <div id="webgl-container"></div>
-            </div>
         </div>
 
     </div>
 
-    <!-- JavaScript Calculation and 3D Engine -->
+    <!-- JavaScript Engine (Three.js 3D Raycasting & Full Scientific Calculator Logic) -->
     <script>
         // --- HISTORY LOG SYSTEM ---
         function logHistory(text) {
             const box = document.getElementById('historyBox');
-            if (box.innerHTML.includes("System ready")) {
+            if (box.innerHTML.includes("System initialized")) {
                 box.innerHTML = "";
             }
             const time = new Date().toLocaleTimeString();
@@ -151,6 +161,62 @@
 
         function clearHistory() {
             document.getElementById('historyBox').innerHTML = '<div class="history-item">History cleared.</div>';
+        }
+
+        // --- CALCULATOR CORE LOGIC ---
+        let currentExpression = "0";
+        let lastAnswer = "0";
+
+        function updateScreen(expr, ans) {
+            document.getElementById('calcExpression').innerText = expr;
+            document.getElementById('calcResult').innerText = "Ans: " + ans;
+        }
+
+        function handleCalculatorInput(val) {
+            if (val === 'AC') {
+                currentExpression = "0";
+                lastAnswer = "0";
+                logHistory("Calculator cleared (AC).");
+            } else if (val === 'DEL') {
+                if (currentExpression.length > 1) {
+                    currentExpression = currentExpression.slice(0, -1);
+                } else {
+                    currentExpression = "0";
+                }
+                logHistory("Deleted last character.");
+            } else if (val === '=') {
+                try {
+                    // Translate standard symbols to JS eval syntax
+                    let expClean = currentExpression
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/sin\(/g, 'Math.sin(Math.PI/180*')
+                        .replace(/cos\(/g, 'Math.cos(Math.PI/180*')
+                        .replace(/tan\(/g, 'Math.tan(Math.PI/180*')
+                        .replace(/log\(/g, 'Math.log10(')
+                        .replace(/ln\(/g, 'Math.log(')
+                        .replace(/√\(/g, 'Math.sqrt(')
+                        .replace(/Ans/g, lastAnswer);
+
+                    let evalResult = eval(expClean);
+                    if (isNaN(evalResult) || !isFinite(evalResult)) throw new Error();
+                    
+                    logHistory(`Computed: ${currentExpression} = ${evalResult}`);
+                    lastAnswer = evalResult;
+                    currentExpression = evalResult.toString();
+                } catch (err) {
+                    logHistory(`Syntax Error on: ${currentExpression}`);
+                    currentExpression = "Error";
+                }
+            } else {
+                if (currentExpression === '0' || currentExpression === 'Error') {
+                    currentExpression = val;
+                } else {
+                    currentExpression += val;
+                }
+                logHistory(`Pressed key: ${val}`);
+            }
+            updateScreen(currentExpression, lastAnswer);
         }
 
         // --- GPA LOGIC ---
@@ -187,49 +253,11 @@
             logHistory("GPA Calculator reset.");
         }
 
-        // --- SCIENTIFIC CALCULATOR LOGIC ---
-        let calcDisplay = document.getElementById('calcScreen');
-
-        function appendCalc(val) {
-            if (calcDisplay.innerText === '0' || calcDisplay.innerText === 'Error') {
-                calcDisplay.innerText = val;
-            } else {
-                calcDisplay.innerText += val;
-            }
-        }
-
-        function clearCalc() {
-            calcDisplay.innerText = '0';
-        }
-
-        function applyScientific(func) {
-            if (calcDisplay.innerText === '0' || calcDisplay.innerText === 'Error') {
-                calcDisplay.innerText = func;
-            } else {
-                calcDisplay.innerText = func + calcDisplay.innerText + ')';
-            }
-        }
-
-        function calculateResult() {
-            try {
-                let expression = calcDisplay.innerText;
-                // Evaluate expression securely via Function
-                let result = eval(expression);
-                if (isNaN(result) || !isFinite(result)) throw new Error();
-                
-                logHistory(`Calc: ${expression} = ${result}`);
-                calcDisplay.innerText = result;
-            } catch (err) {
-                logHistory(`Calc Error on: ${calcDisplay.innerText}`);
-                calcDisplay.innerText = 'Error';
-            }
-        }
-
-        // --- 3D MINI CASIO ACCENT RENDERER ---
+        // --- THREE.JS 3D CASIO fx-82ES PLUS MODEL RENDERER ---
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.z = 5;
+        camera.position.set(0, 0, 5.8);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
@@ -238,33 +266,157 @@
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 4;
+        controls.maxDistance = 8;
 
+        // Lighting
         scene.add(new THREE.AmbientLight(0xffffff, 1.2));
         const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
-        // Procedural 3D Calculator Mesh
-        const calcGroup = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 3.5, 0.25), new THREE.MeshStandardMaterial({color: 0x1c1e21}));
-        const face = new THREE.Mesh(new THREE.BoxGeometry(2.0, 3.3, 0.28), new THREE.MeshStandardMaterial({color: 0xdcdde1}));
-        calcGroup.add(body);
-        calcGroup.add(face);
-        scene.add(calcGroup);
+        // Build Casiofx-82ES Group
+        const casioGroup = new THREE.Group();
 
-        let clock = new THREE.Clock();
+        // 1. Black Body Casing
+        const body = new THREE.Mesh(
+            new THREE.BoxGeometry(2.6, 4.6, 0.25), 
+            new THREE.MeshStandardMaterial({ color: 0x181a1c, roughness: 0.3 })
+        );
+        casioGroup.add(body);
+
+        // 2. Faceplate Panel
+        const faceplate = new THREE.Mesh(
+            new THREE.BoxGeometry(2.4, 4.4, 0.27), 
+            new THREE.MeshStandardMaterial({ color: 0x22252a, roughness: 0.5 })
+        );
+        faceplate.position.z = 0.01;
+        casioGroup.add(faceplate);
+
+        // 3. Screen Bezel
+        const screenBezel = new THREE.Mesh(
+            new THREE.BoxGeometry(2.1, 0.75, 0.29), 
+            new THREE.MeshStandardMaterial({ color: 0x111315, roughness: 0.2 })
+        );
+        screenBezel.position.set(0, 1.55, 0.02);
+        casioGroup.add(casioButtonMatCheck = screenBezel); // reference
+
+        // 4. Scientific Key Layout (Matching your Casio fx-82ES Plus image layout)
+        const matNum = new THREE.MeshStandardMaterial({ color: 0x3e424a, roughness: 0.4 });
+        const matSci = new THREE.MeshStandardMaterial({ color: 0x2b2e34, roughness: 0.5 });
+        const matOp = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
+        const matAC = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.3 });
+        const matDEL = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.3 });
+
+        // Define scientific and standard rows precisely
+        const buttonConfig = [
+            // Scientific row 1
+            [{label: 'shift', w:0.35, h:0.18, mat:matSci}, {label: 'alpha', w:0.35, h:0.18, mat:matSci}, {label: 'mode', w:0.35, h:0.18, mat:matSci}, {label: 'on', w:0.35, h:0.18, mat:matSci}],
+            // Scientific row 2
+            [{label: 'x³', w:0.35, h:0.18, mat:matSci}, {label: 'x⁻¹', w:0.35, h:0.18, mat:matSci}, {label: 'log(', w:0.35, h:0.18, mat:matSci}, {label: 'ln(', w:0.35, h:0.18, mat:matSci}],
+            // Scientific row 3
+            [{label: '√(', w:0.35, h:0.18, mat:matSci}, {label: 'x²', w:0.35, h:0.18, mat:matSci}, {label: 'log(', w:0.35, h:0.18, mat:matSci}, {label: 'Ans', w:0.35, h:0.18, mat:matSci}],
+            // Scientific row 4
+            [{label: 'sin(', w:0.35, h:0.18, mat:matSci}, {label: 'cos(', w:0.35, h:0.18, mat:matSci}, {label: 'tan(', w:0.35, h:0.18, mat:matSci}, {label: '(', w:0.35, h:0.18, mat:matSci}],
+            // Scientific row 5 (Memory & Brackets)
+            [{label: 'RCL', w:0.35, h:0.18, mat:matSci}, {label: 'ENG', w:0.35, h:0.18, mat:matSci}, {label: '(', w:0.35, h:0.18, mat:matSci}, {label: ')', w:0.35, h:0.18, mat:matSci}],
+            // Standard Number & Operator Pad
+            [{label: '7', w:0.42, h:0.2, mat:matNum}, {label: '8', w:0.42, h:0.2, mat:matNum}, {label: '9', w:0.42, h:0.2, mat:matNum}, {label: 'DEL', w:0.42, h:0.2, mat:matDEL}, {label: 'AC', w:0.42, h:0.2, mat:matAC}],
+            [{label: '4', w:0.42, h:0.2, mat:matNum}, {label: '5', w:0.42, h:0.2, mat:matNum}, {label: '6', w:0.42, h:0.2, mat:matNum}, {label: '×', w:0.42, h:0.2, mat:matOp}, {label: '÷', w:0.42, h:0.2, mat:matOp}],
+            [{label: '1', w:0.42, h:0.2, mat:matNum}, {label: '2', w:0.42, h:0.2, mat:matNum}, {label: '3', w:0.42, h:0.2, mat:matNum}, {label: '+', w:0.42, h:0.2, mat:matOp}, {label: '-', w:0.42, h:0.2, mat:matOp}],
+            [{label: '0', w:0.42, h:0.2, mat:matNum}, {label: '.', w:0.42, h:0.2, mat:matNum}, {label: '×10ˣ', w:0.42, h:0.2, mat:matNum}, {label: 'Ans', w:0.42, h:0.2, mat:matNum}, {label: '=', w:0.42, h:0.2, mat:matOp}]
+        ];
+
+        const interactiveButtons = [];
+
+        // Render scientific rows
+        for (let r = 0; r < 5; r++) {
+            let row = buttonConfig[r];
+            let startX = -0.6;
+            let posY = 0.95 - (r * 0.23);
+            for (let c = 0; c < row.length; c++) {
+                let btnData = row[c];
+                let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.05);
+                let btnMesh = new THREE.Mesh(btnGeo, btnData.mat);
+                btnMesh.position.set(startX + (c * 0.42), posY, 0.04);
+                btnMesh.userData = { value: btnData.label === 'on' ? 'AC' : (btnData.label === '×10ˣ' ? '*' : btnData.label) };
+                casioGroup.add(btnMesh);
+                interactiveButtons.push(btnMesh);
+            }
+        }
+
+        // Render standard main keypad rows
+        for (let r = 5; r < buttonConfig.length; r++) {
+            let row = buttonConfig[r];
+            let startX = -0.85;
+            let posY = 0.05 - ((r - 5) * 0.25);
+            for (let c = 0; c < row.length; c++) {
+                let btnData = row[c];
+                let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.06);
+                let btnMesh = new THREE.Mesh(btnGeo, btnData.mat);
+                btnMesh.position.set(startX + (c * 0.44), posY, 0.04);
+                
+                let valMapping = btnData.label;
+                if (valMapping === '×10ˣ') valMapping = '*';
+                if (valMapping === 'Ans') valMapping = 'Ans';
+
+                btnMesh.userData = { value: valMapping };
+                casioGroup.add(btnMesh);
+                interactiveButtons.push(btnMesh);
+            }
+        }
+
+        scene.add(casioGroup);
+
+        // --- RAYCASTING FOR 3D BUTTON CLICKS ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('pointerdown', (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            if (
+                event.clientX >= rect.left &&
+                event.clientX <= rect.right &&
+                event.clientY >= rect.top &&
+                event.clientY <= rect.bottom
+            ) {
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(interactiveButtons);
+
+                if (intersects.length > 0) {
+                    const clickedButton = intersects[0].object;
+                    const val = clickedButton.userData.value;
+
+                    // Button press click down/up effect
+                    clickedButton.position.z -= 0.02;
+                    setTimeout(() => {
+                        clickedButton.position.z += 0.02;
+                    }, 120);
+
+                    handleCalculatorInput(val);
+                }
+            }
+        });
+
+        // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            calcGroup.rotation.y = clock.getElapsedTime() * 0.5;
             controls.update();
             renderer.render(scene, camera);
         }
         animate();
 
+        // Resize handling
         window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
             camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setSize(width, height);
         });
     </script>
 </body>
