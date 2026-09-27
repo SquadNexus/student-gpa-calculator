@@ -3,46 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Casio fx-82ES PLUS & GPA Hub</title>
+    <title>Interactive 3D Casio fx-82ES PLUS Calculator</title>
     
     <!-- Load Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1400px; margin: auto; }
-        
-        .main-layout { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
-        
-        /* Cards */
-        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 340px; max-width: 420px; }
-        h2 { margin-top: 0; color: #3498db; font-size: 1.3rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
-        
-        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        .btn-action { background: #007bff; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 8px; }
-        .btn-action:hover { background: #0056b3; }
-        
-        /* History Log Panel */
-        .history-box { background: #18191a; border: 1px solid #333; border-radius: 6px; padding: 10px; height: 280px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #a4b0be; margin-top: 10px; }
-        .history-item { padding: 4px 0; border-bottom: 1px dashed #2f3542; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #121212; 
+            color: #fff; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            box-sizing: border-box;
+        }
+
+        h1 { margin-bottom: 20px; color: #3498db; font-size: 1.6rem; text-align: center; }
+
+        .app-container { 
+            display: flex; 
+            gap: 30px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            max-width: 1000px; 
+            width: 100%; 
+        }
 
         /* 3D Calculator Viewport Wrapper */
         .calculator-wrapper {
             position: relative;
-            width: 100%;
-            height: 560px;
+            width: 420px;
+            height: 600px;
             background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
             border-radius: 12px;
             border: 2px solid #333;
             box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             overflow: hidden;
-            margin-top: 10px;
         }
 
         #webgl-container { width: 100%; height: 100%; cursor: grab; }
         #webgl-container:active { cursor: grabbing; }
 
-        /* LCD Screen Overlay matching the Casio fx-82ES PLUS screen position */
+        /* LCD Screen Overlay aligned perfectly to the 3D model screen slot */
         .calc-lcd-overlay {
             position: absolute;
             top: 75px;
@@ -82,72 +89,76 @@
             border: 1px solid #444;
         }
 
-        .result-text { margin-top: 15px; font-size: 1.1rem; text-align: center; color: #2ecc71; font-weight: bold; }
+        /* History Log Panel */
+        .history-card { 
+            background: #1e1e1e; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6); 
+            width: 360px; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .history-card h2 { margin-top: 0; color: #3498db; font-size: 1.2rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
+        .history-box { 
+            background: #18191a; 
+            border: 1px solid #333; 
+            border-radius: 6px; 
+            padding: 10px; 
+            height: 440px; 
+            overflow-y: auto; 
+            font-family: monospace; 
+            font-size: 0.85rem; 
+            color: #a4b0be; 
+            margin-top: 10px; 
+            flex-grow: 1;
+        }
+        .history-item { padding: 4px 0; border-bottom: 1px dashed #2f3542; }
+        .btn-clear { 
+            background: #444; 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            width: 100%; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin-top: 15px; 
+        }
+        .btn-clear:hover { background: #555; }
     </style>
 </head>
 <body>
 
-    <h1 style="text-align: center; margin-bottom: 25px;">MUST Student 3D Casio fx-82ES PLUS Hub</h1>
+    <h1>Interactive 3D Casio fx-82ES PLUS Calculator</h1>
 
-    <div class="main-layout">
+    <div class="app-container">
         
-        <!-- CARD 1: GPA Calculator -->
-        <div class="card">
-            <h2>GPA Calculator</h2>
-            <label>Course Name / Code</label>
-            <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
+        <!-- 3D Calculator Viewport -->
+        <div class="calculator-wrapper">
+            <div id="webgl-container"></div>
             
-            <label>Grade & Points</label>
-            <select id="gradePoints">
-                <option value="5">A (5 Points)</option>
-                <option value="4">B+ (4 Points)</option>
-                <option value="3">B (3 Points)</option>
-                <option value="2">C (2 Points)</option>
-                <option value="1">D (1 Point)</option>
-                <option value="0">F (0 Points)</option>
-            </select>
-
-            <label>Credit Hours / Units</label>
-            <input type="number" id="credits" value="3" min="1" max="10">
-
-            <button class="btn-action" onclick="addCourse()">Add Course to GPA</button>
-            <button class="btn-action" style="background:#c0392b;" onclick="resetGPA()">Reset GPA</button>
-            
-            <div id="result" class="result-text"></div>
-            <div id="courseList" style="margin-top: 10px; font-size: 0.85rem; color: #ccc; max-height: 150px; overflow-y: auto;"></div>
-        </div>
-
-        <!-- CARD 2: Interactive 3D Casio fx-82ES PLUS Calculator Viewport -->
-        <div class="card" style="max-width: 440px;">
-            <h2>3D Casio fx-82ES PLUS Model</h2>
-            <p style="font-size: 0.8rem; color: #aaa; margin: 5px 0;">Click the physical scientific keys directly on the 3D model below!</p>
-            
-            <div class="calculator-wrapper">
-                <div id="webgl-container"></div>
-                
-                <!-- Live Screen Overlay -->
-                <div class="calc-lcd-overlay">
-                    <div class="lcd-main-row" id="calcExpression">0</div>
-                    <div class="lcd-ans-row" id="calcResult">Ans: 0</div>
-                </div>
-
-                <div class="instruction-badge">🖱️ Drag to Rotate | Click 3D Keys to Calculate</div>
+            <div class="calc-lcd-overlay">
+                <div class="lcd-main-row" id="calcExpression">0</div>
+                <div class="lcd-ans-row" id="calcResult">Ans: 0</div>
             </div>
+
+            <div class="instruction-badge">🖱️ Drag to Rotate | Click 3D Keys to Calculate</div>
         </div>
 
-        <!-- CARD 3: Calculations Log -->
-        <div class="card">
-            <h2>Calculations History Log</h2>
-            <p style="font-size: 0.85rem; color: #aaa;">All 3D scientific button presses, computations, and GPA updates are recorded here:</p>
+        <!-- Calculations Log Panel -->
+        <div class="history-card">
+            <h2>Calculations Log</h2>
+            <p style="font-size: 0.85rem; color: #aaa;">All 3D button presses and mathematical computations are tracked here:</p>
             <div id="historyBox" class="history-box">
-                <div class="history-item">System initialized. Click 3D Casio keys to compute.</div>
+                <div class="history-item">System initialized. Click 3D calculator keys.</div>
             </div>
-            <button class="btn-action" style="background: #444; margin-top: 15px;" onclick="clearHistory()">Clear History Log</button>
+            <button class="btn-clear" onclick="clearHistory()">Clear History Log</button>
         </div>
 
     </div>
 
-    <!-- JavaScript Engine (Three.js 3D Raycasting & Full Scientific Calculator Logic) -->
+    <!-- JavaScript Execution Engine -->
     <script>
         // --- HISTORY LOG SYSTEM ---
         function logHistory(text) {
@@ -186,7 +197,6 @@
                 logHistory("Deleted last character.");
             } else if (val === '=') {
                 try {
-                    // Translate standard symbols to JS eval syntax
                     let expClean = currentExpression
                         .replace(/×/g, '*')
                         .replace(/÷/g, '/')
@@ -219,41 +229,7 @@
             updateScreen(currentExpression, lastAnswer);
         }
 
-        // --- GPA LOGIC ---
-        let totalPoints = 0;
-        let totalCredits = 0;
-
-        function addCourse() {
-            const nameField = document.getElementById('courseName');
-            const name = nameField.value || "Unnamed Course";
-            const points = parseFloat(document.getElementById('gradePoints').value);
-            const credits = parseFloat(document.getElementById('credits').value);
-
-            if (isNaN(credits) || credits <= 0) {
-                alert("Please enter valid credit hours.");
-                return;
-            }
-
-            totalPoints += (points * credits);
-            totalCredits += credits;
-            const gpa = (totalPoints / totalCredits).toFixed(2);
-
-            document.getElementById('result').innerHTML = `Semester GPA: ${gpa}`;
-            document.getElementById('courseList').innerHTML += `<div>✔️ ${name} (${credits} Cr, Pts: ${points})</div>`;
-            
-            logHistory(`GPA Added: ${name} | Credits: ${credits}, Points: ${points} | New GPA: ${gpa}`);
-            nameField.value = '';
-        }
-
-        function resetGPA() {
-            totalPoints = 0;
-            totalCredits = 0;
-            document.getElementById('result').innerHTML = '';
-            document.getElementById('courseList').innerHTML = '';
-            logHistory("GPA Calculator reset.");
-        }
-
-        // --- THREE.JS 3D CASIO fx-82ES PLUS MODEL RENDERER ---
+        // --- THREE.JS 3D CASIO MODEL RENDERER ---
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
@@ -276,10 +252,10 @@
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
-        // Build Casiofx-82ES Group
+        // Build Casio Group
         const casioGroup = new THREE.Group();
 
-        // 1. Black Body Casing
+        // 1. Casing Body
         const body = new THREE.Mesh(
             new THREE.BoxGeometry(2.6, 4.6, 0.25), 
             new THREE.MeshStandardMaterial({ color: 0x181a1c, roughness: 0.3 })
@@ -300,28 +276,21 @@
             new THREE.MeshStandardMaterial({ color: 0x111315, roughness: 0.2 })
         );
         screenBezel.position.set(0, 1.55, 0.02);
-        casioGroup.add(casioButtonMatCheck = screenBezel); // reference
+        casioGroup.add(screenBezel);
 
-        // 4. Scientific Key Layout (Matching your Casio fx-82ES Plus image layout)
+        // 4. Keypad Configuration matching Casio fx-82ES Plus
         const matNum = new THREE.MeshStandardMaterial({ color: 0x3e424a, roughness: 0.4 });
         const matSci = new THREE.MeshStandardMaterial({ color: 0x2b2e34, roughness: 0.5 });
         const matOp = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
         const matAC = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.3 });
         const matDEL = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.3 });
 
-        // Define scientific and standard rows precisely
         const buttonConfig = [
-            // Scientific row 1
             [{label: 'shift', w:0.35, h:0.18, mat:matSci}, {label: 'alpha', w:0.35, h:0.18, mat:matSci}, {label: 'mode', w:0.35, h:0.18, mat:matSci}, {label: 'on', w:0.35, h:0.18, mat:matSci}],
-            // Scientific row 2
             [{label: 'x³', w:0.35, h:0.18, mat:matSci}, {label: 'x⁻¹', w:0.35, h:0.18, mat:matSci}, {label: 'log(', w:0.35, h:0.18, mat:matSci}, {label: 'ln(', w:0.35, h:0.18, mat:matSci}],
-            // Scientific row 3
             [{label: '√(', w:0.35, h:0.18, mat:matSci}, {label: 'x²', w:0.35, h:0.18, mat:matSci}, {label: 'log(', w:0.35, h:0.18, mat:matSci}, {label: 'Ans', w:0.35, h:0.18, mat:matSci}],
-            // Scientific row 4
             [{label: 'sin(', w:0.35, h:0.18, mat:matSci}, {label: 'cos(', w:0.35, h:0.18, mat:matSci}, {label: 'tan(', w:0.35, h:0.18, mat:matSci}, {label: '(', w:0.35, h:0.18, mat:matSci}],
-            // Scientific row 5 (Memory & Brackets)
             [{label: 'RCL', w:0.35, h:0.18, mat:matSci}, {label: 'ENG', w:0.35, h:0.18, mat:matSci}, {label: '(', w:0.35, h:0.18, mat:matSci}, {label: ')', w:0.35, h:0.18, mat:matSci}],
-            // Standard Number & Operator Pad
             [{label: '7', w:0.42, h:0.2, mat:matNum}, {label: '8', w:0.42, h:0.2, mat:matNum}, {label: '9', w:0.42, h:0.2, mat:matNum}, {label: 'DEL', w:0.42, h:0.2, mat:matDEL}, {label: 'AC', w:0.42, h:0.2, mat:matAC}],
             [{label: '4', w:0.42, h:0.2, mat:matNum}, {label: '5', w:0.42, h:0.2, mat:matNum}, {label: '6', w:0.42, h:0.2, mat:matNum}, {label: '×', w:0.42, h:0.2, mat:matOp}, {label: '÷', w:0.42, h:0.2, mat:matOp}],
             [{label: '1', w:0.42, h:0.2, mat:matNum}, {label: '2', w:0.42, h:0.2, mat:matNum}, {label: '3', w:0.42, h:0.2, mat:matNum}, {label: '+', w:0.42, h:0.2, mat:matOp}, {label: '-', w:0.42, h:0.2, mat:matOp}],
@@ -330,7 +299,7 @@
 
         const interactiveButtons = [];
 
-        // Render scientific rows
+        // Render upper scientific rows
         for (let r = 0; r < 5; r++) {
             let row = buttonConfig[r];
             let startX = -0.6;
@@ -346,7 +315,7 @@
             }
         }
 
-        // Render standard main keypad rows
+        // Render main keypad rows
         for (let r = 5; r < buttonConfig.length; r++) {
             let row = buttonConfig[r];
             let startX = -0.85;
@@ -359,7 +328,6 @@
                 
                 let valMapping = btnData.label;
                 if (valMapping === '×10ˣ') valMapping = '*';
-                if (valMapping === 'Ans') valMapping = 'Ans';
 
                 btnMesh.userData = { value: valMapping };
                 casioGroup.add(btnMesh);
@@ -391,7 +359,7 @@
                     const clickedButton = intersects[0].object;
                     const val = clickedButton.userData.value;
 
-                    // Button press click down/up effect
+                    // Press animation
                     clickedButton.position.z -= 0.02;
                     setTimeout(() => {
                         clickedButton.position.z += 0.02;
