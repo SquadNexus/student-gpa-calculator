@@ -3,7 +3,7 @@ body {
     background: #ffffff; /* Clean white background */
     color: #333; 
     padding: 20px; 
-    max-width: 1150px; 
+    max-width: 1200px; 
     margin: auto; 
 }
 
@@ -15,7 +15,7 @@ body {
     justify-content: center; 
 }
 
-/* Left GPA Card Styling */
+/* GPA Card Styling */
 .card { 
     background: #ffffff; 
     padding: 25px; 
@@ -87,16 +87,13 @@ button:hover { background: #0052a3; }
     border: 1px solid #e9ecef;
 }
 
-/* --- 3D PHONE VIEWPORT --- */
+/* --- FREE-FLOATING 3D VIEWPORT (NO OUTER BOX) --- */
 .calculator-3d-wrapper {
     position: relative;
-    width: 380px;
-    height: 680px;
-    background: #ffffff;
-    border-radius: 28px;
-    border: 1px solid #e1e4e8;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    overflow: hidden;
+    width: 400px;
+    height: 700px;
+    background: transparent; /* Absolutely no outer container box */
+    overflow: visible;
     flex-shrink: 0;
 }
 
@@ -111,18 +108,16 @@ button:hover { background: #0052a3; }
 
 .instruction-badge {
     position: absolute;
-    bottom: 12px;
+    bottom: 5px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    padding: 6px 14px;
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 12px;
+    border-radius: 12px;
     font-size: 0.7rem;
     color: #0066cc;
     font-weight: bold;
     pointer-events: none;
     border: 1px solid #d1d5db;
-    z-index: 10;
-    text-align: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
