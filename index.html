@@ -203,7 +203,7 @@
         directionalLight.position.set(5, 10, 7);
         scene.add(directionalLight);
 
-        // Continuous Animation Loop (Runs independently of the model loading state)
+        // Continuous Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -211,18 +211,17 @@
         }
         animate();
 
-        // Load your downloaded casio3d.glb file
+        // Load your casio3d.glb file from the models folder
         const loader = new THREE.GLTFLoader();
-        loader.load('casio3d.glb', function (gltf) {
+        loader.load('models/casio3d.glb', function (gltf) {
             const calculatorMesh = gltf.scene;
             
-            // Adjust scaling or positioning if needed based on your model size
             calculatorMesh.scale.set(1.5, 1.5, 1.5);
             calculatorMesh.position.set(0, -0.5, 0);
             
             scene.add(calculatorMesh);
         }, undefined, function (error) {
-            console.error('Error loading 3D model file (Ensure casio3d.glb is in the same directory and served via a local server):', error);
+            console.error('Error loading 3D model file:', error);
         });
 
         window.addEventListener('resize', () => {
