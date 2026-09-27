@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student GPA & 3D Interactive Casio Calculator</title>
+    
+    <!-- Load Three.js and OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1250px; margin: auto; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1300px; margin: auto; overflow-x: hidden; }
         
-        .main-container { display: flex; gap: 50px; flex-wrap: wrap; align-items: center; justify-content: center; min-height: 85vh; perspective: 1500px; }
+        .main-container { display: flex; gap: 40px; flex-wrap: wrap; align-items: center; justify-content: center; min-height: 85vh; }
         
         /* Left GPA Card */
         .card { background: #1e1e1e; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); flex: 1; min-width: 300px; max-width: 380px; z-index: 10; }
@@ -17,136 +22,63 @@
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
         .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
 
-        /* --- 3D SCENE & CASIO BOX CONTAINER --- */
-        .scene {
-            width: 340px;
-            height: 600px;
-            perspective: 1400px;
-            cursor: pointer;
+        /* --- 3D CALCULATOR WRAPPER --- */
+        .calculator-wrapper {
+            position: relative;
+            width: 440px;
+            height: 650px;
+            background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
+            border-radius: 20px;
+            border: 2px solid #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
 
-        .casio-3d-model {
+        #webgl-container {
             width: 100%;
             height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-            transform: rotateX(8deg) rotateY(-18deg);
+            cursor: crosshair;
         }
 
-        /* Hover tilts and reveals the 3D depth of the calculator */
-        .scene:hover .casio-3d-model {
-            transform: rotateX(15deg) rotateY(-30deg) translateZ(20px);
-        }
-
-        /* 3D Sides/Volume Styling */
-        .side {
+        /* Live Calculator LCD Screen Overlay (Synced with GPA Calculation) */
+        .calc-lcd-overlay {
             position: absolute;
-            background: #121418;
-            border: 1px solid #2a2f38;
+            top: 125px;
+            left: 55px;
+            width: 330px;
+            height: 105px;
+            background: #8fa096;
+            color: #111;
+            border: 3px solid #1c2025;
+            border-radius: 6px;
+            padding: 8px;
             box-sizing: border-box;
-        }
-
-        /* 1. FRONT FACE (Contains the Fully Working Calculator) */
-        .face-front {
-            width: 340px;
-            height: 600px;
-            transform: translateZ(18px);
-            border-radius: 16px;
-            padding: 16px;
-            background: linear-gradient(145deg, #1c1f26, #111317);
-            border: 2px solid #2e3440;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        }
-
-        /* 2. BACK FACE */
-        .face-back {
-            width: 340px;
-            height: 600px;
-            transform: rotateY(180deg) translateZ(18px);
-            border-radius: 16px;
-            background: #0d0f12;
+            font-family: monospace;
+            pointer-events: none;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px solid #252a33;
-            color: #555;
+            justify-content: space-between;
         }
+        .lcd-top-row { font-size: 0.65rem; font-weight: bold; color: #2c3e50; display: flex; justify-content: space-between; border-bottom: 1px solid #78877e; padding-bottom: 2px; }
+        .lcd-main-row { font-size: 1.1rem; font-weight: bold; text-align: right; overflow: hidden; }
+        .lcd-gpa-row { font-size: 0.8rem; font-weight: bold; color: #8b0000; text-align: right; }
 
-        /* 3 & 4. LEFT & RIGHT THICKNESS SIDES */
-        .side-left {
-            width: 36px;
-            height: 600px;
-            left: -18px;
-            transform: rotateY(-90deg) translateZ(170px);
-            background: #090a0d;
-        }
-        .side-right {
-            width: 36px;
-            height: 600px;
-            right: -18px;
-            transform: rotateY(90deg) translateZ(170px);
-            background: #171a20;
-        }
-
-        /* 5 & 6. TOP & BOTTOM THICKNESS SIDES */
-        .side-top {
-            width: 340px;
-            height: 36px;
-            top: -18px;
-            transform: rotateX(90deg) translateZ(282px);
-            background: #101216;
-        }
-        .side-bottom {
-            width: 340px;
-            height: 36px;
-            bottom: -18px;
-            transform: rotateX(-90deg) translateZ(282px);
-            background: #08090b;
-        }
-
-        /* --- CALCULATOR INTERFACE STYLING --- */
-        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .calc-brand { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 1px; }
-        .calc-model { font-size: 0.65rem; color: #f1c40f; font-weight: bold; }
-
-        .calc-lcd { 
-            background: #8fa096; 
-            color: #111; 
-            padding: 10px; 
-            border-radius: 6px; 
-            border: 3px solid #1a1e24;
-            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
-            margin-bottom: 12px; 
-            font-family: monospace; 
-        }
-        .lcd-top { font-size: 0.55rem; color: #2c3e50; display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #78877e; padding-bottom: 2px; margin-bottom: 4px; }
-        .lcd-screen { font-size: 1.4rem; min-height: 38px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; }
-
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .ckey { 
-            background: linear-gradient(to bottom, #2c3038, #1c1f26); 
-            color: #fff; 
-            border: 1px solid #363c48; 
-            border-bottom: 3px solid #0a0c0f;
-            padding: 8px 0; 
+        .instruction-badge { 
+            position: absolute; 
+            bottom: 15px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(0, 0, 0, 0.8); 
+            padding: 8px 15px; 
+            border-radius: 20px; 
             font-size: 0.75rem; 
-            border-radius: 5px; 
-            cursor: pointer; 
+            color: #f1c40f; 
             font-weight: bold; 
-            text-align: center; 
-            box-shadow: 0 3px 5px rgba(0,0,0,0.4);
-            transition: all 0.05s ease;
+            pointer-events: none;
+            border: 1px solid #444;
+            text-align: center;
         }
-        .ckey:active { transform: translateY(2px); border-bottom: 1px solid #0a0c0f; }
-        .ckey:hover { background: linear-gradient(to bottom, #383f4d, #252932); }
-        .ckey span { display: block; font-size: 0.45rem; color: #3498db; margin-top: 2px; font-weight: normal; }
-        
-        .ckey.action { background: linear-gradient(to bottom, #27ae60, #1e8449); border-color: #145a32; }
-        .ckey.equals { background: linear-gradient(to bottom, #2980b9, #1f618d); border-color: #154360; }
-
-        .instruction-badge { text-align: center; margin-top: 20px; font-size: 0.8rem; color: #f1c40f; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -180,83 +112,27 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: 3D Interactive Casio Calculator Device -->
-        <div>
-            <div class="scene">
-                <div class="casio-3d-model">
-                    
-                    <!-- FRONT FACE: Real Interactive Calculator -->
-                    <div class="side face-front">
-                        <div class="calc-header">
-                            <span class="calc-brand">CASIO fx-82ES PLUS</span>
-                            <span class="calc-model">2nd EDITION</span>
-                        </div>
-
-                        <div class="calc-lcd">
-                            <div class="lcd-top">
-                               <span>Math DEG</span>
-                               <span>FIX</span>
-                            </div>
-                            <div class="lcd-screen" id="calcScreen">0</div>
-                        </div>
-
-                        <div class="calc-grid">
-                            <button class="ckey" onclick="pressKey('Math.sin(')">sin<span>sin⁻¹</span></button>
-                            <button class="ckey" onclick="pressKey('Math.cos(')">cos<span>cos⁻¹</span></button>
-                            <button class="ckey" onclick="pressKey('Math.tan(')">tan<span>tan⁻¹</span></button>
-                            <button class="ckey" onclick="pressKey('Math.sqrt(')">√<span>x²</span></button>
-
-                            <button class="ckey" onclick="pressKey('(')">(<span> </span></button>
-                            <button class="ckey" onclick="pressKey(')')">)<span> </span></button>
-                            <button class="ckey action" onclick="pressKey('DEL')">DEL</button>
-                            <button class="ckey action" onclick="pressKey('AC')">AC</button>
-
-                            <button class="ckey" onclick="pressKey('7')">7</button>
-                            <button class="ckey" onclick="pressKey('8')">8</button>
-                            <button class="ckey" onclick="pressKey('9')">9</button>
-                            <button class="ckey" onclick="pressKey('/')">÷</button>
-
-                            <button class="ckey" onclick="pressKey('4')">4</button>
-                            <button class="ckey" onclick="pressKey('5')">5</button>
-                            <button class="ckey" onclick="pressKey('6')">6</button>
-                            <button class="ckey" onclick="pressKey('*')">×</button>
-
-                            <button class="ckey" onclick="pressKey('1')">1</button>
-                            <button class="ckey" onclick="pressKey('2')">2</button>
-                            <button class="ckey" onclick="pressKey('3')">3</button>
-                            <button class="ckey" onclick="pressKey('-')">-</button>
-
-                            <button class="ckey" onclick="pressKey('0')">0</button>
-                            <button class="ckey" onclick="pressKey('.')">.</button>
-                            <button class="ckey" onclick="pressKey('Math.PI')">π</button>
-                            <button class="ckey" onclick="pressKey('+')">+</button>
-
-                            <button class="ckey" style="grid-column: span 2;" onclick="pressKey('Ans')">Ans</button>
-                            <button class="ckey equals" style="grid-column: span 2;" onclick="calculateResult()">=</button>
-                        </div>
-                    </div>
-
-                    <!-- BACK FACE -->
-                    <div class="side face-back">
-                        <h3 style="color:#aaa; margin:0;">CASIO</h3>
-                        <p style="font-size:0.75rem;">Dual Power / Battery</p>
-                    </div>
-
-                    <!-- 3D THICKNESS SIDES -->
-                    <div class="side side-left"></div>
-                    <div class="side side-right"></div>
-                    <div class="side side-top"></div>
-                    <div class="side side-bottom"></div>
-
+        <!-- RIGHT: 3D Casio Model with Right-Click Drag & Live GPA Screen Display -->
+        <div class="calculator-wrapper">
+            <div id="webgl-container"></div>
+            
+            <!-- Live Screen Overlay showing GPA calculation and results -->
+            <div class="calc-lcd-overlay">
+                <div class="lcd-top-row">
+                    <span>Math DEG</span>
+                    <span>STAT</span>
                 </div>
+                <div class="lcd-main-row" id="calcFormula">Sum(Pts × Cr) / Sum(Cr)</div>
+                <div class="lcd-gpa-row" id="calcAnswer">GPA: 0.00</div>
             </div>
-            <div class="instruction-badge">💡 Hover over the calculator to view its 3D depth while using it!</div>
+
+            <div class="instruction-badge">🖱️ Hold & drag RIGHT mouse button to rotate 3D Casio</div>
         </div>
     </div>
 
     <!-- JavaScript Execution Engine -->
     <script>
-        // --- GPA LOGIC ---
+        // --- GPA & CALCULATOR SYNC LOGIC ---
         let totalPoints = 0;
         let totalCredits = 0;
 
@@ -276,8 +152,14 @@
 
             const gpa = (totalPoints / totalCredits).toFixed(2);
             
-            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Credits)</span><span>Pts: ${points}</span></div>`;
+            // Update UI
+            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
             document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
+
+            // Send calculation details directly to the 3D Casio Calculator Screen
+            document.getElementById('calcFormula').innerText = `${totalPoints} Pts / ${totalCredits} Cr`;
+            document.getElementById('calcAnswer').innerText = `SEM GPA = ${gpa}`;
+
             nameField.value = '';
         }
 
@@ -286,57 +168,84 @@
             totalCredits = 0;
             document.getElementById('courseList').innerHTML = '';
             document.getElementById('result').innerHTML = '';
-        }
-
-        // --- CALCULATOR LOGIC ---
-        let expression = "";
-        let lastAns = "0";
-
-        function pressKey(val) {
-            const screen = document.getElementById('calcScreen');
-
-            if (val === 'AC') {
-                expression = "";
-                screen.innerText = "0";
-                return;
-            }
-            if (val === 'DEL') {
-                expression = expression.slice(0, -1);
-                screen.innerText = expression === "" ? "0" : expression;
-                return;
-            }
-            if (val === 'Ans') {
-                expression += lastAns;
-            } else {
-                if (expression === "0" && val !== '.') {
-                    expression = val;
-                } else {
-                    expression += val;
-                }
-            }
             
-            let cleanDisplay = expression.replace(/Math\.sin\(/g, "sin(")
-                                         .replace(/Math\.cos\(/g, "cos(")
-                                         .replace(/Math\.tan\(/g, "tan(")
-                                         .replace(/Math\.sqrt\(/g, "√(")
-                                         .replace(/Math\.PI/g, "π");
-            screen.innerText = cleanDisplay;
+            // Reset Calculator Screen
+            document.getElementById('calcFormula').innerText = "Sum(Pts × Cr) / Sum(Cr)";
+            document.getElementById('calcAnswer').innerText = "GPA: 0.00";
         }
 
-        function calculateResult() {
-            const screen = document.getElementById('calcScreen');
-            try {
-                let evaluated = eval(expression.replace(/Math\.PI/g, Math.PI));
-                evaluated = Math.round(evaluated * 100000000) / 100000000;
-                
-                lastAns = Number.isFinite(evaluated) ? evaluated.toString() : "Error";
-                screen.innerText = lastAns;
-                expression = lastAns;
-            } catch (err) {
-                screen.innerText = "Syntax Error";
-                expression = "";
+        // --- THREE.JS 3D RENDERER CONFIGURATION ---
+        const container = document.getElementById('webgl-container');
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 5.5;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // Configure OrbitControls to rotate ONLY when dragging with the RIGHT mouse button
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 3;
+        controls.maxDistance = 9;
+        
+        // Map mouse buttons: Left = None/Disabled for rotation, Right = Rotate 3D Model
+        controls.mouseButtons = {
+            LEFT: THREE.MOUSE.NONE,
+            MIDDLE: THREE.MOUSE.DOLLY,
+            RIGHT: THREE.MOUSE.ROTATE
+        };
+
+        // Lighting setup
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1.2);
+        pointLight.position.set(4, 5, 4);
+        scene.add(pointLight);
+
+        // Load your Casio texture image (ensure casio.png is in the same folder)
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load('casio.png', (texture) => {
+            texture.generateMipmaps = true;
+            texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+            const geometry = new THREE.BoxGeometry(2.3, 4.4, 0.28);
+            
+            const materials = [
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Right side
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Left side
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Top side
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Bottom side
+                new THREE.MeshStandardMaterial({ map: texture, roughness: 0.3 }),    // Front face (casio.png)
+                new THREE.MeshStandardMaterial({ color: 0x0a0b0d, roughness: 0.5 })  // Back face
+            ];
+
+            const calculatorMesh = new THREE.Mesh(geometry, materials);
+            scene.add(calculatorMesh);
+
+            calculatorMesh.rotation.x = 0.15;
+            calculatorMesh.rotation.y = -0.3;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
             }
-        }
+            animate();
+        });
+
+        window.addEventListener('resize', () => {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
     </script>
 </body>
 </html>
