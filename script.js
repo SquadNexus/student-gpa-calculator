@@ -194,10 +194,10 @@ function handleCalculate() {
     redrawPhoneUI();
 }
 
-// Three.js Setup
+// Three.js Setup with Limited Free Rotation and No Box Container
 const container = document.getElementById('webgl-container');
-const width = container.clientWidth || 380;
-const height = container.clientHeight || 680;
+const width = container.clientWidth || 400;
+const height = container.clientHeight || 700;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
@@ -208,63 +208,69 @@ renderer.setSize(width, height);
 renderer.setPixelRatio(window.devicePixelRatio);
 container.appendChild(renderer.domElement);
 
+// Limited Orbit Controls to prevent crazy tumbling and keep phone stable
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.minDistance = 3.5;
-controls.maxDistance = 7;
+controls.minDistance = 4.0;
+controls.maxDistance = 6.5;
+controls.minPolarAngle = Math.PI / 3; // Limit vertical tilt angle up
+controls.maxPolarAngle = Math.PI * 2 / 3; // Limit vertical tilt angle down
+controls.maxAzimuthAngle = Math.PI / 2; // Limit side rotation bounds
+controls.minAzimuthAngle = -Math.PI / 2;
 
 scene.add(new THREE.AmbientLight(0xffffff, 1.5));
 const dirLight = new THREE.DirectionalLight(0xffffff, 2.0);
 dirLight.position.set(5, 10, 7);
 scene.add(dirLight);
 
-// Build Solid Silver Samsung S25 Ultra 3D Phone Group
+// Build Solid Matte Dark / Titanium Phone Chassis Body
 const phoneGroup = new THREE.Group();
 
-// 1. Polished Silver Titanium Chassis Body
 const phoneBodyGeo = new THREE.BoxGeometry(2.36, 4.76, 0.18);
-const silverMat = new THREE.MeshStandardMaterial({ 
-    color: 0xdcdfe3, 
-    roughness: 0.15, 
-    metalness: 0.95 
+const phoneMat = new THREE.MeshStandardMaterial({ 
+    color: 0x1b1c1e, // Matte dark titanium finish matching your reference
+    roughness: 0.35, 
+    metalness: 0.85 
 });
-const phoneBody = new THREE.Mesh(phoneBodyGeo, silverMat);
+const phoneBody = new THREE.Mesh(phoneBodyGeo, phoneMat);
 phoneGroup.add(phoneBody);
 
-// 2. Front Screen with Live CalcES App Texture
+// Front Screen with CalcES App Texture
 const screenGeo = new THREE.PlaneGeometry(2.22, 4.62);
 const screenMat = new THREE.MeshBasicMaterial({ map: phoneTexture });
 const screenMesh = new THREE.Mesh(screenGeo, screenMat);
 screenMesh.position.z = 0.095;
 phoneGroup.add(screenMesh);
 
-// 3. Back Panel & 5 Camera Lenses
+// Back Panel Surface
 const backGeo = new THREE.PlaneGeometry(2.32, 4.72);
-const backMat = new THREE.MeshStandardMaterial({ color: 0xe6e9ec, roughness: 0.2, metalness: 0.5 });
+const backMat = new THREE.MeshStandardMaterial({ color: 0x1b1c1e, roughness: 0.4, metalness: 0.8 });
 const backPanel = new THREE.Mesh(backGeo, backMat);
 backPanel.position.z = -0.095;
 backPanel.rotation.y = Math.PI;
 phoneGroup.add(backPanel);
 
-// 5 Camera Lenses Setup
-const lensBaseGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.03, 32);
-const ringMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.99 });
-const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x040404, roughness: 0.05, metalness: 0.95 });
+// 5 Camera Lenses Setup matching your exact reference photo layout
+const ringMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.2, metalness: 0.99 });
+const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.05, metalness: 0.95 });
+const flashMat = new THREE.MeshBasicMaterial({ color: 0xffffee });
 
-const cameraPositions = [
-    { x: -0.6, y: 1.7 },
-    { x: -0.6, y: 1.25 },
-    { x: -0.6, y: 0.8 },
-    { x: -0.28, y: 1.7 },
-    { x: -0.28, y: 1.25 }
+// Left vertical column (3 large lenses) & Right column (2 smaller sensors + flash)
+const cameraLayout = [
+    { x: -0.62, y: 1.75, r: 0.14 }, // Left top
+    { x: -0.62, y: 1.25, r: 0.14 }, // Left middle
+    { x: -0.62, y: 0.75, r: 0.14 }, // Left bottom
+    { x: -0.28, y: 1.65, r: 0.09 }, // Right top sensor
+    { x: -0.28, y: 1.25, r: 0.09 }  // Right middle sensor
 ];
 
-cameraPositions.forEach((pos) => {
+cameraLayout.forEach((pos) => {
+    const lensBaseGeo = new THREE.CylinderGeometry(pos.r, pos.r, 0.03, 32);
     const ring = new THREE.Mesh(lensBaseGeo, ringMat);
     ring.rotation.x = Math.PI / 2;
     
-    const glassLens = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.035, 32), innerLensMat);
+    const glassLens = new THREE.Mesh(new THREE.CylinderGeometry(pos.r * 0.75, pos.r * 0.75, 0.035, 32), innerLensMat);
     glassLens.rotation.x = Math.PI / 2;
 
     ring.position.set(pos.x, pos.y, -0.11);
@@ -274,9 +280,16 @@ cameraPositions.forEach((pos) => {
     phoneGroup.add(glassLens);
 });
 
+// Flashlight dot below right sensors
+const flashGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.02, 16);
+const flash = new THREE.Mesh(flashGeo, flashMat);
+flash.rotation.x = Math.PI / 2;
+flash.position.set(-0.28, 0.95, -0.11);
+phoneGroup.add(flash);
+
 scene.add(phoneGroup);
 
-// Interactive Click Support on Screen
+// Interactive Click Support on CalcES Calculator Screen Buttons
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -328,8 +341,8 @@ animate();
 
 // Resize handling
 window.addEventListener('resize', () => {
-    const w = container.clientWidth || 380;
-    const h = container.clientHeight || 680;
+    const w = container.clientWidth || 400;
+    const h = container.clientHeight || 700;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
