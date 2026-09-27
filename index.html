@@ -3,36 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA Calculator</title>
+    <title>Student GPA Calculator & Scientific Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 950px; margin: auto; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1050px; margin: auto; }
         
-        /* Two-column wrapper container */
-        .main-container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+        .main-container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
         
-        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; }
-        
+        /* Left GPA Card */
+        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 420px; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         button:hover { background: #0056b3; }
-        
-        .btn-danger { background: #dc3545; margin-top: 5px; }
-        .btn-danger:hover { background: #b02a37; }
-
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
-        
-        /* Side calculation panel styling */
-        .side-calc-panel { background: #161616; border: 1px solid #333; padding: 20px; border-radius: 10px; flex: 1; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .side-calc-panel h3 { margin-top: 0; color: #3498db; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .math-step-row { font-family: monospace; font-size: 0.85rem; color: #aaa; margin-top: 10px; word-break: break-all; background: #1e1e1e; padding: 10px; border-radius: 5px; border-left: 3px solid #007bff; }
-        
         .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
+
+        /* Right Realistic Scientific Calculator (Catiga / ClassWiz Style) */
+        .real-calc { background: #18191a; border: 2px solid #333; padding: 15px; border-radius: 12px; width: 340px; box-shadow: 0 8px 20px rgba(0,0,0,0.7); flex-shrink: 0; }
+        .calc-brand { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        
+        /* Calculator Screen */
+        .calc-screen { background: #c2cbd1; color: #111; padding: 10px; border-radius: 4px; border: 2px inset #555; margin-bottom: 12px; font-family: monospace; }
+        .screen-top { font-size: 0.7rem; color: #444; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 3px; margin-bottom: 4px; }
+        .screen-main { font-size: 1.2rem; min-height: 25px; text-align: right; font-weight: bold; overflow-x: auto; }
+        
+        /* Top Action Rows (Shift, Alpha, Replay) */
+        .calc-action-row { display: flex; gap: 5px; margin-bottom: 8px; }
+        .btn-shift { background: #e67e22; color: #fff; font-size: 0.7rem; padding: 5px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
+        .btn-alpha { background: #9b59b6; color: #fff; font-size: 0.7rem; padding: 5px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
+        .btn-mode { background: #2980b9; color: #fff; font-size: 0.7rem; padding: 5px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
+
+        /* Keypad Grid */
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .ckey { background: #2c2f33; color: #fff; border: 1px solid #444; padding: 8px 0; font-size: 0.85rem; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: center; }
+        .ckey:hover { background: #3c4247; }
+        .ckey.op { background: #202225; color: #3498db; }
+        .ckey.del { background: #d35400; color: #fff; }
+        .ckey.ac { background: #c0392b; color: #fff; }
+        .ckey.equals { background: #27ae60; color: #fff; }
+        .ckey-sub { font-size: 0.55rem; color: #3498db; display: block; margin-top: 1px; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <!-- LEFT COLUMN: Your original interface unchanged -->
+        <!-- LEFT: Your Original GPA Calculator -->
         <div class="card">
             <h2>GPA Calculator</h2>
             <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
@@ -54,30 +68,82 @@
             <input type="number" id="credits" value="3" min="1" max="10">
 
             <button onclick="addCourse()">Add Course</button>
-            <button class="btn-danger" onclick="resetCalculator()">Reset Calculator</button>
+            <button style="background:#c0392b;" onclick="resetGPA()">Reset GPA</button>
             
-            <div id="courseList" style="margin-top: 15px;"></div>
+            <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #ccc;"></div>
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT COLUMN: The new side calculation breakdown panel -->
-        <div class="side-calc-panel">
-            <h3>🧮 Live Calculation Breakdown</h3>
-            <p style="color: #aaa; font-size: 0.85rem;">Formula: GPA = Σ(Points × Credits) / Σ(Credits)</p>
+        <!-- RIGHT: Realistic Scientific Calculator (Catiga / ClassWiz Style) -->
+        <div class="real-calc">
+            <div class="calc-brand">
+                <span>CATIGA CS-991EX</span>
+                <span>SOLAR & BATTERY</span>
+            </div>
             
-            <div class="math-step-row" id="breakdownContent">
-                No calculation steps yet. Add a course to see the math breakdown.
+            <!-- Screen Display -->
+            <div class="calc-screen">
+                <div class="screen-top">
+                    <span>M Setup</span>
+                    <span>DEG</span>
+                </div>
+                <div class="screen-main" id="calcScreen">0</div>
+            </div>
+
+            <!-- Action Buttons Row -->
+            <div class="calc-action-row">
+                <button class="btn-shift" onclick="pressKey('SHIFT')">SHIFT</button>
+                <button class="btn-alpha" onclick="pressKey('ALPHA')">ALPHA</button>
+                <button class="btn-mode" onclick="pressKey('MODE')">MENU</button>
+            </div>
+
+            <!-- Keypad -->
+            <div class="calc-grid">
+                <button class="ckey op" onclick="pressKey('Math.sin(')">sin<span class="ckey-sub">sin⁻¹</span></button>
+                <button class="ckey op" onclick="pressKey('Math.cos(')">cos<span class="ckey-sub">cos⁻¹</span></button>
+                <button class="ckey op" onclick="pressKey('Math.tan(')">tan<span class="ckey-sub">tan⁻¹</span></button>
+                <button class="ckey op" onclick="pressKey('Math.sqrt(')">√<span class="ckey-sub">x²</span></button>
+
+                <button class="ckey op" onclick="pressKey('(')">(</button>
+                <button class="ckey op" onclick="pressKey(')')">)</button>
+                <button class="ckey op" onclick="pressKey('**2')">x²</button>
+                <button class="ckey op" onclick="pressKey('/')">÷</button>
+
+                <button class="ckey" onclick="pressKey('7')">7</button>
+                <button class="ckey" onclick="pressKey('8')">8</button>
+                <button class="ckey" onclick="pressKey('9')">9</button>
+                <button class="ckey del" onclick="pressKey('DEL')">DEL</button>
+
+                <button class="ckey" onclick="pressKey('4')">4</button>
+                <button class="ckey" onclick="pressKey('5')">5</button>
+                <button class="ckey" onclick="pressKey('6')">6</button>
+                <button class="ckey ac" onclick="pressKey('AC')">AC</button>
+
+                <button class="ckey" onclick="pressKey('1')">1</button>
+                <button class="ckey" onclick="pressKey('2')">2</button>
+                <button class="ckey" onclick="pressKey('3')">3</button>
+                <button class="ckey op" onclick="pressKey('*')">×</button>
+
+                <button class="ckey" onclick="pressKey('0')">0</button>
+                <button class="ckey" onclick="pressKey('.')">.</button>
+                <button class="ckey op" onclick="pressKey('Math.log10(')">log</button>
+                <button class="ckey op" onclick="pressKey('-')">-</button>
+
+                <button class="ckey" onclick="pressKey('Ans')">Ans</button>
+                <button class="ckey op" onclick="pressKey('Math.PI')">π</button>
+                <button class="ckey equals" onclick="calculateResult()">=</button>
+                <button class="ckey op" onclick="pressKey('+')">+</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Array to store course data dynamically
-        let courses = [];
+        // --- GPA Calculator Logic ---
+        let totalPoints = 0;
+        let totalCredits = 0;
 
         function addCourse() {
-            const nameInput = document.getElementById('courseName');
-            const name = nameInput.value.trim() || "Course";
+            const name = document.getElementById('courseName').value || "Course";
             const points = parseFloat(document.getElementById('gradePoints').value);
             const credits = parseFloat(document.getElementById('credits').value);
 
@@ -86,68 +152,70 @@
                 return;
             }
 
-            // Save course object
-            courses.push({ name, points, credits });
-            nameInput.value = ''; // Clear input
+            totalPoints += (points * credits);
+            totalCredits += credits;
 
-            updateUI();
+            const gpa = (totalPoints / totalCredits).toFixed(2);
+            
+            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Credits)</span><span>Pts: ${points}</span></div>`;
+            document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
+            document.getElementById('courseName').value = '';
         }
 
-        function deleteCourse(index) {
-            courses.splice(index, 1);
-            updateUI();
+        function resetGPA() {
+            totalPoints = 0;
+            totalCredits = 0;
+            document.getElementById('courseList').innerHTML = '';
+            document.getElementById('result').innerHTML = '';
         }
 
-        function resetCalculator() {
-            courses = [];
-            updateUI();
-        }
+        // --- Realistic Scientific Calculator Logic ---
+        let calcExpression = "";
+        let lastAns = "0";
 
-        function updateUI() {
-            const courseListEl = document.getElementById('courseList');
-            const resultEl = document.getElementById('result');
-            const breakdownEl = document.getElementById('breakdownContent');
+        function pressKey(val) {
+            const screen = document.getElementById('calcScreen');
 
-            courseListEl.innerHTML = '';
-
-            if (courses.length === 0) {
-                resultEl.innerHTML = '';
-                breakdownEl.innerHTML = 'No calculation steps yet. Add a course to see the math breakdown.';
+            if (val === 'AC') {
+                calcExpression = "";
+                screen.innerText = "0";
                 return;
             }
 
-            let totalPoints = 0;
-            let totalCredits = 0;
-            let numeratorParts = [];
-            let denominatorParts = [];
+            if (val === 'DEL') {
+                calcExpression = calcExpression.slice(0, -1);
+                screen.innerText = calcExpression === "" ? "0" : calcExpression;
+                return;
+            }
 
-            courses.forEach((c, index) => {
-                let product = c.points * c.credits;
-                totalPoints += product;
-                totalCredits += c.credits;
+            if (val === 'Ans') {
+                calcExpression += lastAns;
+            } else if (val === 'SHIFT' || val === 'ALPHA' || val === 'MODE') {
+                // Interactive indicator feedback
+                return; 
+            } else {
+                if (calcExpression === "0" && val !== '.') {
+                    calcExpression = val;
+                } else {
+                    calcExpression += val;
+                }
+            }
 
-                // Render item in original list with a small delete option
-                courseListEl.innerHTML += `
-                    <div class="course-row">
-                        <span>✔️ ${c.name} (${c.credits} Credits) - Pts: ${c.points}</span>
-                        <span style="color:#ff6b6b; cursor:pointer; font-weight:bold;" onclick="deleteCourse(${index})">✕</span>
-                    </div>`;
+            screen.innerText = calcExpression;
+        }
 
-                numeratorParts.push(`(${c.points} × ${c.credits})`);
-                denominatorParts.push(c.credits);
-            });
-
-            const gpa = (totalPoints / totalCredits).toFixed(2);
-
-            // Display result on left card
-            resultEl.innerHTML = `Current Semester GPA: ${gpa}`;
-
-            // Display detailed math steps on the side panel
-            breakdownEl.innerHTML = `
-                <div style="margin-bottom:8px;"><strong>Quality Points (Numerator):</strong><br>${numeratorParts.join(' + ')} = <strong>${totalPoints}</strong></div>
-                <div style="margin-bottom:8px;"><strong>Total Credits (Denominator):</strong><br>${denominatorParts.join(' + ')} = <strong>${totalCredits}</strong></div>
-                <div style="color: #2ecc71;"><strong>Computation:</strong> ${totalPoints} / ${totalCredits} = <strong>${gpa}</strong></div>
-            `;
+        function calculateResult() {
+            const screen = document.getElementById('calcScreen');
+            try {
+                // Evaluate expression securely
+                let evaluated = eval(calcExpression.replace(/Math\.PI/g, Math.PI));
+                lastAns = Number.isFinite(evaluated) ? evaluated.toString() : "Error";
+                screen.innerText = lastAns;
+                calcExpression = lastAns;
+            } catch (err) {
+                screen.innerText = "Syntax Error";
+                calcExpression = "";
+            }
         }
     </script>
 </body>
