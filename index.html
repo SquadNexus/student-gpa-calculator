@@ -152,7 +152,7 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: Free-Floating 3D Phone Viewport -->
+        <!-- RIGHT: Free-Floating 3D Viewport -->
         <div class="calculator-3d-wrapper">
             <div id="webgl-container"></div>
             <div class="instruction-badge">🖱️ Drag to Rotate 360° (See Front & Back)</div>
@@ -405,7 +405,8 @@
         const phoneGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
         phoneGeo.center();
 
-        const phoneMat = new THREE.MeshStandardMaterial({ color: 0x1b1c1e, roughness: 0.3, metalness: 0.9 });
+        // Titanium Blue Phone Body & Frame Material
+        const phoneMat = new THREE.MeshStandardMaterial({ color: 0x8ab6d6, roughness: 0.25, metalness: 0.85 });
         const phoneBody = new THREE.Mesh(phoneGeo, phoneMat);
         phoneGroup.add(phoneBody);
 
@@ -416,25 +417,24 @@
         screenMesh.position.z = 0.102;
         phoneGroup.add(screenMesh);
 
-        // Back Panel
+        // Titanium Blue Back Panel
         const backGeo = new THREE.PlaneGeometry(2.20, 4.60);
-        const backMat = new THREE.MeshStandardMaterial({ color: 0x1b1c1e, roughness: 0.35, metalness: 0.85 });
+        const backMat = new THREE.MeshStandardMaterial({ color: 0x76a3c7, roughness: 0.3, metalness: 0.8 });
         const backPanel = new THREE.Mesh(backGeo, backMat);
         backPanel.position.z = -0.102;
         backPanel.rotation.y = Math.PI;
         phoneGroup.add(backPanel);
 
-        // Camera Lenses
+        // Correct S25 Ultra Quad-Camera Layout (4 Lenses + Flash)
         const ringMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.15, metalness: 0.99 });
         const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.05, metalness: 0.95 });
         const flashMat = new THREE.MeshBasicMaterial({ color: 0xffffee });
 
         const cameraLayout = [
-            { x: -0.62, y: 1.70, r: 0.14 },
-            { x: -0.62, y: 1.20, r: 0.14 },
-            { x: -0.62, y: 0.70, r: 0.14 },
-            { x: -0.25, y: 1.55, r: 0.09 },
-            { x: -0.25, y: 1.15, r: 0.09 }
+            { x: -0.55, y: 1.65, r: 0.13 }, // Left Top (Ultrawide)
+            { x: -0.55, y: 1.15, r: 0.13 }, // Left Middle (Main)
+            { x: -0.55, y: 0.65, r: 0.13 }, // Left Bottom (Telephoto)
+            { x: -0.05, y: 1.40, r: 0.13 }  // Right Periscope Telephoto Lens
         ];
 
         cameraLayout.forEach((pos) => {
@@ -449,9 +449,10 @@
             phoneGroup.add(glassLens);
         });
 
+        // Flash/Sensor dot
         const flash = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16), flashMat);
         flash.rotation.x = Math.PI / 2;
-        flash.position.set(-0.25, 0.80, -0.125);
+        flash.position.set(-0.05, 0.85, -0.125);
         phoneGroup.add(flash);
 
         scene.add(phoneGroup);
