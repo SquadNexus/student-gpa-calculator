@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA & Interactive 3D CATIGA Calculator</title>
+    <title>Student GPA & 3D Interactive Calculator</title>
     
     <!-- Link External Stylesheet -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- Load Three.js and OrbitControls for 3D Interaction -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
@@ -44,20 +40,74 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: True 3D Interactive CATIGA CS-991EX Calculator -->
-        <div class="calculator-3d-wrapper">
-            <div id="webgl-container"></div>
-            
-            <!-- Real-time Interactive Screen Overlay -->
-            <div class="calc-lcd-overlay">
-                <div class="lcd-top-icons">
-                    <span>M S Setup</span>
-                    <span>DEG</span>
+        <!-- RIGHT: Pure CSS 3D Interactive Calculator Model -->
+        <div class="calculator-scene">
+            <div class="calculator-3d-body">
+                
+                <!-- Calculator Branding Header -->
+                <div class="calc-brand">
+                    <span>CATIGA</span>
+                    <span class="model-sub">CS-991EX ClassWiz</span>
                 </div>
-                <div class="lcd-screen-main" id="csScreen">0</div>
-            </div>
 
-            <div class="instruction-badge">🖱️ Drag to Rotate | Click 3D Keys to Calculate</div>
+                <!-- Built-in LCD Display Screen directly on the 3D model -->
+                <div class="calc-lcd-screen">
+                    <div class="lcd-top-row">
+                        <span>M S Setup</span>
+                        <span>DEG</span>
+                    </div>
+                    <div class="lcd-main-display" id="calcScreen">0</div>
+                </div>
+
+                <!-- Fully Visible, Functional 3D Keypad Grid -->
+                <div class="calc-keypad-grid">
+                    <button class="btn-action" onclick="calcInput('SHIFT')">SHIFT</button>
+                    <button class="btn-action" onclick="calcInput('ALPHA')">ALPHA</button>
+                    <button class="btn-menu" onclick="calcInput('MENU')">MENU</button>
+                    <button class="btn-nav" onclick="calcInput('▲')">▲</button>
+
+                    <button class="btn-op" onclick="calcInput('Math.sqrt(')">√</button>
+                    <button class="btn-op" onclick="calcInput('**3')">x³</button>
+                    <button class="btn-op" onclick="calcInput('**')">x^y</button>
+                    <button class="btn-nav" onclick="calcInput('▼')">▼</button>
+
+                    <button class="btn-op" onclick="calcInput('Math.log(')">ln</button>
+                    <button class="btn-op" onclick="calcInput('(-1)*')">(-)</button>
+                    <button class="btn-op" onclick="calcInput('Math.sin(')">sin</button>
+                    <button class="btn-op" onclick="calcInput('Math.cos(')">cos</button>
+
+                    <button class="btn-op" onclick="calcInput('Math.tan(')">tan</button>
+                    <button class="btn-op" onclick="calcInput('(')">(</button>
+                    <button class="btn-op" onclick="calcInput(')')">)</button>
+                    <button class="btn-op" onclick="calcInput('/')">÷</button>
+
+                    <button class="btn-num" onclick="calcInput('7')">7</button>
+                    <button class="btn-num" onclick="calcInput('8')">8</button>
+                    <button class="btn-num" onclick="calcInput('9')">9</button>
+                    <button class="btn-del" onclick="calcInput('DEL')">DEL</button>
+
+                    <button class="btn-num" onclick="calcInput('4')">4</button>
+                    <button class="btn-num" onclick="calcInput('5')">5</button>
+                    <button class="btn-num" onclick="calcInput('6')">6</button>
+                    <button class="btn-ac" onclick="calcInput('AC')">AC</button>
+
+                    <button class="btn-num" onclick="calcInput('1')">1</button>
+                    <button class="btn-num" onclick="calcInput('2')">2</button>
+                    <button class="btn-num" onclick="calcInput('3')">3</button>
+                    <button class="btn-op" onclick="calcInput('*')">×</button>
+
+                    <button class="btn-num" onclick="calcInput('0')">0</button>
+                    <button class="btn-num" onclick="calcInput('.')">.</button>
+                    <button class="btn-op" onclick="calcInput('Math.PI')">π</button>
+                    <button class="btn-op" onclick="calcInput('-')">-</button>
+
+                    <button class="btn-num" onclick="calcInput('Ans')">Ans</button>
+                    <button class="btn-op" onclick="calcInput('/100')">%</button>
+                    <button class="btn-eq" onclick="calculateResult()">=</button>
+                    <button class="btn-op" onclick="calcInput('+')">+</button>
+                </div>
+
+            </div>
         </div>
 
     </div>
