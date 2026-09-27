@@ -183,7 +183,7 @@
             <div id="courseList" style="margin-top: 15px; max-height: 220px; overflow-y: auto;"></div>
         </div>
 
-        <!-- RIGHT: True 3D Rotating Device Container (Properly framed to fit fully on load) -->
+        <!-- RIGHT: True 3D Rotating Device Container -->
         <div class="calculator-3d-wrapper">
             <div id="webgl-container"></div>
             <div class="instruction-badge">🖱️ Drag to Rotate 3D Phone 360° &bull; Click Buttons to Calculate</div>
@@ -352,7 +352,7 @@
         const height = container.clientHeight || 750;
 
         const scene = new THREE.Scene();
-        // Adjusted camera distance so the entire phone fits comfortably in view on initial load
+        // Camera positioned straight-on facing the screen, perfectly framed so the phone fills the view on load
         const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
         camera.position.set(0, 0, 7.8);
 
@@ -415,6 +415,10 @@
         backPanel.position.z = -0.125;
         backPanel.rotation.y = Math.PI;
         deviceGroup.add(backPanel);
+
+        // --- FIX INITIAL ROTATION ---
+        // Sets the phone facing straight forward (displaying the screen front and center) right when the page loads
+        deviceGroup.rotation.y = 0;
 
         scene.add(deviceGroup);
 
