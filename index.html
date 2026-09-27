@@ -388,7 +388,7 @@
 
         const phoneGroup = new THREE.Group();
 
-        // Sharp-cornered phone chassis body
+        // Phone body dimensions
         const shape = new THREE.Shape();
         const pw = 2.36, ph = 4.76, r = 0.15;
         shape.moveTo(-pw/2 + r, -ph/2);
@@ -410,7 +410,7 @@
         const phoneBody = new THREE.Mesh(phoneGeo, phoneMat);
         phoneGroup.add(phoneBody);
 
-        // Front Screen
+        // Solid Black Front Glass Screen Body with UI mapped onto it properly facing forward
         const screenGeo = new THREE.PlaneGeometry(2.20, 4.60);
         const screenMat = new THREE.MeshBasicMaterial({ map: phoneTexture });
         const screenMesh = new THREE.Mesh(screenGeo, screenMat);
@@ -425,40 +425,50 @@
         backPanel.rotation.y = Math.PI;
         phoneGroup.add(backPanel);
 
-        // CORRECT S25 ULTRA CAMERA CLUSTER (Upper-Right when looking at the back)
+        // --- PRECISE CAMERA LAYOUT MATCHING YOUR DRAWING ---
         const ringMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.15, metalness: 0.99 });
         const innerLensMat = new THREE.MeshStandardMaterial({ color: 0x020202, roughness: 0.05, metalness: 0.95 });
         const flashMat = new THREE.MeshBasicMaterial({ color: 0xffffee });
 
-        // Accurate placement matching the S25 Ultra reference layout on the upper-right area of the back panel
-        const cameraLayout = [
-            { x: 0.52, y: 1.70, r: 0.14 }, // Top Right Lens
-            { x: 0.18, y: 1.70, r: 0.14 }, // Top Middle Lens
-            { x: -0.16, y: 1.70, r: 0.14 }, // Top Left Lens (Periscope)
-            { x: 0.18, y: 1.25, r: 0.11 }  // Bottom Right Lens
+        // Left vertical column (3 large camera rings)
+        const leftColumnLenses = [
+            { y: 1.65, r: 0.13 }, 
+            { y: 1.20, r: 0.13 }, 
+            { y: 0.75, r: 0.13 }  
         ];
 
-        cameraLayout.forEach((pos) => {
+        leftColumnLenses.forEach((pos) => {
             const ring = new THREE.Mesh(new THREE.CylinderGeometry(pos.r, pos.r, 0.04, 32), ringMat);
             ring.rotation.x = Math.PI / 2;
             const glassLens = new THREE.Mesh(new THREE.CylinderGeometry(pos.r * 0.75, pos.r * 0.75, 0.045, 32), innerLensMat);
             glassLens.rotation.x = Math.PI / 2;
 
-            ring.position.set(pos.x, pos.y, -0.125);
-            glassLens.position.set(pos.x, pos.y, -0.125);
+            ring.position.set(-0.50, pos.y, -0.125);
+            glassLens.position.set(-0.50, pos.y, -0.125);
             phoneGroup.add(ring);
             phoneGroup.add(glassLens);
         });
 
-        // Flash and Sensor in the correct gap position
+        // Right side: Top lens, middle flash dot, bottom sensor dot (matching your sketch layout)
+        const rightLens = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.04, 32), ringMat);
+        rightLens.rotation.x = Math.PI / 2;
+        const rightGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.13 * 0.75, 0.13 * 0.75, 0.045, 32), innerLensMat);
+        rightGlass.rotation.x = Math.PI / 2;
+        rightLens.position.set(-0.05, 1.65, -0.125);
+        rightGlass.position.set(-0.05, 1.65, -0.125);
+        phoneGroup.add(rightLens);
+        phoneGroup.add(rightGlass);
+
+        // Flash dot (middle right)
         const flash = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), flashMat);
         flash.rotation.x = Math.PI / 2;
-        flash.position.set(-0.16, 1.25, -0.125);
+        flash.position.set(-0.05, 1.20, -0.125);
         phoneGroup.add(flash);
 
+        // Sensor dot (bottom right)
         const sensor = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 16), innerLensMat);
         sensor.rotation.x = Math.PI / 2;
-        sensor.position.set(-0.16, 1.00, -0.125);
+        sensor.position.set(-0.05, 0.85, -0.125);
         phoneGroup.add(sensor);
 
         scene.add(phoneGroup);
