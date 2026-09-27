@@ -1,7 +1,7 @@
 body { 
     font-family: Arial, sans-serif; 
-    background: #121212; 
-    color: #fff; 
+    background: #f4f6f9; /* Clean white / light professional background */
+    color: #333; 
     padding: 20px; 
     max-width: 1150px; 
     margin: auto; 
@@ -17,45 +17,61 @@ body {
 
 /* Left GPA Card Styling */
 .card { 
-    background: #1e1e1e; 
-    padding: 20px; 
-    border-radius: 10px; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+    background: #ffffff; 
+    padding: 25px; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+    border: 1px solid #e1e4e8;
     flex: 1; 
     min-width: 300px; 
     max-width: 400px; 
 }
 
+.card h2 {
+    margin-top: 0;
+    color: #111;
+}
+
+label {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #444;
+}
+
 input, select { 
     width: 100%; 
     padding: 10px; 
-    margin: 8px 0; 
-    background: #2a2a2a; 
-    border: 1px solid #444; 
-    color: #fff; 
-    border-radius: 5px; 
+    margin: 8px 0 15px 0; 
+    background: #f9fafb; 
+    border: 1px solid #d1d5db; 
+    color: #333; 
+    border-radius: 6px; 
     box-sizing: border-box; 
 }
 
 button { 
-    background: #007bff; 
+    background: #0066cc; 
     color: white; 
     border: none; 
     padding: 12px; 
     width: 100%; 
-    border-radius: 5px; 
+    border-radius: 6px; 
     cursor: pointer; 
     font-weight: bold; 
-    margin-top: 10px; 
+    margin-top: 5px; 
+    transition: background 0.2s;
 }
 
-button:hover { background: #0056b3; }
+button:hover { background: #0052a3; }
+
+.btn-danger { background: #dc3545; }
+.btn-danger:hover { background: #b02a37; }
 
 #result { 
     margin-top: 20px; 
     font-size: 1.2rem; 
     text-align: center; 
-    color: #2ecc71; 
+    color: #198754; 
     font-weight: bold; 
 }
 
@@ -63,11 +79,12 @@ button:hover { background: #0056b3; }
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    background: #2a2a2a; 
-    padding: 6px 10px; 
-    margin-top: 5px; 
-    border-radius: 4px; 
+    background: #f1f3f5; 
+    padding: 8px 12px; 
+    margin-top: 6px; 
+    border-radius: 6px; 
     font-size: 0.85rem; 
+    border: 1px solid #e9ecef;
 }
 
 /* --- TRUE 3D ROTATABLE PHONE VIEWPORT --- */
@@ -75,10 +92,10 @@ button:hover { background: #0056b3; }
     position: relative;
     width: 380px;
     height: 680px;
-    background: radial-gradient(circle, #1c1f26 0%, #0d0f12 100%);
-    border-radius: 24px;
-    border: 2px solid #333a45;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+    background: radial-gradient(circle, #ffffff 0%, #e9ecef 100%);
+    border-radius: 28px;
+    border: 3px solid #dcdfe6;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -97,14 +114,15 @@ button:hover { background: #0056b3; }
     bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     padding: 6px 14px;
     border-radius: 15px;
     font-size: 0.7rem;
-    color: #3498db;
+    color: #0066cc;
     font-weight: bold;
     pointer-events: none;
-    border: 1px solid #444;
+    border: 1px solid #d1d5db;
     z-index: 10;
     text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
