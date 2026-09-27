@@ -3,389 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Casio fx-82ES PLUS Calculator</title>
-    
-    <!-- Load Three.js and OrbitControls -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
+    <title>Student GPA & Scientific Calculator</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #121212; 
-            color: #fff; 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            box-sizing: border-box;
-        }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1150px; margin: auto; }
+        
+        .main-container { display: flex; gap: 30px; flex-wrap: wrap; align-items: flex-start; justify-content: center; perspective: 1000px; }
+        
+        /* Left GPA Card */
+        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 400px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
+        .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
 
-        h1 { margin-bottom: 20px; color: #3498db; font-size: 1.6rem; text-align: center; }
-
-        .app-container { 
-            display: flex; 
-            gap: 30px; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            max-width: 1000px; 
-            width: 100%; 
-        }
-
-        /* 3D Calculator Viewport Wrapper */
-        .calculator-wrapper {
-            position: relative;
-            width: 420px;
-            height: 600px;
-            background: radial-gradient(circle, #1a1c23 0%, #111215 100%);
-            border-radius: 12px;
-            border: 2px solid #333;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-            overflow: hidden;
-        }
-
-        #webgl-container { width: 100%; height: 100%; cursor: grab; }
-        #webgl-container:active { cursor: grabbing; }
-
-        /* LCD Screen Overlay aligned perfectly to the 3D model screen slot */
-        .calc-lcd-overlay {
-            position: absolute;
-            top: 75px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 230px;
-            height: 62px;
-            background: #9ead99;
-            color: #111;
-            border-radius: 3px;
-            padding: 5px 8px;
-            box-sizing: border-box;
-            font-family: monospace;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
-            border: 2px solid #3b423d;
-            z-index: 5;
-        }
-        .lcd-main-row { font-size: 0.75rem; font-weight: bold; text-align: right; white-space: nowrap; overflow: hidden; }
-        .lcd-ans-row { font-size: 0.95rem; font-weight: bold; color: #8b0000; text-align: right; }
-
-        .instruction-badge { 
-            position: absolute; 
-            bottom: 10px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: rgba(0, 0, 0, 0.8); 
-            padding: 5px 12px; 
-            border-radius: 15px; 
-            font-size: 0.7rem; 
-            color: #f1c40f; 
-            font-weight: bold; 
-            pointer-events: none;
-            border: 1px solid #444;
-        }
-
-        /* History Log Panel */
-        .history-card { 
-            background: #1e1e1e; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6); 
+        /* RIGHT: True 3D Real-World Physical Calculator Styling */
+        .sci-calc-body { 
+            background: linear-gradient(145deg, #1f2124, #121315); 
+            border: 2px solid #33363d; 
+            padding: 18px; 
+            border-radius: 16px; 
             width: 360px; 
-            display: flex; 
-            flex-direction: column; 
+            /* Heavy 3D desk shadow + subtle card tilt */
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.8), 
+                inset 0 2px 3px rgba(255, 255, 255, 0.1), 
+                inset 0 -4px 6px rgba(0, 0, 0, 0.6); 
+            transform: rotateX(2deg) rotateY(-2deg);
+            flex-shrink: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         }
-        .history-card h2 { margin-top: 0; color: #3498db; font-size: 1.2rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
-        .history-box { 
-            background: #18191a; 
-            border: 1px solid #333; 
+        
+        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .calc-brand-title { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 0.5px; text-shadow: 0 1px 1px #000; }
+        .solar-panel { background: #0b0c0e; border: 1px solid #222; width: 90px; height: 18px; display: flex; justify-content: space-around; align-items: center; padding: 1px; border-radius: 3px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.9); }
+        .solar-cell { background: linear-gradient(90deg, #1a2a40, #2c4a75); width: 20px; height: 14px; border: 1px solid #000; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); }
+
+        /* 3D Beveled LCD Screen */
+        .calc-lcd { 
+            background: #b5bec3; 
+            color: #111; 
+            padding: 10px; 
             border-radius: 6px; 
-            padding: 10px; 
-            height: 440px; 
-            overflow-y: auto; 
+            border: 3px solid;
+            border-color: #555c63 #2a2f33 #2a2f33 #555c63; /* 3D groove inset look */
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
+            margin-bottom: 12px; 
             font-family: monospace; 
-            font-size: 0.85rem; 
-            color: #a4b0be; 
-            margin-top: 10px; 
-            flex-grow: 1;
         }
-        .history-item { padding: 4px 0; border-bottom: 1px dashed #2f3542; }
-        .btn-clear { 
-            background: #444; 
-            color: white; 
-            border: none; 
-            padding: 10px; 
-            width: 100%; 
+        .lcd-top-icons { font-size: 0.6rem; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 2px; margin-bottom: 4px; font-weight: bold; }
+        .lcd-screen-main { font-size: 1.2rem; min-height: 35px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
+
+        /* Control & Replay Cluster */
+        .control-row-top { display: flex; gap: 6px; margin-bottom: 8px; }
+        .btn-sft { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
+        .btn-alp { background: linear-gradient(to bottom, #af7ac5, #884ea0); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
+        .btn-mod { background: linear-gradient(to bottom, #3498db, #2471a3); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
+
+        /* Replay Pad 3D Effect */
+        .replay-container { display: flex; justify-content: center; margin-bottom: 10px; }
+        .replay-pad { background: linear-gradient(145deg, #18191c, #26292e); border: 1px solid #3a3f44; border-radius: 20px; padding: 4px 14px; display: flex; gap: 12px; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
+        .replay-btn { background: linear-gradient(to bottom, #3498db, #1b4f72); color: #fff; border: none; font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 3px rgba(0,0,0,0.4); }
+        .replay-label { font-size: 0.6rem; color: #777; font-weight: bold; letter-spacing: 1px; }
+
+        /* 3D Tactile Buttons Grid */
+        .calc-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .skey { 
+            background: linear-gradient(to bottom, #2c3036, #202226); 
+            color: #fff; 
+            border: 1px solid #3c424a; 
+            border-bottom: 2px solid #111;
+            padding: 8px 0; 
+            font-size: 0.75rem; 
             border-radius: 5px; 
             cursor: pointer; 
             font-weight: bold; 
-            margin-top: 15px; 
+            text-align: center; 
+            box-shadow: 0 3px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: all 0.05s ease;
         }
-        .btn-clear:hover { background: #555; }
+        .skey:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.6); }
+        .skey:hover { background: linear-gradient(to bottom, #363b42, #26292e); }
+        
+        .skey span { display: block; font-size: 0.5rem; color: #3498db; margin-top: 2px; }
+        .skey span.shift-hint { color: #f39c12; }
+
+        .skey.op { color: #5dade2; }
+        .skey.del { background: linear-gradient(to bottom, #e67e22, #ba4a00); border-color: #d35400; color: #fff; }
+        .skey.ac { background: linear-gradient(to bottom, #e74c3c, #b03a2e); border-color: #c0392b; color: #fff; }
+        .skey.eq { background: linear-gradient(to bottom, #2ecc71, #27ae60); border-color: #219653; color: #fff; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <h1>Interactive 3D Casio fx-82ES PLUS Calculator</h1>
-
-    <div class="app-container">
-        
-        <!-- 3D Calculator Viewport -->
-        <div class="calculator-wrapper">
-            <div id="webgl-container"></div>
+    <div class="main-container">
+        <!-- LEFT: GPA Calculator -->
+        <div class="card">
+            <h2>GPA Calculator</h2>
+            <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
             
-            <div class="calc-lcd-overlay">
-                <div class="lcd-main-row" id="calcExpression">0</div>
-                <div class="lcd-ans-row" id="calcResult">Ans: 0</div>
-            </div>
+            <label>Course Name / Code</label>
+            <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
+            
+            <label>Grade & Points</label>
+            <select id="gradePoints">
+                <option value="5">A (5 Points)</option>
+                <option value="4">B+ (4 Points)</option>
+                <option value="3">B (3 Points)</option>
+                <option value="2">C (2 Points)</option>
+                <option value="1">D (1 Point)</option>
+                <option value="0">F (0 Points)</option>
+            </select>
 
-            <div class="instruction-badge">🖱️ Drag to Rotate | Click 3D Keys to Calculate</div>
+            <label>Credit Hours / Units</label>
+            <input type="number" id="credits" value="3" min="1" max="10">
+
+            <button onclick="addCourse()">Add Course</button>
+            <button style="background:#c0392b;" onclick="resetGPA()">Reset GPA</button>
+            
+            <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #ccc;"></div>
+            <div id="result"></div>
         </div>
 
-        <!-- Calculations Log Panel -->
-        <div class="history-card">
-            <h2>Calculations Log</h2>
-            <p style="font-size: 0.85rem; color: #aaa;">All 3D button presses and mathematical computations are tracked here:</p>
-            <div id="historyBox" class="history-box">
-                <div class="history-item">System initialized. Click 3D calculator keys.</div>
+        <!-- RIGHT: True 3D Physical Catiga Calculator -->
+        <div class="sci-calc-body">
+            <div class="calc-header">
+                <div class="calc-brand-title">CATIGA CS-991EX</div>
+                <div class="solar-panel">
+                    <div class="solar-cell"></div>
+                    <div class="solar-cell"></div>
+                    <div class="solar-cell"></div>
+                </div>
             </div>
-            <button class="btn-clear" onclick="clearHistory()">Clear History Log</button>
-        </div>
 
+            <div class="calc-lcd">
+                <div class="lcd-top-icons">
+                    <span>M S Setup</span>
+                    <span>DEG</span>
+                </div>
+                <div class="lcd-screen-main" id="csScreen">0</div>
+            </div>
+
+            <div class="control-row-top">
+                <button class="btn-sft" onclick="csInput('SHIFT')">SHIFT</button>
+                <button class="btn-alp" onclick="csInput('ALPHA')">ALPHA</button>
+                <button class="btn-mod" onclick="csInput('MODE')">MENU</button>
+            </div>
+
+            <div class="replay-container">
+                <div class="replay-pad">
+                    <span class="replay-label">REPLAY</span>
+                    <button class="replay-btn" onclick="csInput('▲')">▲</button>
+                    <button class="replay-btn" onclick="csInput('▼')">▼</button>
+                </div>
+            </div>
+
+            <div class="calc-keypad">
+                <button class="skey op" onclick="csInput('Math.sqrt(')">√<span class="shift-hint">x²</span></button>
+                <button class="skey op" onclick="csInput('**3')">x³<span class="shift-hint">∛</span></button>
+                <button class="skey op" onclick="csInput('**')">x^<span class="shift-hint">x√</span></button>
+                <button class="skey op" onclick="csInput('Math.log10(')">log<span class="shift-hint">10ˣ</span></button>
+
+                <button class="skey op" onclick="csInput('Math.log(')">ln<span class="shift-hint">eˣ</span></button>
+                <button class="skey op" onclick="csInput('(-1)*')">(-)<span class="shift-hint">° ’ ”</span></button>
+                <button class="skey op" onclick="csInput('Math.sin(')">sin<span class="shift-hint">sin⁻¹</span></button>
+                <button class="skey op" onclick="csInput('Math.cos(')">cos<span class="shift-hint">cos⁻¹</span></button>
+
+                <button class="skey op" onclick="csInput('Math.tan(')">tan<span class="shift-hint">tan⁻¹</span></button>
+                <button class="skey op" onclick="csInput('(')">(<span class="shift-hint">i</span></button>
+                <button class="skey op" onclick="csInput(')')">)<span class="shift-hint">X</span></button>
+                <button class="skey op" onclick="csInput('/')">÷</button>
+
+                <button class="skey" onclick="csInput('7')">7<span class="shift-hint">CONST</span></button>
+                <button class="skey" onclick="csInput('8')">8<span class="shift-hint">CONV</span></button>
+                <button class="skey" onclick="csInput('9')">9<span class="shift-hint">CLR</span></button>
+                <button class="skey del" onclick="csInput('DEL')">DEL</button>
+
+                <button class="skey" onclick="csInput('4')">4<span class="shift-hint">matrix</span></button>
+                <button class="skey" onclick="csInput('5')">5<span class="shift-hint">vector</span></button>
+                <button class="skey" onclick="csInput('6')">6<span class="shift-hint">stats</span></button>
+                <button class="skey ac" onclick="csInput('AC')">AC</button>
+
+                <button class="skey" onclick="csInput('1')">1<span class="shift-hint">STAT</span></button>
+                <button class="skey" onclick="csInput('2')">2<span class="shift-hint">CMPLX</span></button>
+                <button class="skey" onclick="csInput('3')">3<span class="shift-hint">BASE</span></button>
+                <button class="skey op" onclick="csInput('*')">×</button>
+
+                <button class="skey" onclick="csInput('0')">0<span class="shift-hint">RND</span></button>
+                <button class="skey" onclick="csInput('.')">.<span class="shift-hint">Int</span></button>
+                <button class="skey op" onclick="csInput('Math.PI')">π<span class="shift-hint">e</span></button>
+                <button class="skey op" onclick="csInput('-')">-</button>
+
+                <button class="skey" onclick="csInput('Ans')">Ans<span class="shift-hint">DRG</span></button>
+                <button class="skey op" onclick="csInput('/100')">%<span class="shift-hint">;</span></button>
+                <button class="skey eq" onclick="csCalculate()">=</button>
+                <button class="skey op" onclick="csInput('+')">+</button>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript Execution Engine -->
     <script>
-        // --- HISTORY LOG SYSTEM ---
-        function logHistory(text) {
-            const box = document.getElementById('historyBox');
-            if (box.innerHTML.includes("System initialized")) {
-                box.innerHTML = "";
+        let totalPoints = 0;
+        let totalCredits = 0;
+
+        function addCourse() {
+            const name = document.getElementById('courseName').value || "Course";
+            const points = parseFloat(document.getElementById('gradePoints').value);
+            const credits = parseFloat(document.getElementById('credits').value);
+
+            if (isNaN(credits) || credits <= 0) {
+                alert("Please enter valid credit hours.");
+                return;
             }
-            const time = new Date().toLocaleTimeString();
-            box.innerHTML = `<div class="history-item">[${time}] ${text}</div>` + box.innerHTML;
+
+            totalPoints += (points * credits);
+            totalCredits += credits;
+
+            const gpa = (totalPoints / totalCredits).toFixed(2);
+            
+            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Credits)</span><span>Pts: ${points}</span></div>`;
+            document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
+            document.getElementById('courseName').value = '';
         }
 
-        function clearHistory() {
-            document.getElementById('historyBox').innerHTML = '<div class="history-item">History cleared.</div>';
+        function resetGPA() {
+            totalPoints = 0;
+            totalCredits = 0;
+            document.getElementById('courseList').innerHTML = '';
+            document.getElementById('result').innerHTML = '';
         }
 
-        // --- CALCULATOR CORE LOGIC ---
-        let currentExpression = "0";
-        let lastAnswer = "0";
+        let csExpression = "";
+        let csLastAns = "0";
 
-        function updateScreen(expr, ans) {
-            document.getElementById('calcExpression').innerText = expr;
-            document.getElementById('calcResult').innerText = "Ans: " + ans;
-        }
+        function csInput(val) {
+            const screen = document.getElementById('csScreen');
 
-        function handleCalculatorInput(val) {
             if (val === 'AC') {
-                currentExpression = "0";
-                lastAnswer = "0";
-                logHistory("Calculator cleared (AC).");
-            } else if (val === 'DEL') {
-                if (currentExpression.length > 1) {
-                    currentExpression = currentExpression.slice(0, -1);
-                } else {
-                    currentExpression = "0";
-                }
-                logHistory("Deleted last character.");
-            } else if (val === '=') {
-                try {
-                    let expClean = currentExpression
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/sin\(/g, 'Math.sin(Math.PI/180*')
-                        .replace(/cos\(/g, 'Math.cos(Math.PI/180*')
-                        .replace(/tan\(/g, 'Math.tan(Math.PI/180*')
-                        .replace(/log\(/g, 'Math.log10(')
-                        .replace(/ln\(/g, 'Math.log(')
-                        .replace(/√\(/g, 'Math.sqrt(')
-                        .replace(/Ans/g, lastAnswer);
+                csExpression = "";
+                screen.innerText = "0";
+                return;
+            }
 
-                    let evalResult = eval(expClean);
-                    if (isNaN(evalResult) || !isFinite(evalResult)) throw new Error();
-                    
-                    logHistory(`Computed: ${currentExpression} = ${evalResult}`);
-                    lastAnswer = evalResult;
-                    currentExpression = evalResult.toString();
-                } catch (err) {
-                    logHistory(`Syntax Error on: ${currentExpression}`);
-                    currentExpression = "Error";
-                }
+            if (val === 'DEL') {
+                csExpression = csExpression.slice(0, -1);
+                screen.innerText = csExpression === "" ? "0" : csExpression;
+                return;
+            }
+
+            if (val === 'Ans') {
+                csExpression += csLastAns;
+            } else if (['SHIFT', 'ALPHA', 'MODE', '▲', '▼'].includes(val)) {
+                return;
             } else {
-                if (currentExpression === '0' || currentExpression === 'Error') {
-                    currentExpression = val;
+                if (csExpression === "0" && val !== '.') {
+                    csExpression = val;
                 } else {
-                    currentExpression += val;
-                }
-                logHistory(`Pressed key: ${val}`);
-            }
-            updateScreen(currentExpression, lastAnswer);
-        }
-
-        // --- THREE.JS 3D CASIO MODEL RENDERER ---
-        const container = document.getElementById('webgl-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 0, 5.8);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 4;
-        controls.maxDistance = 8;
-
-        // Lighting
-        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        dirLight.position.set(5, 10, 7);
-        scene.add(dirLight);
-
-        // Build Casio Group
-        const casioGroup = new THREE.Group();
-
-        // 1. Casing Body
-        const body = new THREE.Mesh(
-            new THREE.BoxGeometry(2.6, 4.6, 0.25), 
-            new THREE.MeshStandardMaterial({ color: 0x181a1c, roughness: 0.3 })
-        );
-        casioGroup.add(body);
-
-        // 2. Faceplate Panel
-        const faceplate = new THREE.Mesh(
-            new THREE.BoxGeometry(2.4, 4.4, 0.27), 
-            new THREE.MeshStandardMaterial({ color: 0x22252a, roughness: 0.5 })
-        );
-        faceplate.position.z = 0.01;
-        casioGroup.add(faceplate);
-
-        // 3. Screen Bezel
-        const screenBezel = new THREE.Mesh(
-            new THREE.BoxGeometry(2.1, 0.75, 0.29), 
-            new THREE.MeshStandardMaterial({ color: 0x111315, roughness: 0.2 })
-        );
-        screenBezel.position.set(0, 1.55, 0.02);
-        casioGroup.add(screenBezel);
-
-        // 4. Keypad Configuration matching Casio fx-82ES Plus
-        const matNum = new THREE.MeshStandardMaterial({ color: 0x3e424a, roughness: 0.4 });
-        const matSci = new THREE.MeshStandardMaterial({ color: 0x2b2e34, roughness: 0.5 });
-        const matOp = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
-        const matAC = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.3 });
-        const matDEL = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.3 });
-
-        const buttonConfig = [
-            [{label: 'shift', w:0.35, h:0.18, mat:matSci}, {label: 'alpha', w:0.35, h:0.18, mat:matSci}, {label: 'mode', w:0.35, h:0.18, mat:matSci}, {label: 'on', w:0.35, h:0.18, mat:matSci}],
-            [{label: 'x³', w:0.35, h:0.18, mat:matSci}, {label: 'x⁻¹', w:0.35, h:0.18, mat:matSci}, {label: 'log(', w:0.35, h:0.18, mat:matSci}, {label: 'ln(', w:0.35, h:0.18, mat:matSci}],
-            [{label: '√(', w:0.35, h:0.18, mat:matSci}, {label: 'x²', w:0.35, h:0.18, mat:matSci}, {label: 'log(', w:0.35, h:0.18, mat:matSci}, {label: 'Ans', w:0.35, h:0.18, mat:matSci}],
-            [{label: 'sin(', w:0.35, h:0.18, mat:matSci}, {label: 'cos(', w:0.35, h:0.18, mat:matSci}, {label: 'tan(', w:0.35, h:0.18, mat:matSci}, {label: '(', w:0.35, h:0.18, mat:matSci}],
-            [{label: 'RCL', w:0.35, h:0.18, mat:matSci}, {label: 'ENG', w:0.35, h:0.18, mat:matSci}, {label: '(', w:0.35, h:0.18, mat:matSci}, {label: ')', w:0.35, h:0.18, mat:matSci}],
-            [{label: '7', w:0.42, h:0.2, mat:matNum}, {label: '8', w:0.42, h:0.2, mat:matNum}, {label: '9', w:0.42, h:0.2, mat:matNum}, {label: 'DEL', w:0.42, h:0.2, mat:matDEL}, {label: 'AC', w:0.42, h:0.2, mat:matAC}],
-            [{label: '4', w:0.42, h:0.2, mat:matNum}, {label: '5', w:0.42, h:0.2, mat:matNum}, {label: '6', w:0.42, h:0.2, mat:matNum}, {label: '×', w:0.42, h:0.2, mat:matOp}, {label: '÷', w:0.42, h:0.2, mat:matOp}],
-            [{label: '1', w:0.42, h:0.2, mat:matNum}, {label: '2', w:0.42, h:0.2, mat:matNum}, {label: '3', w:0.42, h:0.2, mat:matNum}, {label: '+', w:0.42, h:0.2, mat:matOp}, {label: '-', w:0.42, h:0.2, mat:matOp}],
-            [{label: '0', w:0.42, h:0.2, mat:matNum}, {label: '.', w:0.42, h:0.2, mat:matNum}, {label: '×10ˣ', w:0.42, h:0.2, mat:matNum}, {label: 'Ans', w:0.42, h:0.2, mat:matNum}, {label: '=', w:0.42, h:0.2, mat:matOp}]
-        ];
-
-        const interactiveButtons = [];
-
-        // Render upper scientific rows
-        for (let r = 0; r < 5; r++) {
-            let row = buttonConfig[r];
-            let startX = -0.6;
-            let posY = 0.95 - (r * 0.23);
-            for (let c = 0; c < row.length; c++) {
-                let btnData = row[c];
-                let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.05);
-                let btnMesh = new THREE.Mesh(btnGeo, btnData.mat);
-                btnMesh.position.set(startX + (c * 0.42), posY, 0.04);
-                btnMesh.userData = { value: btnData.label === 'on' ? 'AC' : (btnData.label === '×10ˣ' ? '*' : btnData.label) };
-                casioGroup.add(btnMesh);
-                interactiveButtons.push(btnMesh);
-            }
-        }
-
-        // Render main keypad rows
-        for (let r = 5; r < buttonConfig.length; r++) {
-            let row = buttonConfig[r];
-            let startX = -0.85;
-            let posY = 0.05 - ((r - 5) * 0.25);
-            for (let c = 0; c < row.length; c++) {
-                let btnData = row[c];
-                let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.06);
-                let btnMesh = new THREE.Mesh(btnGeo, btnData.mat);
-                btnMesh.position.set(startX + (c * 0.44), posY, 0.04);
-                
-                let valMapping = btnData.label;
-                if (valMapping === '×10ˣ') valMapping = '*';
-
-                btnMesh.userData = { value: valMapping };
-                casioGroup.add(btnMesh);
-                interactiveButtons.push(btnMesh);
-            }
-        }
-
-        scene.add(casioGroup);
-
-        // --- RAYCASTING FOR 3D BUTTON CLICKS ---
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        window.addEventListener('pointerdown', (event) => {
-            const rect = renderer.domElement.getBoundingClientRect();
-            if (
-                event.clientX >= rect.left &&
-                event.clientX <= rect.right &&
-                event.clientY >= rect.top &&
-                event.clientY <= rect.bottom
-            ) {
-                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(interactiveButtons);
-
-                if (intersects.length > 0) {
-                    const clickedButton = intersects[0].object;
-                    const val = clickedButton.userData.value;
-
-                    // Press animation
-                    clickedButton.position.z -= 0.02;
-                    setTimeout(() => {
-                        clickedButton.position.z += 0.02;
-                    }, 120);
-
-                    handleCalculatorInput(val);
+                    csExpression += val;
                 }
             }
-        });
-
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
+            screen.innerText = csExpression;
         }
-        animate();
 
-        // Resize handling
-        window.addEventListener('resize', () => {
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        });
+        function csCalculate() {
+            const screen = document.getElementById('csScreen');
+            try {
+                let evaluated = eval(csExpression.replace(/Math\.PI/g, Math.PI));
+                csLastAns = Number.isFinite(evaluated) ? evaluated.toString() : "Math Error";
+                screen.innerText = csLastAns;
+                csExpression = csLastAns;
+            } catch (err) {
+                screen.innerText = "Syntax Error";
+                csExpression = "";
+            }
+        }
     </script>
 </body>
 </html>
