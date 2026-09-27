@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Smartphone Calculator & Academic GPA Ledger</title>
+    <title>Interactive 3D Device & Academic GPA System</title>
     
     <!-- Load Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -15,7 +15,7 @@
             background: #0f172a; 
             color: #f8fafc; 
             padding: 20px; 
-            max-width: 1250px; 
+            max-width: 1300px; 
             margin: auto; 
         }
 
@@ -107,10 +107,14 @@
         /* --- TRUE 3D VIEWPORT CONTAINER --- */
         .calculator-3d-wrapper {
             position: relative;
-            width: 440px;
-            height: 720px;
-            background: transparent;
+            width: 480px;
+            height: 750px;
+            background: #1e293b;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             flex-shrink: 0;
+            overflow: hidden;
         }
 
         #webgl-container { 
@@ -123,10 +127,10 @@
 
         .instruction-badge {
             position: absolute;
-            bottom: 10px;
+            bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.92);
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.78rem;
@@ -143,16 +147,16 @@
 <body>
 
     <header>
-        <h1>Interactive 3D Smartphone Calculator & GPA Ledger</h1>
-        <p>Rotate the 3D phone in full 360° space, use the interactive screen, and sync operations into your GPA ledger.</p>
+        <h1>Interactive 3D Device & Academic GPA System</h1>
+        <p>Rotate the fully framed 3D phone device in 360° space, use the calculator, and sync operations into your GPA ledger.</p>
     </header>
 
     <div class="main-container">
         
-        <!-- LEFT: GPA Calculator Card with Step-by-Step Operation Tracking -->
+        <!-- LEFT: GPA Calculator Card -->
         <div class="card">
             <h2>Academic GPA Ledger</h2>
-            <p style="color: #94a3b8; font-size: 0.85rem;">Calculations performed on the 3D phone sync here with full step-by-step operation logs.</p>
+            <p style="color: #94a3b8; font-size: 0.85rem;">Calculations performed on the 3D phone device sync here automatically with full operation logs.</p>
             
             <label>Course Name / Synced Operation</label>
             <input type="text" id="courseName" placeholder="Synced calculation...">
@@ -179,10 +183,10 @@
             <div id="courseList" style="margin-top: 15px; max-height: 220px; overflow-y: auto;"></div>
         </div>
 
-        <!-- RIGHT: True 3D Rotating Smartphone Device -->
+        <!-- RIGHT: True 3D Rotating Device Container (Properly framed to fit fully on load) -->
         <div class="calculator-3d-wrapper">
             <div id="webgl-container"></div>
-            <div class="instruction-badge">🖱️ Drag to Rotate Phone 360° &bull; Click Screen Buttons to Calculate</div>
+            <div class="instruction-badge">🖱️ Drag to Rotate 3D Phone 360° &bull; Click Buttons to Calculate</div>
         </div>
 
     </div>
@@ -234,7 +238,6 @@
         // --- CALCULATOR ENGINE ---
         let calcExpression = "150+50";
         let calcResultOutput = "200"; 
-        let lastStepsLog = "150 + 50 = 200";
 
         const calcButtons = [
             { label: 'AC', val: 'AC', x: 20, y: 150, w: 105, h: 50, bg: '#ef4444', col: '#fff' },
@@ -284,7 +287,7 @@
             dCtx.lineWidth = 3;
             dCtx.strokeRect(20, 20, 470, 115);
 
-            // Expression / Steps view
+            // Expression view
             dCtx.fillStyle = '#94a3b8';
             dCtx.font = 'bold 20px monospace';
             dCtx.fillText(calcExpression, 35, 55);
@@ -334,10 +337,7 @@
                 let evaluated = eval(cleanExp);
                 calcResultOutput = Number.isFinite(evaluated) ? evaluated.toString() : "Error";
                 
-                // Record operation details with full calculation steps
                 lastOperationDetails = `${calcExpression} = ${calcResultOutput}`;
-                
-                // Automatically sync calculation and operations to GPA input field
                 document.getElementById('courseName').value = `Calc: ${lastOperationDetails}`;
             } catch (err) {
                 calcResultOutput = "Error";
@@ -346,14 +346,15 @@
             redrawDeviceUI();
         }
 
-        // --- THREE.JS 3D SCENE & DEVICE SETUP ---
+        // --- THREE.JS 3D SCENE & PHONE SETUP ---
         const container = document.getElementById('webgl-container');
-        const width = container.clientWidth || 440;
-        const height = container.clientHeight || 720;
+        const width = container.clientWidth || 480;
+        const height = container.clientHeight || 750;
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        camera.position.set(0, 0, 5.0); // Framed nicely inside container box
+        // Adjusted camera distance so the entire phone fits comfortably in view on initial load
+        const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 7.8);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(width, height);
@@ -363,8 +364,8 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.minDistance = 3.0;
-        controls.maxDistance = 6.5;
+        controls.minDistance = 4.5;
+        controls.maxDistance = 10.0;
 
         // Lighting
         scene.add(new THREE.AmbientLight(0xffffff, 1.5));
@@ -376,12 +377,12 @@
         backLight.position.set(-5, -5, -7);
         scene.add(backLight);
 
-        // 3D Smartphone Group
+        // 3D Device Group
         const deviceGroup = new THREE.Group();
 
-        // Extruded 3D Phone Body Shape with realistic thickness
+        // Extruded 3D Phone Body Shape
         const shape = new THREE.Shape();
-        const pw = 2.7, ph = 5.2, r = 0.22;
+        const pw = 2.6, ph = 4.8, r = 0.18;
         shape.moveTo(-pw/2 + r, -ph/2);
         shape.lineTo(pw/2 - r, -ph/2);
         shape.quadraticCurveTo(pw/2, -ph/2, pw/2, -ph/2 + r);
@@ -392,7 +393,7 @@
         shape.lineTo(-pw/2, -ph/2 + r);
         shape.quadraticCurveTo(-pw/2, -ph/2, -pw/2 + r, -ph/2);
 
-        const extrudeSettings = { depth: 0.32, bevelEnabled: true, bevelSegments: 5, steps: 1, bevelSize: 0.04, bevelThickness: 0.04 };
+        const extrudeSettings = { depth: 0.22, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.03, bevelThickness: 0.03 };
         const deviceGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
         deviceGeo.center();
 
@@ -401,17 +402,17 @@
         deviceGroup.add(deviceBody);
 
         // Front Screen Plane
-        const screenGeo = new THREE.PlaneGeometry(2.45, 4.90);
+        const screenGeo = new THREE.PlaneGeometry(2.35, 4.50);
         const screenMat = new THREE.MeshBasicMaterial({ map: deviceTexture });
         const screenMesh = new THREE.Mesh(screenGeo, screenMat);
-        screenMesh.position.z = 0.17;
+        screenMesh.position.z = 0.125;
         deviceGroup.add(screenMesh);
 
         // Clean Back Panel
-        const backGeo = new THREE.PlaneGeometry(2.45, 4.90);
+        const backGeo = new THREE.PlaneGeometry(2.35, 4.50);
         const backMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.7 });
         const backPanel = new THREE.Mesh(backGeo, backMat);
-        backPanel.position.z = -0.17;
+        backPanel.position.z = -0.125;
         backPanel.rotation.y = Math.PI;
         deviceGroup.add(backPanel);
 
@@ -457,8 +458,8 @@
         animate();
 
         window.addEventListener('resize', () => {
-            const w = container.clientWidth || 440;
-            const h = container.clientHeight || 720;
+            const w = container.clientWidth || 480;
+            const h = container.clientHeight || 750;
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
             renderer.setSize(w, h);
