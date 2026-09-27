@@ -3,26 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPA Calculator & 3D Calculator</title>
+    <title>GPA Calculator & True 3D Rotating Calculator Device</title>
+    
+    <!-- Load Three.js and OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <style>
         body { 
             font-family: Arial, sans-serif; 
             background: #f4f7f6; 
             color: #333; 
             padding: 20px; 
-            max-width: 1100px; 
+            max-width: 1200px; 
             margin: auto; 
         }
 
         .main-container { 
             display: flex; 
-            gap: 30px; 
+            gap: 40px; 
             flex-wrap: wrap; 
-            align-items: flex-start; 
+            align-items: center; 
             justify-content: center; 
         }
 
-        /* Common Card Style */
+        /* GPA Card Styling */
         .card { 
             background: #ffffff; 
             padding: 25px; 
@@ -31,7 +36,7 @@
             border: 1px solid #e1e4e8;
             flex: 1; 
             min-width: 320px; 
-            max-width: 420px; 
+            max-width: 400px; 
         }
 
         .card h2 { margin-top: 0; color: #111; }
@@ -46,7 +51,7 @@
             border-radius: 6px; 
             box-sizing: border-box; 
         }
-        .action-btn { 
+        button { 
             background: #0066cc; 
             color: white; 
             border: none; 
@@ -57,11 +62,11 @@
             font-weight: bold; 
             margin-top: 5px; 
         }
-        .action-btn:hover { background: #0052a3; }
+        button:hover { background: #0052a3; }
         .btn-danger { background: #dc3545; }
         .btn-danger:hover { background: #b02a37; }
 
-        #gpaResult { 
+        #result { 
             margin-top: 20px; 
             font-size: 1.2rem; 
             text-align: center; 
@@ -81,127 +86,51 @@
             border: 1px solid #e9ecef;
         }
 
-        /* --- TRUE 3D REALISTIC CALCULATOR DESIGN --- */
-        .calculator-3d-scene {
-            perspective: 1200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* --- TRUE 3D VIEWPORT CONTAINER --- */
+        .calculator-3d-wrapper {
+            position: relative;
+            width: 420px;
+            height: 720px;
+            background: transparent;
+            flex-shrink: 0;
         }
 
-        .calculator-3d-chassis {
-            background: linear-gradient(145deg, #2b323b 0%, #171b22 100%);
-            padding: 24px;
-            border-radius: 24px;
-            /* Multi-layer box-shadow to achieve physical 3D depth and curved body bevels */
-            box-shadow: 
-                0 30px 60px rgba(0,0,0,0.4), 
-                0 10px 20px rgba(0,0,0,0.2),
-                inset 0 2px 4px rgba(255,255,255,0.2), 
-                inset 0 -8px 12px rgba(0,0,0,0.8),
-                inset 3px 0 5px rgba(255,255,255,0.05),
-                inset -3px 0 5px rgba(0,0,0,0.3);
-            width: 350px;
-            box-sizing: border-box;
-            border: 2px solid #3c4654;
-            transform: rotateX(6deg) rotateY(-4deg);
-            transform-style: preserve-3d;
-            transition: transform 0.3s ease;
+        #webgl-container { 
+            width: 100%; 
+            height: 100%; 
+            display: block;
+            cursor: grab; 
         }
+        #webgl-container:active { cursor: grabbing; }
 
-        .calculator-3d-chassis:hover {
-            transform: rotateX(0deg) rotateY(0deg);
-        }
-
-        .calc-screen {
-            background: #9bb1af;
-            padding: 14px;
-            border-radius: 10px;
-            font-family: monospace;
-            text-align: right;
-            border: inset 3px #6b807e;
-            margin-bottom: 22px;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.3), 0 2px 4px rgba(255,255,255,0.1);
-        }
-
-        #calc-history {
-            font-size: 0.85rem;
-            color: #2c3534;
-            min-height: 18px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        #calc-output {
-            font-size: 1.7rem;
+        .instruction-badge {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #0066cc;
             font-weight: bold;
-            color: #111;
-            margin-top: 4px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            pointer-events: none;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-
-        .calc-keypad {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        /* Physical 3D Tactile Buttons */
-        .calc-btn {
-            background: linear-gradient(to bottom, #525f75, #2d3748);
-            color: #ffffff;
-            border: none;
-            padding: 15px 0;
-            font-size: 1.15rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            /* 3D block extrusion shadow */
-            box-shadow: 0 6px 0 #1a202c, 0 8px 8px rgba(0,0,0,0.4);
-            transition: all 0.05s ease;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .calc-btn:hover {
-            background: linear-gradient(to bottom, #5e6d85, #344054);
-        }
-
-        .calc-btn:active {
-            transform: translateY(5px);
-            box-shadow: 0 1px 0 #1a202c, 0 2px 3px rgba(0,0,0,0.3);
-        }
-
-        .btn-op {
-            background: linear-gradient(to bottom, #ecc94b, #b7791f);
-            box-shadow: 0 6px 0 #744210, 0 8px 8px rgba(0,0,0,0.4);
-        }
-        .btn-op:active { transform: translateY(5px); box-shadow: 0 1px 0 #744210, 0 2px 3px rgba(0,0,0,0.3); }
-
-        .btn-clear {
-            background: linear-gradient(to bottom, #f56565, #c53030);
-            box-shadow: 0 6px 0 #742a2a, 0 8px 8px rgba(0,0,0,0.4);
-        }
-        .btn-clear:active { transform: translateY(5px); box-shadow: 0 1px 0 #742a2a, 0 2px 3px rgba(0,0,0,0.3); }
-
-        .btn-equals {
-            background: linear-gradient(to bottom, #38b2ac, #285e61);
-            box-shadow: 0 6px 0 #134e4a, 0 8px 8px rgba(0,0,0,0.4);
-        }
-        .btn-equals:active { transform: translateY(5px); box-shadow: 0 1px 0 #134e4a, 0 2px 3px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
     <div class="main-container">
         
-        <!-- LEFT: GPA Calculator Card -->
+        <!-- LEFT: GPA Calculator Card (Automatically syncs with 3D Calculator history/results) -->
         <div class="card">
-            <h2>GPA Calculator</h2>
-            <p style="color: #666; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
+            <h2>GPA & Calculator Sync</h2>
+            <p style="color: #666; font-size: 0.9rem;">Calculations performed on the 3D device sync here automatically.</p>
             
-            <label>Course Name / Code</label>
-            <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
+            <label>Course Name / Code / Synced Entry</label>
+            <input type="text" id="courseName" placeholder="Synced from 3D Calc...">
             
             <label>Grade & Points</label>
             <select id="gradePoints">
@@ -216,59 +145,28 @@
             <label>Credit Hours / Units</label>
             <input type="number" id="credits" value="3" min="1" max="10">
 
-            <button class="action-btn" onclick="addCourse()">Add Course</button>
-            <button class="action-btn btn-danger" onclick="resetGPA()">Reset GPA</button>
+            <button onclick="addCourse()">Add Course From Sync</button>
+            <button class="btn-danger" onclick="resetGPA()">Reset GPA</button>
             
             <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #444;"></div>
-            <div id="gpaResult"></div>
+            <div id="result"></div>
         </div>
 
-        <!-- RIGHT: True 3D Functional Calculator -->
-        <div class="calculator-3d-scene">
-            <div class="calculator-3d-chassis">
-                <div class="calc-screen">
-                    <div id="calc-history"></div>
-                    <div id="calc-output">0</div>
-                </div>
-                
-                <div class="calc-keypad">
-                    <button class="calc-btn btn-clear" onclick="clearCalc()">AC</button>
-                    <button class="calc-btn" onclick="appendValue('(')">(</button>
-                    <button class="calc-btn" onclick="appendValue(')')">)</button>
-                    <button class="calc-btn btn-op" onclick="appendValue('/')">÷</button>
-
-                    <button class="calc-btn" onclick="appendValue('7')">7</button>
-                    <button class="calc-btn" onclick="appendValue('8')">8</button>
-                    <button class="calc-btn" onclick="appendValue('9')">9</button>
-                    <button class="calc-btn btn-op" onclick="appendValue('*')">×</button>
-
-                    <button class="calc-btn" onclick="appendValue('4')">4</button>
-                    <button class="calc-btn" onclick="appendValue('5')">5</button>
-                    <button class="calc-btn" onclick="appendValue('6')">6</button>
-                    <button class="calc-btn btn-op" onclick="appendValue('-')">-</button>
-
-                    <button class="calc-btn" onclick="appendValue('1')">1</button>
-                    <button class="calc-btn" onclick="appendValue('2')">2</button>
-                    <button class="calc-btn" onclick="appendValue('3')">3</button>
-                    <button class="calc-btn btn-op" onclick="appendValue('+')">+</button>
-
-                    <button class="calc-btn" onclick="appendValue('0')">0</button>
-                    <button class="calc-btn" onclick="appendValue('.')">.</button>
-                    <button class="calc-btn btn-clear" onclick="backspace()">⌫</button>
-                    <button class="calc-btn btn-equals" onclick="calculateResult()">=</button>
-                </div>
-            </div>
+        <!-- RIGHT: True 3D Rotating Calculator Device (Like the S25 phone model) -->
+        <div class="calculator-3d-wrapper">
+            <div id="webgl-container"></div>
+            <div class="instruction-badge">🖱️ Drag to Rotate 360° (See Front, Back & All Sides)</div>
         </div>
 
     </div>
 
     <script>
-        // --- GPA CALCULATOR SCRIPT ---
+        // --- GPA CALCULATOR LOGIC ---
         let totalPoints = 0;
         let totalCredits = 0;
 
         function addCourse() {
-            const name = document.getElementById('courseName').value || "Course";
+            const name = document.getElementById('courseName').value || "Calculation Entry";
             const points = parseFloat(document.getElementById('gradePoints').value);
             const credits = parseFloat(document.getElementById('credits').value);
 
@@ -282,78 +180,276 @@
 
             const gpa = (totalPoints / totalCredits).toFixed(2);
             
-            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Credits)</span><span>Pts: ${points}</span></div>`;
-            document.getElementById('gpaResult').innerHTML = `Current Semester GPA: ${gpa}`;
-            document.getElementById('courseName').value = '';
+            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
+            document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
         }
 
         function resetGPA() {
             totalPoints = 0;
             totalCredits = 0;
             document.getElementById('courseList').innerHTML = '';
-            document.getElementById('gpaResult').innerHTML = '';
+            document.getElementById('result').innerHTML = '';
         }
 
-        // Preload default course with grade points on page load as requested
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('courseName').value = "Calculated Result Entry";
-            document.getElementById('gradePoints').value = "5";
-            document.getElementById('credits').value = "3";
-            addCourse();
+        // --- INTERACTIVE 3D CALCULATOR ENGINE MAPPED TO DEVICE ---
+        let calcExpression = "125×4";
+        let calcResultOutput = "500"; 
+
+        const calcButtons = [
+            { label: 'AC', val: 'AC', x: 20, y: 150, w: 105, h: 50, bg: '#e74c3c', col: '#fff' },
+            { label: '(', val: '(', x: 135, y: 150, w: 105, h: 50, bg: '#34495e', col: '#fff' },
+            { label: ')', val: ')', x: 250, y: 150, w: 105, h: 50, bg: '#34495e', col: '#fff' },
+            { label: '÷', val: '/', x: 365, y: 150, w: 125, h: 50, bg: '#f39c12', col: '#fff' },
+
+            { label: '7', val: '7', x: 20, y: 210, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '8', val: '8', x: 135, y: 210, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '9', val: '9', x: 250, y: 210, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '×', val: '*', x: 365, y: 210, w: 125, h: 60, bg: '#f39c12', col: '#fff' },
+
+            { label: '4', val: '4', x: 20, y: 280, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '5', val: '5', x: 135, y: 280, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '6', val: '6', x: 250, y: 280, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '-', val: '-', x: 365, y: 280, w: 125, h: 60, bg: '#f39c12', col: '#fff' },
+
+            { label: '1', val: '1', x: 20, y: 350, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '2', val: '2', x: 135, y: 350, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '3', val: '3', x: 250, y: 350, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '+', val: '+', x: 365, y: 350, w: 125, h: 60, bg: '#f39c12', col: '#fff' },
+
+            { label: '0', val: '0', x: 20, y: 420, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '.', val: '.', x: 135, y: 420, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
+            { label: '⌫', val: 'DEL', x: 250, y: 420, w: 105, h: 60, bg: '#d35400', col: '#fff' },
+            { label: '=', val: '=', x: 365, y: 420, w: 125, h: 60, bg: '#27ae60', col: '#fff' }
+        ];
+
+        // Canvas texture mapped onto the front screen of the 3D device
+        const deviceCanvas = document.createElement('canvas');
+        deviceCanvas.width = 512;
+        deviceCanvas.height = 512;
+        const dCtx = deviceCanvas.getContext('2d');
+        const deviceTexture = new THREE.CanvasTexture(deviceCanvas);
+        deviceTexture.generateMipmaps = true;
+        deviceTexture.minFilter = THREE.LinearMipmapLinearFilter;
+
+        function redrawDeviceUI() {
+            // Screen Background
+            dCtx.fillStyle = '#1e272e';
+            dCtx.fillRect(0, 0, deviceCanvas.width, deviceCanvas.height);
+
+            // LCD Display Screen Box
+            dCtx.fillStyle = '#d2f8d2';
+            dCtx.fillRect(20, 25, 470, 105);
+            dCtx.strokeStyle = '#2f3640';
+            dCtx.lineWidth = 3;
+            dCtx.strokeRect(20, 25, 470, 105);
+
+            // Expression text
+            dCtx.fillStyle = '#353b48';
+            dCtx.font = 'bold 22px monospace';
+            dCtx.fillText(calcExpression, 35, 65);
+
+            // Result text
+            dCtx.fillStyle = '#000000';
+            dCtx.font = 'bold 36px monospace';
+            dCtx.textAlign = 'right';
+            dCtx.fillText(calcResultOutput, 475, 110);
+            dCtx.textAlign = 'left';
+
+            // Keypad buttons
+            calcButtons.forEach(btn => {
+                dCtx.fillStyle = btn.bg;
+                dCtx.fillRect(btn.x, btn.y, btn.w, btn.h);
+                dCtx.strokeStyle = '#ffffff';
+                dCtx.lineWidth = 1;
+                dCtx.strokeRect(btn.x, btn.y, btn.w, btn.h);
+
+                dCtx.fillStyle = btn.col || '#ffffff';
+                dCtx.font = 'bold 20px Arial, sans-serif';
+                dCtx.textAlign = 'center';
+                dCtx.textBaseline = 'middle';
+                dCtx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2);
+            });
+
+            deviceTexture.needsUpdate = true;
+        }
+        redrawDeviceUI();
+
+        function handleCalcInput(val) {
+            if (val === 'AC') {
+                calcExpression = "";
+                calcResultOutput = "0";
+            } else if (val === 'DEL') {
+                calcExpression = calcExpression.slice(0, -1);
+            } else {
+                if (calcExpression === "125×4" || calcExpression === "0") calcExpression = "";
+                calcExpression += val;
+            }
+            redrawDeviceUI();
+        }
+
+        function handleCalculate() {
+            try {
+                let evalStr = calcExpression.replace(/÷/g, '/').replace(/×/g, '*');
+                let evaluated = eval(evalStr);
+                calcResultOutput = Number.isFinite(evaluated) ? evaluated.toString() : "Error";
+                
+                // Automatically synchronize calculation result to GPA Calculator input field
+                document.getElementById('courseName').value = `Calc: ${calcExpression} = ${calcResultOutput}`;
+            } catch (err) {
+                calcResultOutput = "Error";
+            }
+            redrawDeviceUI();
+        }
+
+        // --- THREE.JS TRUE 3D SCENE SETUP ---
+        const container = document.getElementById('webgl-container');
+        const width = container.clientWidth || 420;
+        const height = container.clientHeight || 720;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 5.8);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 3.5;
+        controls.maxDistance = 7.5;
+
+        // Lighting to showcase 3D physical depth, edges, and metallic body
+        scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2.2);
+        dirLight.position.set(5, 10, 7);
+        scene.add(dirLight);
+
+        const backLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        backLight.position.set(-5, -5, -7);
+        scene.add(backLight);
+
+        // 3D Device Group Container
+        const deviceGroup = new THREE.Group();
+
+        // Extruded 3D Body (gives physical depth and 3D sides like the S25 phone model)
+        const shape = new THREE.Shape();
+        const dw = 2.6, dh = 4.8, r = 0.18;
+        shape.moveTo(-dw/2 + r, -dh/2);
+        shape.lineTo(dw/2 - r, -dh/2);
+        shape.quadraticCurveTo(dw/2, -dh/2, dw/2, -dh/2 + r);
+        shape.lineTo(dw/2, dh/2 - r);
+        shape.quadraticCurveTo(dw/2, dh/2, dw/2 - r, dh/2);
+        shape.lineTo(-dw/2 + r, dh/2);
+        shape.quadraticCurveTo(-dw/2, dh/2, -dw/2, dh/2 - r);
+        shape.lineTo(-dw/2, -dh/2 + r);
+        shape.quadraticCurveTo(-dw/2, -dh/2, -dw/2 + r, -dh/2);
+
+        const extrudeSettings = { depth: 0.22, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.03, bevelThickness: 0.03 };
+        const deviceGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        deviceGeo.center();
+
+        // Metallic Slate / Titanium Device Chassis Material
+        const chassisMat = new THREE.MeshStandardMaterial({ color: 0x34495e, roughness: 0.2, metalness: 0.85 });
+        const deviceBody = new THREE.Mesh(deviceGeo, chassisMat);
+        deviceGroup.add(deviceBody);
+
+        // Front Interactive Screen Plane
+        const screenGeo = new THREE.PlaneGeometry(2.35, 4.50);
+        const screenMat = new THREE.MeshBasicMaterial({ map: deviceTexture });
+        const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+        screenMesh.position.z = 0.125;
+        deviceGroup.add(screenMesh);
+
+        // Back Panel Design (with camera/sensor cluster modules)
+        const backGeo = new THREE.PlaneGeometry(2.35, 4.50);
+        const backMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.3, metalness: 0.7 });
+        const backPanel = new THREE.Mesh(backGeo, backMat);
+        backPanel.position.z = -0.125;
+        backPanel.rotation.y = Math.PI;
+        deviceGroup.add(backPanel);
+
+        // Back Camera Modules & Sensor Rings (matching multi-lens layout)
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.95 });
+        const lensGlassMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.05, metalness: 0.99 });
+        const flashMat = new THREE.MeshBasicMaterial({ color: 0xfffaed });
+
+        const backCameras = [
+            { x: -0.55, y: 1.70, r: 0.14 },
+            { x: -0.55, y: 1.25, r: 0.14 },
+            { x: -0.55, y: 0.80, r: 0.14 }
+        ];
+
+        backCameras.forEach(pos => {
+            const ring = new THREE.Mesh(new THREE.CylinderGeometry(pos.r, pos.r, 0.04, 32), ringMat);
+            ring.rotation.x = Math.PI / 2;
+            const glass = new THREE.Mesh(new THREE.CylinderGeometry(pos.r*0.75, pos.r*0.75, 0.045, 32), lensGlassMat);
+            glass.rotation.x = Math.PI / 2;
+
+            ring.position.set(pos.x, pos.y, -0.145);
+            glass.position.set(pos.x, pos.y, -0.145);
+            deviceGroup.add(ring);
+            deviceGroup.add(glass);
         });
 
-        // --- 3D CALCULATOR SCRIPT ---
-        let currentInput = "0";
-        let calculationHistory = "";
+        // Flash & sub-sensor on back
+        const flashMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16), flashMat);
+        flashMesh.rotation.x = Math.PI / 2;
+        flashMesh.position.set(-0.05, 1.70, -0.145);
+        deviceGroup.add(flashMesh);
 
-        const outputEl = document.getElementById('calc-output');
-        const historyEl = document.getElementById('calc-history');
+        scene.add(deviceGroup);
 
-        function updateDisplay() {
-            outputEl.textContent = currentInput;
-            historyEl.textContent = calculationHistory;
-        }
+        // Raycasting to allow clicking interactive buttons directly on the 3D rotating device model
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
 
-        function appendValue(val) {
-            if (currentInput === "0" && val !== ".") {
-                currentInput = val;
-            } else {
-                currentInput += val;
-            }
-            updateDisplay();
-        }
+        window.addEventListener('pointerdown', (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            if (event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom) {
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-        function clearCalc() {
-            currentInput = "0";
-            calculationHistory = "";
-            updateDisplay();
-        }
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObject(screenMesh);
 
-        function backspace() {
-            if (currentInput.length > 1) {
-                currentInput = currentInput.slice(0, -1);
-            } else {
-                currentInput = "0";
-            }
-            updateDisplay();
-        }
+                if (intersects.length > 0) {
+                    const uv = intersects[0].uv;
+                    const clickX = uv.x * deviceCanvas.width;
+                    const clickY = (1 - uv.y) * deviceCanvas.height;
 
-        function calculateResult() {
-            try {
-                calculationHistory = currentInput;
-                let sanitized = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
-                let result = eval(sanitized);
-                currentInput = Number.isFinite(result) ? result.toString() : "Error";
-                
-                // Automatically send/show calculation output in the GPA calculator entry fields as default
-                if (Number.isFinite(result)) {
-                    document.getElementById('courseName').value = `Calc: ${calculationHistory} = ${result}`;
+                    for (let btn of calcButtons) {
+                        if (clickX >= btn.x && clickX <= btn.x + btn.w && clickY >= btn.y && clickY <= btn.y + btn.h) {
+                            if (btn.val === '=') {
+                                handleCalculate();
+                            } else if (btn.val) {
+                                handleCalcInput(btn.val);
+                            }
+                            break;
+                        }
+                    }
                 }
-            } catch (err) {
-                currentInput = "Error";
             }
-            updateDisplay();
+        });
+
+        // Animation loop for smooth 3D rendering and orbiting controls
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
         }
+        animate();
+
+        // Responsive window scaling
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth || 420;
+            const h = container.clientHeight || 720;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
     </script>
 </body>
 </html>
