@@ -301,67 +301,99 @@
         faceplate.position.z = 0.01;
         catigaGroup.add(faceplate);
 
-        // Materials for buttons
-        const matKey = new THREE.MeshStandardMaterial({ color: 0x2c3036, roughness: 0.4 });
-        const matShift = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
-        const matAlpha = new THREE.MeshStandardMaterial({ color: 0x884ea0, roughness: 0.3 });
-        const matMenu = new THREE.MeshStandardMaterial({ color: 0x2471a3, roughness: 0.3 });
-        const matDel = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.3 });
-        const matAC = new THREE.MeshStandardMaterial({ color: 0xc0392b, roughness: 0.3 });
-        const matEq = new THREE.MeshStandardMaterial({ color: 0x27ae60, roughness: 0.3 });
-        const matOp = new THREE.MeshStandardMaterial({ color: 0x202226, roughness: 0.5 });
+        // Helper function to create text-labeled button materials
+        function createButtonMaterial(text, bgColor, textColor = '#ffffff') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = textColor;
+            ctx.font = 'bold 24px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Shorten lengthy function names for cleaner display on keys
+            let displayText = text;
+            if (text === 'Math.sqrt(') displayText = '√';
+            else if (text === 'Math.log10(') displayText = 'log';
+            else if (text === 'Math.log(') displayText = 'ln';
+            else if (text === 'Math.sin(') displayText = 'sin';
+            else if (text === 'Math.cos(') displayText = 'cos';
+            else if (text === 'Math.tan(') displayText = 'tan';
+            else if (text === '**3') displayText = 'x³';
+            else if (text === '**') displayText = 'x^y';
+            else if (text === '(-1)*') displayText = '(-)';
+            else if (text === '/100') displayText = '%';
+
+            ctx.fillText(displayText, canvas.width / 2, canvas.height / 2);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            return new THREE.MeshStandardMaterial({ map: texture, roughness: 0.4 });
+        }
+
+        // Color definitions for key categories
+        const colKey = '#2c3036';
+        const colShift = '#d35400';
+        const colAlpha = '#884ea0';
+        const colMenu = '#2471a3';
+        const colAC = '#c0392b';
+        const colEq = '#27ae60';
+        const colOp = '#202226';
 
         // Button layout definitions matching the CATIGA CS-991EX keypad
         const layout = [
             // Top control buttons row
-            [{label:'SHIFT', w:0.65, h:0.2, mat:matShift}, {label:'ALPHA', w:0.65, h:0.2, mat:matAlpha}, {label:'MENU', w:0.65, h:0.2, mat:matMenu}],
+            [{label:'SHIFT', w:0.65, h:0.2, col:colShift}, {label:'ALPHA', w:0.65, h:0.2, col:colAlpha}, {label:'MENU', w:0.65, h:0.2, col:colMenu}],
             // Replay row
-            [{label:'▲', w:0.35, h:0.16, mat:matKey}, {label:'▼', w:0.35, h:0.16, mat:matKey}],
+            [{label:'▲', w:0.35, h:0.16, col:colKey}, {label:'▼', w:0.35, h:0.16, col:colKey}],
             // Function Grid
             [
-                {label:'Math.sqrt(', w:0.45, h:0.18, mat:matOp}, {label:'**3', w:0.45, h:0.18, mat:matOp}, {label:'**', w:0.45, h:0.18, mat:matOp}, {label:'Math.log10(', w:0.45, h:0.18, mat:matOp}
+                {label:'Math.sqrt(', w:0.45, h:0.18, col:colOp}, {label:'**3', w:0.45, h:0.18, col:colOp}, {label:'**', w:0.45, h:0.18, col:colOp}, {label:'Math.log10(', w:0.45, h:0.18, col:colOp}
             ],
             [
-                {label:'Math.log(', w:0.45, h:0.18, mat:matOp}, {label:'(-1)*', w:0.45, h:0.18, mat:matOp}, {label:'Math.sin(', w:0.45, h:0.18, mat:matOp}, {label:'Math.cos(', w:0.45, h:0.18, mat:matOp}
+                {label:'Math.log(', w:0.45, h:0.18, col:colOp}, {label:'(-1)*', w:0.45, h:0.18, col:colOp}, {label:'Math.sin(', w:0.45, h:0.18, col:colOp}, {label:'Math.cos(', w:0.45, h:0.18, col:colOp}
             ],
             [
-                {label:'Math.tan(', w:0.45, h:0.18, mat:matOp}, {label:'(', w:0.45, h:0.18, mat:matOp}, {label:')', w:0.45, h:0.18, mat:matOp}, {label:'/', w:0.45, h:0.18, mat:matOp}
+                {label:'Math.tan(', w:0.45, h:0.18, col:colOp}, {label:'(', w:0.45, h:0.18, col:colOp}, {label:')', w:0.45, h:0.18, col:colOp}, {label:'/', w:0.45, h:0.18, col:colOp}
             ],
             // Number / Action Keypad Rows
             [
-                {label:'7', w:0.45, h:0.2, mat:matKey}, {label:'8', w:0.45, h:0.2, mat:matKey}, {label:'9', w:0.45, h:0.2, mat:matKey}, {label:'DEL', w:0.45, h:0.2, mat:matDel}
+                {label:'7', w:0.45, h:0.18, col:colKey}, {label:'8', w:0.45, h:0.18, col:colKey}, {label:'9', w:0.45, h:0.18, col:colKey}, {label:'DEL', w:0.45, h:0.18, col:colShift}
             ],
             [
-                {label:'4', w:0.45, h:0.2, mat:matKey}, {label:'5', w:0.45, h:0.2, mat:matKey}, {label:'6', w:0.45, h:0.2, mat:matKey}, {label:'AC', w:0.45, h:0.2, mat:matAC}
+                {label:'4', w:0.45, h:0.18, col:colKey}, {label:'5', w:0.45, h:0.18, col:colKey}, {label:'6', w:0.45, h:0.18, col:colKey}, {label:'AC', w:0.45, h:0.18, col:colAC}
             ],
             [
-                {label:'1', w:0.45, h:0.2, mat:matKey}, {label:'2', w:0.45, h:0.2, mat:matKey}, {label:'3', w:0.45, h:0.2, mat:matKey}, {label:'*', w:0.45, h:0.2, mat:matOp}
+                {label:'1', w:0.45, h:0.18, col:colKey}, {label:'2', w:0.45, h:0.18, col:colKey}, {label:'3', w:0.45, h:0.18, col:colKey}, {label:'*', w:0.45, h:0.18, col:colOp}
             ],
             [
-                {label:'0', w:0.45, h:0.2, mat:matKey}, {label:'.', w:0.45, h:0.2, mat:matKey}, {label:'Math.PI', w:0.45, h:0.2, mat:matOp}, {label:'-', w:0.45, h:0.2, mat:matOp}
+                {label:'0', w:0.45, h:0.18, col:colKey}, {label:'.', w:0.45, h:0.18, col:colKey}, {label:'Math.PI', w:0.45, h:0.18, col:colOp}, {label:'-', w:0.45, h:0.18, col:colOp}
             ],
             [
-                {label:'Ans', w:0.45, h:0.2, mat:matKey}, {label:'/100', w:0.45, h:0.2, mat:matOp}, {label:'=', w:0.45, h:0.2, mat:matEq}, {label:'+', w:0.45, h:0.2, mat:matOp}
+                {label:'Ans', w:0.45, h:0.18, col:colKey}, {label:'/100', w:0.45, h:0.18, col:colOp}, {label:'=', w:0.45, h:0.18, col:colEq}, {label:'+', w:0.45, h:0.18, col:colOp}
             ]
         ];
 
         const interactiveButtons = [];
 
-        // Generate 3D button meshes from layout configuration
-        let startY = 0.95;
+        // Generate 3D button meshes with visible text labels and perfect spacing
         layout.forEach((row, rIndex) => {
-            let rowWidth = row.reduce((acc, item) => acc + item.w + 0.05, -0.05);
+            let rowWidth = row.reduce((acc, item) => acc + item.w + 0.04, -0.04);
             let startX = -rowWidth / 2 + row[0].w / 2;
 
             row.forEach((btnData, cIndex) => {
-                let xPos = startX + cIndex * (btnData.w + 0.06);
+                let xPos = startX + cIndex * (btnData.w + 0.05);
                 let btnGeo = new THREE.BoxGeometry(btnData.w, btnData.h, 0.05);
-                let btnMesh = new THREE.Mesh(btnGeo, btnData.mat);
+                let mat = createButtonMaterial(btnData.label, btnData.col);
+                let btnMesh = new THREE.Mesh(btnGeo, mat);
                 
-                let yOffset = rIndex === 0 ? 1.45 : (rIndex === 1 ? 1.15 : startY - (rIndex - 2) * 0.24);
-                if (rIndex > 1) {
-                    // Shift standard numpad down slightly
-                    yOffset = 0.75 - ((rIndex - 2) * 0.24);
+                // Vertical positioning curve matching the faceplate bounds
+                let yOffset = 1.35 - (rIndex * 0.22);
+                if (rIndex >= 2) {
+                    yOffset = 0.72 - ((rIndex - 2) * 0.21);
                 }
 
                 btnMesh.position.set(xPos, yOffset, 0.04);
