@@ -3,44 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA Calculator & Scientific Calculator</title>
+    <title>Student GPA & Scientific Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1050px; margin: auto; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1150px; margin: auto; }
         
         .main-container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
         
         /* Left GPA Card */
-        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 420px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 400px; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         button:hover { background: #0056b3; }
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
         .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
 
-        /* Right Realistic Scientific Calculator (Catiga / ClassWiz Style) */
-        .real-calc { background: #18191a; border: 2px solid #333; padding: 15px; border-radius: 12px; width: 340px; box-shadow: 0 8px 20px rgba(0,0,0,0.7); flex-shrink: 0; }
-        .calc-brand { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        /* Right Realistic Catiga CS-991EX Scientific Calculator */
+        .sci-calc-body { background: #18191a; border: 3px solid #2c2f33; padding: 15px; border-radius: 12px; width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); flex-shrink: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
-        /* Calculator Screen */
-        .calc-screen { background: #c2cbd1; color: #111; padding: 10px; border-radius: 4px; border: 2px inset #555; margin-bottom: 12px; font-family: monospace; }
-        .screen-top { font-size: 0.7rem; color: #444; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 3px; margin-bottom: 4px; }
-        .screen-main { font-size: 1.2rem; min-height: 25px; text-align: right; font-weight: bold; overflow-x: auto; }
-        
-        /* Top Action Rows (Shift, Alpha, Replay) */
-        .calc-action-row { display: flex; gap: 5px; margin-bottom: 8px; }
-        .btn-shift { background: #e67e22; color: #fff; font-size: 0.7rem; padding: 5px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
-        .btn-alpha { background: #9b59b6; color: #fff; font-size: 0.7rem; padding: 5px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
-        .btn-mode { background: #2980b9; color: #fff; font-size: 0.7rem; padding: 5px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; flex: 1; }
+        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .calc-brand-title { font-size: 0.75rem; font-weight: bold; color: #bbb; letter-spacing: 0.5px; }
+        .solar-panel { background: #111; border: 1px solid #444; width: 90px; height: 18px; display: flex; justify-content: space-around; align-items: center; padding: 1px; border-radius: 2px; }
+        .solar-cell { background: #223a5e; width: 20px; height: 14px; border: 1px solid #000; }
 
-        /* Keypad Grid */
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .ckey { background: #2c2f33; color: #fff; border: 1px solid #444; padding: 8px 0; font-size: 0.85rem; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: center; }
-        .ckey:hover { background: #3c4247; }
-        .ckey.op { background: #202225; color: #3498db; }
-        .ckey.del { background: #d35400; color: #fff; }
-        .ckey.ac { background: #c0392b; color: #fff; }
-        .ckey.equals { background: #27ae60; color: #fff; }
-        .ckey-sub { font-size: 0.55rem; color: #3498db; display: block; margin-top: 1px; }
+        /* LCD Screen Simulation */
+        .calc-lcd { background: #c2cbd1; color: #111; padding: 8px; border-radius: 4px; border: 2px inset #4a525a; margin-bottom: 10px; font-family: monospace; }
+        .lcd-top-icons { font-size: 0.6rem; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 2px; margin-bottom: 4px; font-weight: bold; }
+        .lcd-screen-main { font-size: 1.1rem; min-height: 35px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; }
+
+        /* Control & Replay Cluster */
+        .control-row-top { display: flex; gap: 4px; margin-bottom: 6px; }
+        .btn-sft { background: #e67e22; color: #fff; font-size: 0.65rem; padding: 4px; border: none; border-radius: 3px; font-weight: bold; flex: 1; cursor: pointer; }
+        .btn-alp { background: #9b59b6; color: #fff; font-size: 0.65rem; padding: 4px; border: none; border-radius: 3px; font-weight: bold; flex: 1; cursor: pointer; }
+        .btn-mod { background: #2980b9; color: #fff; font-size: 0.65rem; padding: 4px; border: none; border-radius: 3px; font-weight: bold; flex: 1; cursor: pointer; }
+
+        /* Replay Pad Area */
+        .replay-container { display: flex; justify-content: center; margin-bottom: 8px; }
+        .replay-pad { background: #222; border: 1px solid #444; border-radius: 20px; padding: 4px 12px; display: flex; gap: 10px; align-items: center; }
+        .replay-btn { background: #2980b9; color: #fff; border: none; font-size: 0.7rem; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; }
+        .replay-label { font-size: 0.6rem; color: #888; font-weight: bold; }
+
+        /* Dense Scientific Keypad Grid */
+        .calc-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .skey { background: #26292e; color: #fff; border: 1px solid #3a3f44; padding: 7px 0; font-size: 0.75rem; border-radius: 3px; cursor: pointer; font-weight: bold; text-align: center; }
+        .skey:hover { background: #363b42; }
+        
+        /* Secondary color hints above buttons */
+        .skey span { display: block; font-size: 0.5rem; color: #3498db; margin-top: 1px; }
+        .skey span.shift-hint { color: #e67e22; }
+
+        /* Special Key Styles */
+        .skey.op { color: #3498db; }
+        .skey.del { background: #d35400; color: #fff; }
+        .skey.ac { background: #c0392b; color: #fff; }
+        .skey.eq { background: #27ae60; color: #fff; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -74,65 +89,84 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: Realistic Scientific Calculator (Catiga / ClassWiz Style) -->
-        <div class="real-calc">
-            <div class="calc-brand">
-                <span>CATIGA CS-991EX</span>
-                <span>SOLAR & BATTERY</span>
+        <!-- RIGHT: Realistic Catiga CS-991EX Scientific Calculator -->
+        <div class="sci-calc-body">
+            <!-- Header with Solar Panel -->
+            <div class="calc-header">
+                <div class="calc-brand-title">CATIGA CS-991EX</div>
+                <div class="solar-panel">
+                    <div class="solar-cell"></div>
+                    <div class="solar-cell"></div>
+                    <div class="solar-cell"></div>
+                </div>
             </div>
-            
-            <!-- Screen Display -->
-            <div class="calc-screen">
-                <div class="screen-top">
-                    <span>M Setup</span>
+
+            <!-- LCD Screen -->
+            <div class="calc-lcd">
+                <div class="lcd-top-icons">
+                    <span>M S Setup</span>
                     <span>DEG</span>
                 </div>
-                <div class="screen-main" id="calcScreen">0</div>
+                <div class="lcd-screen-main" id="csScreen">0</div>
             </div>
 
-            <!-- Action Buttons Row -->
-            <div class="calc-action-row">
-                <button class="btn-shift" onclick="pressKey('SHIFT')">SHIFT</button>
-                <button class="btn-alpha" onclick="pressKey('ALPHA')">ALPHA</button>
-                <button class="btn-mode" onclick="pressKey('MODE')">MENU</button>
+            <!-- Top Function Row -->
+            <div class="control-row-top">
+                <button class="btn-sft" onclick="csInput('SHIFT')">SHIFT</button>
+                <button class="btn-alp" onclick="csInput('ALPHA')">ALPHA</button>
+                <button class="btn-mod" onclick="csInput('MODE')">MENU</button>
             </div>
 
-            <!-- Keypad -->
-            <div class="calc-grid">
-                <button class="ckey op" onclick="pressKey('Math.sin(')">sin<span class="ckey-sub">sin⁻¹</span></button>
-                <button class="ckey op" onclick="pressKey('Math.cos(')">cos<span class="ckey-sub">cos⁻¹</span></button>
-                <button class="ckey op" onclick="pressKey('Math.tan(')">tan<span class="ckey-sub">tan⁻¹</span></button>
-                <button class="ckey op" onclick="pressKey('Math.sqrt(')">√<span class="ckey-sub">x²</span></button>
+            <!-- Replay Pad Simulation -->
+            <div class="replay-container">
+                <div class="replay-pad">
+                    <span class="replay-label">REPLAY</span>
+                    <button class="replay-btn" onclick="csInput('▲')">▲</button>
+                    <button class="replay-btn" onclick="csInput('▼')">▼</button>
+                </div>
+            </div>
 
-                <button class="ckey op" onclick="pressKey('(')">(</button>
-                <button class="ckey op" onclick="pressKey(')')">)</button>
-                <button class="ckey op" onclick="pressKey('**2')">x²</button>
-                <button class="ckey op" onclick="pressKey('/')">÷</button>
+            <!-- Dense Keypad Matrix -->
+            <div class="calc-keypad">
+                <button class="skey op" onclick="csInput('Math.sqrt(')">√<span class="shift-hint">x²</span></button>
+                <button class="skey op" onclick="csInput('**3')">x³<span class="shift-hint">∛</span></button>
+                <button class="skey op" onclick="csInput('**')">x^<span class="shift-hint">x√</span></button>
+                <button class="skey op" onclick="csInput('Math.log10(')">log<span class="shift-hint">10ˣ</span></button>
 
-                <button class="ckey" onclick="pressKey('7')">7</button>
-                <button class="ckey" onclick="pressKey('8')">8</button>
-                <button class="ckey" onclick="pressKey('9')">9</button>
-                <button class="ckey del" onclick="pressKey('DEL')">DEL</button>
+                <button class="skey op" onclick="csInput('Math.log(')">ln<span class="shift-hint">eˣ</span></button>
+                <button class="skey op" onclick="csInput('(-1)*')">(-)<span class="shift-hint">° ’ ”</span></button>
+                <button class="skey op" onclick="csInput('Math.sin(')">sin<span class="shift-hint">sin⁻¹</span></button>
+                <button class="skey op" onclick="csInput('Math.cos(')">cos<span class="shift-hint">cos⁻¹</span></button>
 
-                <button class="ckey" onclick="pressKey('4')">4</button>
-                <button class="ckey" onclick="pressKey('5')">5</button>
-                <button class="ckey" onclick="pressKey('6')">6</button>
-                <button class="ckey ac" onclick="pressKey('AC')">AC</button>
+                <button class="skey op" onclick="csInput('Math.tan(')">tan<span class="shift-hint">tan⁻¹</span></button>
+                <button class="skey op" onclick="csInput('(')">(<span class="shift-hint">i</span></button>
+                <button class="skey op" onclick="csInput(')')">)<span class="shift-hint">X</span></button>
+                <button class="skey op" onclick="csInput('/')">÷</button>
 
-                <button class="ckey" onclick="pressKey('1')">1</button>
-                <button class="ckey" onclick="pressKey('2')">2</button>
-                <button class="ckey" onclick="pressKey('3')">3</button>
-                <button class="ckey op" onclick="pressKey('*')">×</button>
+                <button class="skey" onclick="csInput('7')">7<span class="shift-hint">CONST</span></button>
+                <button class="skey" onclick="csInput('8')">8<span class="shift-hint">CONV</span></button>
+                <button class="skey" onclick="csInput('9')">9<span class="shift-hint">CLR</span></button>
+                <button class="skey del" onclick="csInput('DEL')">DEL</button>
 
-                <button class="ckey" onclick="pressKey('0')">0</button>
-                <button class="ckey" onclick="pressKey('.')">.</button>
-                <button class="ckey op" onclick="pressKey('Math.log10(')">log</button>
-                <button class="ckey op" onclick="pressKey('-')">-</button>
+                <button class="skey" onclick="csInput('4')">4<span class="shift-hint">matrix</span></button>
+                <button class="skey" onclick="csInput('5')">5<span class="shift-hint">vector</span></button>
+                <button class="skey" onclick="csInput('6')">6<span class="shift-hint">stats</span></button>
+                <button class="skey ac" onclick="csInput('AC')">AC</button>
 
-                <button class="ckey" onclick="pressKey('Ans')">Ans</button>
-                <button class="ckey op" onclick="pressKey('Math.PI')">π</button>
-                <button class="ckey equals" onclick="calculateResult()">=</button>
-                <button class="ckey op" onclick="pressKey('+')">+</button>
+                <button class="skey" onclick="csInput('1')">1<span class="shift-hint">STAT</span></button>
+                <button class="skey" onclick="csInput('2')">2<span class="shift-hint">CMPLX</span></button>
+                <button class="skey" onclick="csInput('3')">3<span class="shift-hint">BASE</span></button>
+                <button class="skey op" onclick="csInput('*')">×</button>
+
+                <button class="skey" onclick="csInput('0')">0<span class="shift-hint">RND</span></button>
+                <button class="skey" onclick="csInput('.')">.<span class="shift-hint">Int</span></button>
+                <button class="skey op" onclick="csInput('Math.PI')">π<span class="shift-hint">e</span></button>
+                <button class="skey op" onclick="csInput('-')">-</button>
+
+                <button class="skey" onclick="csInput('Ans')">Ans<span class="shift-hint">DRG</span></button>
+                <button class="skey op" onclick="csInput('/100')">%<span class="shift-hint">;</span></button>
+                <button class="skey eq" onclick="csCalculate()">=</button>
+                <button class="skey op" onclick="csInput('+')">+</button>
             </div>
         </div>
     </div>
@@ -169,52 +203,49 @@
             document.getElementById('result').innerHTML = '';
         }
 
-        // --- Realistic Scientific Calculator Logic ---
-        let calcExpression = "";
-        let lastAns = "0";
+        // --- Realistic CS-991EX Scientific Calculator Logic ---
+        let csExpression = "";
+        let csLastAns = "0";
 
-        function pressKey(val) {
-            const screen = document.getElementById('calcScreen');
+        function csInput(val) {
+            const screen = document.getElementById('csScreen');
 
             if (val === 'AC') {
-                calcExpression = "";
+                csExpression = "";
                 screen.innerText = "0";
                 return;
             }
 
             if (val === 'DEL') {
-                calcExpression = calcExpression.slice(0, -1);
-                screen.innerText = calcExpression === "" ? "0" : calcExpression;
+                csExpression = csExpression.slice(0, -1);
+                screen.innerText = csExpression === "" ? "0" : csExpression;
                 return;
             }
 
             if (val === 'Ans') {
-                calcExpression += lastAns;
-            } else if (val === 'SHIFT' || val === 'ALPHA' || val === 'MODE') {
-                // Interactive indicator feedback
-                return; 
+                csExpression += csLastAns;
+            } else if (['SHIFT', 'ALPHA', 'MODE', '▲', '▼'].includes(val)) {
+                return; // Mode indicators feedback
             } else {
-                if (calcExpression === "0" && val !== '.') {
-                    calcExpression = val;
+                if (csExpression === "0" && val !== '.') {
+                    csExpression = val;
                 } else {
-                    calcExpression += val;
+                    csExpression += val;
                 }
             }
-
-            screen.innerText = calcExpression;
+            screen.innerText = csExpression;
         }
 
-        function calculateResult() {
-            const screen = document.getElementById('calcScreen');
+        function csCalculate() {
+            const screen = document.getElementById('csScreen');
             try {
-                // Evaluate expression securely
-                let evaluated = eval(calcExpression.replace(/Math\.PI/g, Math.PI));
-                lastAns = Number.isFinite(evaluated) ? evaluated.toString() : "Error";
-                screen.innerText = lastAns;
-                calcExpression = lastAns;
+                let evaluated = eval(csExpression.replace(/Math\.PI/g, Math.PI));
+                csLastAns = Number.isFinite(evaluated) ? evaluated.toString() : "Math Error";
+                screen.innerText = csLastAns;
+                csExpression = csLastAns;
             } catch (err) {
                 screen.innerText = "Syntax Error";
-                calcExpression = "";
+                csExpression = "";
             }
         }
     </script>
