@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student GPA & 3D Interactive Casio Calculator</title>
     
-    <!-- Load Three.js, OrbitControls, and GLTFLoader -->
+    <!-- Load Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1300px; margin: auto; overflow-x: hidden; }
@@ -44,28 +43,29 @@
             cursor: grabbing;
         }
 
-        /* Live GPA Overlay aligned to display on top of the model screen */
+        /* Live GPA Overlay aligned precisely over the 3D model's LCD screen */
         .calc-lcd-overlay {
             position: absolute;
-            top: 160px;
-            left: 115px;
-            width: 210px;
-            height: 70px;
-            background: #8fa096;
+            top: 130px;
+            left: 95px;
+            width: 250px;
+            height: 75px;
+            background: #9ead99;
             color: #111;
-            border-radius: 3px;
-            padding: 5px;
+            border-radius: 4px;
+            padding: 8px;
             box-sizing: border-box;
             font-family: monospace;
             pointer-events: none;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
             z-index: 5;
+            border: 2px solid #3b423d;
         }
         .lcd-main-row { font-size: 0.8rem; font-weight: bold; text-align: right; }
-        .lcd-gpa-row { font-size: 0.85rem; font-weight: bold; color: #8b0000; text-align: right; }
+        .lcd-gpa-row { font-size: 0.9rem; font-weight: bold; color: #8b0000; text-align: right; }
 
         .instruction-badge { 
             position: absolute; 
@@ -115,7 +115,7 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: Real 3D Casio Model Viewer -->
+        <!-- RIGHT: Custom 3D Programmatic Casio Model Viewer -->
         <div class="calculator-wrapper">
             <div id="webgl-container"></div>
             
@@ -154,7 +154,7 @@
             document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
             document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
 
-            // Update calculator screen feedback
+            // Update calculator 3D overlay screen feedback
             document.getElementById('calcFormula').innerText = `${totalPoints} Pts / ${totalCredits} Cr`;
             document.getElementById('calcAnswer').innerText = `SEM GPA: ${gpa}`;
 
@@ -171,59 +171,107 @@
             document.getElementById('calcAnswer').innerText = "GPA: 0.00";
         }
 
-        // --- THREE.JS 3D MODEL RENDERER ---
+        // --- THREE.JS 3D PROCEDURAL CASIO CALCULATOR RENDERER ---
         const container = document.getElementById('webgl-container');
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.z = 5;
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 0, 6.5);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // Configure OrbitControls
+        // OrbitControls
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.minDistance = 2;
-        controls.maxDistance = 8;
-        
-        controls.mouseButtons = {
-            LEFT: THREE.MOUSE.ROTATE,
-            MIDDLE: THREE.MOUSE.DOLLY,
-            RIGHT: THREE.MOUSE.PAN
-        };
+        controls.minDistance = 3;
+        controls.maxDistance = 9;
 
-        // Lighting to illuminate the model clearly
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-        scene.add(ambientLight);
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+        dirLight.position.set(5, 10, 7);
+        scene.add(dirLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        directionalLight.position.set(5, 10, 7);
-        scene.add(directionalLight);
+        // --- BUILD 3D CALCULATOR GROUP ---
+        const calculatorGroup = new THREE.Group();
 
-        // Continuous Animation Loop
+        // 1. Main Body Casing (Dark Matte Plastic)
+        const bodyGeo = new THREE.BoxGeometry(3.0, 4.8, 0.35);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1c1e21, roughness: 0.4, metalness: 0.1 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        calculatorGroup.add(body);
+
+        // 2. Inner Faceplate (Classic Grey/Silver Scientific Panel)
+        const faceGeo = new THREE.BoxGeometry(2.7, 4.5, 0.38);
+        const faceMat = new THREE.MeshStandardMaterial({ color: 0xdcdde1, roughness: 0.6 });
+        const faceplate = new THREE.Mesh(faceGeo, faceMat);
+        faceplate.position.z = 0.02;
+        calculatorGroup.add(faceplate);
+
+        // 3. LCD Screen Bezel / Recess
+        const screenGeo = new THREE.BoxGeometry(2.3, 0.9, 0.40);
+        const screenMat = new THREE.MeshStandardMaterial({ color: 0x2f3640, roughness: 0.2 });
+        const screenBezel = new THREE.Mesh(screenGeo, screenMat);
+        screenBezel.position.set(0, 1.55, 0.04);
+        calculatorGroup.add(screenBezel);
+
+        // 4. Directional Pad / Navigation Ring
+        const dPadGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.08, 32);
+        const dPadMat = new THREE.MeshStandardMaterial({ color: 0x485460, roughness: 0.3 });
+        const dPad = new THREE.Mesh(dPadGeo, dPadMat);
+        dPad.rotation.x = Math.PI / 2;
+        dPad.position.set(0, 0.85, 0.05);
+        calculatorGroup.add(dPad);
+
+        // 5. Grid of Scientific Buttons
+        const buttonMat = new THREE.MeshStandardMaterial({ color: 0x2f3640, roughness: 0.5 });
+        const accentButtonMat = new THREE.MeshStandardMaterial({ color: 0xe056fd, roughness: 0.3 }); // Shift/Alpha keys
+        const equalsButtonMat = new THREE.MeshStandardMaterial({ color: 0x0984e3, roughness: 0.3 }); // Equal key
+
+        const rows = 6;
+        const cols = 4;
+        const btnWidth = 0.45;
+        const btnHeight = 0.22;
+        const startX = -0.9;
+        const startY = 0.35;
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                let mat = buttonMat;
+                if (r === 0 && c === 3) mat = accentButtonMat;
+                if (r === rows - 1 && c === cols - 1) mat = equalsButtonMat;
+
+                const btnGeo = new THREE.BoxGeometry(btnWidth, btnHeight, 0.08);
+                const button = new THREE.Mesh(btnGeo, mat);
+                
+                const posX = startX + c * (btnWidth + 0.15);
+                const posY = startY - r * (btnHeight + 0.12);
+                
+                button.position.set(posX, posY, 0.06);
+                calculatorGroup.add(button);
+            }
+        }
+
+        scene.add(calculatorGroup);
+
+        // Gentle floating rotation idle effect
+        let clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
+            
+            // Subtle tilt animation loop
+            const elapsedTime = clock.getElapsedTime();
+            calculatorGroup.rotation.y = Math.sin(elapsedTime * 0.5) * 0.15;
+            calculatorGroup.rotation.x = Math.cos(elapsedTime * 0.4) * 0.08;
+
             controls.update();
             renderer.render(scene, camera);
         }
         animate();
-
-        // Load your casio3d.glb file correctly from the root folder
-        const loader = new THREE.GLTFLoader();
-        loader.load('casio3d.glb', function (gltf) {
-            const calculatorMesh = gltf.scene;
-            
-            calculatorMesh.scale.set(1.5, 1.5, 1.5);
-            calculatorMesh.position.set(0, -0.5, 0);
-            
-            scene.add(calculatorMesh);
-        }, undefined, function (error) {
-            console.error('Error loading 3D model file:', error);
-        });
 
         window.addEventListener('resize', () => {
             const width = container.clientWidth;
