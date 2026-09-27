@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA & CalcES Samsung S25 Ultra 3D</title>
+    <title>Student GPA Calculator & Live S25 Ultra CalcES</title>
     
     <!-- Link Stylesheet -->
     <link rel="stylesheet" href="style.css">
@@ -19,7 +19,7 @@
         <!-- LEFT: GPA Calculator Card -->
         <div class="card">
             <h2>GPA Calculator</h2>
-            <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
+            <p style="color: #666; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
             
             <label>Course Name / Code</label>
             <input type="text" id="courseName" placeholder="e.g. Computer Architecture">
@@ -38,16 +38,16 @@
             <input type="number" id="credits" value="3" min="1" max="10">
 
             <button onclick="addCourse()">Add Course</button>
-            <button style="background:#c0392b;" onclick="resetGPA()">Reset GPA</button>
+            <button class="btn-danger" onclick="resetGPA()">Reset GPA</button>
             
-            <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #ccc;"></div>
+            <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #444;"></div>
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: True 3D WebGL Realistic Samsung S25 Ultra Viewport -->
+        <!-- RIGHT: True 3D WebGL Realistic Silver S25 Ultra Viewport -->
         <div class="calculator-3d-wrapper">
             <div id="webgl-container"></div>
-            <div class="instruction-badge">🖱️ Click & Drag to Rotate S25 Ultra (Front, Back & Sides)</div>
+            <div class="instruction-badge">🖱️ Click & Drag to Rotate Silver S25 Ultra (5 Cameras)</div>
         </div>
 
     </div>
