@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1150px; margin: auto; }
         
-        .main-container { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
+        .main-container { display: flex; gap: 30px; flex-wrap: wrap; align-items: flex-start; justify-content: center; perspective: 1000px; }
         
         /* Left GPA Card */
         .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 400px; }
@@ -17,51 +17,87 @@
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
         .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
 
-        /* Right Realistic Catiga CS-991EX Scientific Calculator */
-        .sci-calc-body { background: #18191a; border: 3px solid #2c2f33; padding: 15px; border-radius: 12px; width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); flex-shrink: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* RIGHT: True 3D Real-World Physical Calculator Styling */
+        .sci-calc-body { 
+            background: linear-gradient(145deg, #1f2124, #121315); 
+            border: 2px solid #33363d; 
+            padding: 18px; 
+            border-radius: 16px; 
+            width: 360px; 
+            /* Heavy 3D desk shadow + subtle card tilt */
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.8), 
+                inset 0 2px 3px rgba(255, 255, 255, 0.1), 
+                inset 0 -4px 6px rgba(0, 0, 0, 0.6); 
+            transform: rotateX(2deg) rotateY(-2deg);
+            flex-shrink: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
         
-        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .calc-brand-title { font-size: 0.75rem; font-weight: bold; color: #bbb; letter-spacing: 0.5px; }
-        .solar-panel { background: #111; border: 1px solid #444; width: 90px; height: 18px; display: flex; justify-content: space-around; align-items: center; padding: 1px; border-radius: 2px; }
-        .solar-cell { background: #223a5e; width: 20px; height: 14px; border: 1px solid #000; }
+        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .calc-brand-title { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 0.5px; text-shadow: 0 1px 1px #000; }
+        .solar-panel { background: #0b0c0e; border: 1px solid #222; width: 90px; height: 18px; display: flex; justify-content: space-around; align-items: center; padding: 1px; border-radius: 3px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.9); }
+        .solar-cell { background: linear-gradient(90deg, #1a2a40, #2c4a75); width: 20px; height: 14px; border: 1px solid #000; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); }
 
-        /* LCD Screen Simulation */
-        .calc-lcd { background: #c2cbd1; color: #111; padding: 8px; border-radius: 4px; border: 2px inset #4a525a; margin-bottom: 10px; font-family: monospace; }
+        /* 3D Beveled LCD Screen */
+        .calc-lcd { 
+            background: #b5bec3; 
+            color: #111; 
+            padding: 10px; 
+            border-radius: 6px; 
+            border: 3px solid;
+            border-color: #555c63 #2a2f33 #2a2f33 #555c63; /* 3D groove inset look */
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
+            margin-bottom: 12px; 
+            font-family: monospace; 
+        }
         .lcd-top-icons { font-size: 0.6rem; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 2px; margin-bottom: 4px; font-weight: bold; }
-        .lcd-screen-main { font-size: 1.1rem; min-height: 35px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; }
+        .lcd-screen-main { font-size: 1.2rem; min-height: 35px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
 
         /* Control & Replay Cluster */
-        .control-row-top { display: flex; gap: 4px; margin-bottom: 6px; }
-        .btn-sft { background: #e67e22; color: #fff; font-size: 0.65rem; padding: 4px; border: none; border-radius: 3px; font-weight: bold; flex: 1; cursor: pointer; }
-        .btn-alp { background: #9b59b6; color: #fff; font-size: 0.65rem; padding: 4px; border: none; border-radius: 3px; font-weight: bold; flex: 1; cursor: pointer; }
-        .btn-mod { background: #2980b9; color: #fff; font-size: 0.65rem; padding: 4px; border: none; border-radius: 3px; font-weight: bold; flex: 1; cursor: pointer; }
+        .control-row-top { display: flex; gap: 6px; margin-bottom: 8px; }
+        .btn-sft { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
+        .btn-alp { background: linear-gradient(to bottom, #af7ac5, #884ea0); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
+        .btn-mod { background: linear-gradient(to bottom, #3498db, #2471a3); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
 
-        /* Replay Pad Area */
-        .replay-container { display: flex; justify-content: center; margin-bottom: 8px; }
-        .replay-pad { background: #222; border: 1px solid #444; border-radius: 20px; padding: 4px 12px; display: flex; gap: 10px; align-items: center; }
-        .replay-btn { background: #2980b9; color: #fff; border: none; font-size: 0.7rem; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-weight: bold; }
-        .replay-label { font-size: 0.6rem; color: #888; font-weight: bold; }
+        /* Replay Pad 3D Effect */
+        .replay-container { display: flex; justify-content: center; margin-bottom: 10px; }
+        .replay-pad { background: linear-gradient(145deg, #18191c, #26292e); border: 1px solid #3a3f44; border-radius: 20px; padding: 4px 14px; display: flex; gap: 12px; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
+        .replay-btn { background: linear-gradient(to bottom, #3498db, #1b4f72); color: #fff; border: none; font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 3px rgba(0,0,0,0.4); }
+        .replay-label { font-size: 0.6rem; color: #777; font-weight: bold; letter-spacing: 1px; }
 
-        /* Dense Scientific Keypad Grid */
-        .calc-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .skey { background: #26292e; color: #fff; border: 1px solid #3a3f44; padding: 7px 0; font-size: 0.75rem; border-radius: 3px; cursor: pointer; font-weight: bold; text-align: center; }
-        .skey:hover { background: #363b42; }
+        /* 3D Tactile Buttons Grid */
+        .calc-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .skey { 
+            background: linear-gradient(to bottom, #2c3036, #202226); 
+            color: #fff; 
+            border: 1px solid #3c424a; 
+            border-bottom: 2px solid #111;
+            padding: 8px 0; 
+            font-size: 0.75rem; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            text-align: center; 
+            box-shadow: 0 3px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: all 0.05s ease;
+        }
+        .skey:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.6); }
+        .skey:hover { background: linear-gradient(to bottom, #363b42, #26292e); }
         
-        /* Secondary color hints above buttons */
-        .skey span { display: block; font-size: 0.5rem; color: #3498db; margin-top: 1px; }
-        .skey span.shift-hint { color: #e67e22; }
+        .skey span { display: block; font-size: 0.5rem; color: #3498db; margin-top: 2px; }
+        .skey span.shift-hint { color: #f39c12; }
 
-        /* Special Key Styles */
-        .skey.op { color: #3498db; }
-        .skey.del { background: #d35400; color: #fff; }
-        .skey.ac { background: #c0392b; color: #fff; }
-        .skey.eq { background: #27ae60; color: #fff; font-size: 0.9rem; }
+        .skey.op { color: #5dade2; }
+        .skey.del { background: linear-gradient(to bottom, #e67e22, #ba4a00); border-color: #d35400; color: #fff; }
+        .skey.ac { background: linear-gradient(to bottom, #e74c3c, #b03a2e); border-color: #c0392b; color: #fff; }
+        .skey.eq { background: linear-gradient(to bottom, #2ecc71, #27ae60); border-color: #219653; color: #fff; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <!-- LEFT: Your Original GPA Calculator -->
+        <!-- LEFT: GPA Calculator -->
         <div class="card">
             <h2>GPA Calculator</h2>
             <p style="color: #aaa; font-size: 0.9rem;">Calculate your semester grade point average easily.</p>
@@ -89,9 +125,8 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: Realistic Catiga CS-991EX Scientific Calculator -->
+        <!-- RIGHT: True 3D Physical Catiga Calculator -->
         <div class="sci-calc-body">
-            <!-- Header with Solar Panel -->
             <div class="calc-header">
                 <div class="calc-brand-title">CATIGA CS-991EX</div>
                 <div class="solar-panel">
@@ -101,7 +136,6 @@
                 </div>
             </div>
 
-            <!-- LCD Screen -->
             <div class="calc-lcd">
                 <div class="lcd-top-icons">
                     <span>M S Setup</span>
@@ -110,14 +144,12 @@
                 <div class="lcd-screen-main" id="csScreen">0</div>
             </div>
 
-            <!-- Top Function Row -->
             <div class="control-row-top">
                 <button class="btn-sft" onclick="csInput('SHIFT')">SHIFT</button>
                 <button class="btn-alp" onclick="csInput('ALPHA')">ALPHA</button>
                 <button class="btn-mod" onclick="csInput('MODE')">MENU</button>
             </div>
 
-            <!-- Replay Pad Simulation -->
             <div class="replay-container">
                 <div class="replay-pad">
                     <span class="replay-label">REPLAY</span>
@@ -126,7 +158,6 @@
                 </div>
             </div>
 
-            <!-- Dense Keypad Matrix -->
             <div class="calc-keypad">
                 <button class="skey op" onclick="csInput('Math.sqrt(')">√<span class="shift-hint">x²</span></button>
                 <button class="skey op" onclick="csInput('**3')">x³<span class="shift-hint">∛</span></button>
@@ -172,7 +203,6 @@
     </div>
 
     <script>
-        // --- GPA Calculator Logic ---
         let totalPoints = 0;
         let totalCredits = 0;
 
@@ -203,7 +233,6 @@
             document.getElementById('result').innerHTML = '';
         }
 
-        // --- Realistic CS-991EX Scientific Calculator Logic ---
         let csExpression = "";
         let csLastAns = "0";
 
@@ -225,7 +254,7 @@
             if (val === 'Ans') {
                 csExpression += csLastAns;
             } else if (['SHIFT', 'ALPHA', 'MODE', '▲', '▼'].includes(val)) {
-                return; // Mode indicators feedback
+                return;
             } else {
                 if (csExpression === "0" && val !== '.') {
                     csExpression = val;
