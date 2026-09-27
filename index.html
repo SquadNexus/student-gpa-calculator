@@ -3,95 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA & Scientific Calculator</title>
+    <title>Student GPA & 3D Casio Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1150px; margin: auto; }
+        body { font-family: Arial, sans-serif; background: #121212; color: #fff; padding: 20px; max-width: 1200px; margin: auto; }
         
-        .main-container { display: flex; gap: 30px; flex-wrap: wrap; align-items: flex-start; justify-content: center; perspective: 1000px; }
+        .main-container { display: flex; gap: 40px; flex-wrap: wrap; align-items: center; justify-content: center; min-height: 80vh; perspective: 1200px; }
         
         /* Left GPA Card */
-        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 400px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex: 1; min-width: 300px; max-width: 380px; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         button { background: #007bff; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         button:hover { background: #0056b3; }
         #result { margin-top: 20px; font-size: 1.2rem; text-align: center; color: #2ecc71; font-weight: bold; }
         .course-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 6px 10px; margin-top: 5px; border-radius: 4px; font-size: 0.85rem; }
 
-        /* RIGHT: True 3D Real-World Physical Calculator Styling */
-        .sci-calc-body { 
-            background: linear-gradient(145deg, #1f2124, #121315); 
-            border: 2px solid #33363d; 
-            padding: 18px; 
-            border-radius: 16px; 
-            width: 360px; 
-            /* Heavy 3D desk shadow + subtle card tilt */
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.8), 
-                inset 0 2px 3px rgba(255, 255, 255, 0.1), 
-                inset 0 -4px 6px rgba(0, 0, 0, 0.6); 
-            transform: rotateX(2deg) rotateY(-2deg);
-            flex-shrink: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        /* --- RIGHT: 3D Interactive Casio Calculator Box --- */
+        .scene {
+            width: 320px;
+            height: 580px;
+            perspective: 1000px;
         }
-        
-        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .calc-brand-title { font-size: 0.75rem; font-weight: bold; color: #aaa; letter-spacing: 0.5px; text-shadow: 0 1px 1px #000; }
-        .solar-panel { background: #0b0c0e; border: 1px solid #222; width: 90px; height: 18px; display: flex; justify-content: space-around; align-items: center; padding: 1px; border-radius: 3px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.9); }
-        .solar-cell { background: linear-gradient(90deg, #1a2a40, #2c4a75); width: 20px; height: 14px; border: 1px solid #000; box-shadow: inset 0 1px 2px rgba(255,255,255,0.2); }
 
-        /* 3D Beveled LCD Screen */
-        .calc-lcd { 
-            background: #b5bec3; 
-            color: #111; 
-            padding: 10px; 
-            border-radius: 6px; 
-            border: 3px solid;
-            border-color: #555c63 #2a2f33 #2a2f33 #555c63; /* 3D groove inset look */
-            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.4);
-            margin-bottom: 12px; 
-            font-family: monospace; 
+        .calculator-3d-box {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
         }
-        .lcd-top-icons { font-size: 0.6rem; color: #333; display: flex; justify-content: space-between; border-bottom: 1px solid #9aa5ab; padding-bottom: 2px; margin-bottom: 4px; font-weight: bold; }
-        .lcd-screen-main { font-size: 1.2rem; min-height: 35px; text-align: right; font-weight: bold; overflow-x: auto; display: flex; flex-direction: column; justify-content: flex-end; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
 
-        /* Control & Replay Cluster */
-        .control-row-top { display: flex; gap: 6px; margin-bottom: 8px; }
-        .btn-sft { background: linear-gradient(to bottom, #f39c12, #d35400); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
-        .btn-alp { background: linear-gradient(to bottom, #af7ac5, #884ea0); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
-        .btn-mod { background: linear-gradient(to bottom, #3498db, #2471a3); color: #fff; font-size: 0.65rem; padding: 6px; border: none; border-radius: 4px; font-weight: bold; flex: 1; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4); }
-
-        /* Replay Pad 3D Effect */
-        .replay-container { display: flex; justify-content: center; margin-bottom: 10px; }
-        .replay-pad { background: linear-gradient(145deg, #18191c, #26292e); border: 1px solid #3a3f44; border-radius: 20px; padding: 4px 14px; display: flex; gap: 12px; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
-        .replay-btn { background: linear-gradient(to bottom, #3498db, #1b4f72); color: #fff; border: none; font-size: 0.7rem; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 3px rgba(0,0,0,0.4); }
-        .replay-label { font-size: 0.6rem; color: #777; font-weight: bold; letter-spacing: 1px; }
-
-        /* 3D Tactile Buttons Grid */
-        .calc-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .skey { 
-            background: linear-gradient(to bottom, #2c3036, #202226); 
-            color: #fff; 
-            border: 1px solid #3c424a; 
-            border-bottom: 2px solid #111;
-            padding: 8px 0; 
-            font-size: 0.75rem; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            text-align: center; 
-            box-shadow: 0 3px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
-            transition: all 0.05s ease;
+        /* Hover or active class to spin and show sides */
+        .calculator-3d-box:hover {
+            transform: rotateY(-35deg) rotateX(15deg);
         }
-        .skey:active { transform: translateY(2px); box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.6); }
-        .skey:hover { background: linear-gradient(to bottom, #363b42, #26292e); }
-        
-        .skey span { display: block; font-size: 0.5rem; color: #3498db; margin-top: 2px; }
-        .skey span.shift-hint { color: #f39c12; }
 
-        .skey.op { color: #5dade2; }
-        .skey.del { background: linear-gradient(to bottom, #e67e22, #ba4a00); border-color: #d35400; color: #fff; }
-        .skey.ac { background: linear-gradient(to bottom, #e74c3c, #b03a2e); border-color: #c0392b; color: #fff; }
-        .skey.eq { background: linear-gradient(to bottom, #2ecc71, #27ae60); border-color: #219653; color: #fff; font-size: 0.9rem; }
+        /* 3D Sides / Faces */
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+        }
+
+        /* Front Face (Your Casio Image) */
+        .face-front {
+            background: #111;
+            transform: translateZ(15px);
+        }
+        .face-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 3px solid #333;
+        }
+
+        /* Back Face */
+        .face-back {
+            background: #1a1a1a;
+            transform: rotateY(180deg) translateZ(15px);
+            border: 3px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 3D Thickness Edges (Simulated via Box Shadow & Depth) */
+        .instruction-badge {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #f1c40f;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
@@ -125,80 +116,23 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: True 3D Physical Catiga Calculator -->
-        <div class="sci-calc-body">
-            <div class="calc-header">
-                <div class="calc-brand-title">CATIGA CS-991EX</div>
-                <div class="solar-panel">
-                    <div class="solar-cell"></div>
-                    <div class="solar-cell"></div>
-                    <div class="solar-cell"></div>
+        <!-- RIGHT: 3D Rotating Casio Calculator -->
+        <div>
+            <div class="scene">
+                <div class="calculator-3d-box">
+                    <!-- Front Side showing your Casio image -->
+                    <div class="face face-front">
+                        <img src="casio.png" alt="Casio fx-82ES PLUS Calculator">
+                    </div>
+                    <!-- Back Side -->
+                    <div class="face face-back">
+                        <h3>CASIO fx-82ES PLUS</h3>
+                        <p style="color: #aaa; font-size: 0.9rem;">Natural Textbook Display</p>
+                        <p style="color: #3498db; font-size: 0.8rem; margin-top: 20px;">2nd Edition Scientific Calculator</p>
+                    </div>
                 </div>
             </div>
-
-            <div class="calc-lcd">
-                <div class="lcd-top-icons">
-                    <span>M S Setup</span>
-                    <span>DEG</span>
-                </div>
-                <div class="lcd-screen-main" id="csScreen">0</div>
-            </div>
-
-            <div class="control-row-top">
-                <button class="btn-sft" onclick="csInput('SHIFT')">SHIFT</button>
-                <button class="btn-alp" onclick="csInput('ALPHA')">ALPHA</button>
-                <button class="btn-mod" onclick="csInput('MODE')">MENU</button>
-            </div>
-
-            <div class="replay-container">
-                <div class="replay-pad">
-                    <span class="replay-label">REPLAY</span>
-                    <button class="replay-btn" onclick="csInput('▲')">▲</button>
-                    <button class="replay-btn" onclick="csInput('▼')">▼</button>
-                </div>
-            </div>
-
-            <div class="calc-keypad">
-                <button class="skey op" onclick="csInput('Math.sqrt(')">√<span class="shift-hint">x²</span></button>
-                <button class="skey op" onclick="csInput('**3')">x³<span class="shift-hint">∛</span></button>
-                <button class="skey op" onclick="csInput('**')">x^<span class="shift-hint">x√</span></button>
-                <button class="skey op" onclick="csInput('Math.log10(')">log<span class="shift-hint">10ˣ</span></button>
-
-                <button class="skey op" onclick="csInput('Math.log(')">ln<span class="shift-hint">eˣ</span></button>
-                <button class="skey op" onclick="csInput('(-1)*')">(-)<span class="shift-hint">° ’ ”</span></button>
-                <button class="skey op" onclick="csInput('Math.sin(')">sin<span class="shift-hint">sin⁻¹</span></button>
-                <button class="skey op" onclick="csInput('Math.cos(')">cos<span class="shift-hint">cos⁻¹</span></button>
-
-                <button class="skey op" onclick="csInput('Math.tan(')">tan<span class="shift-hint">tan⁻¹</span></button>
-                <button class="skey op" onclick="csInput('(')">(<span class="shift-hint">i</span></button>
-                <button class="skey op" onclick="csInput(')')">)<span class="shift-hint">X</span></button>
-                <button class="skey op" onclick="csInput('/')">÷</button>
-
-                <button class="skey" onclick="csInput('7')">7<span class="shift-hint">CONST</span></button>
-                <button class="skey" onclick="csInput('8')">8<span class="shift-hint">CONV</span></button>
-                <button class="skey" onclick="csInput('9')">9<span class="shift-hint">CLR</span></button>
-                <button class="skey del" onclick="csInput('DEL')">DEL</button>
-
-                <button class="skey" onclick="csInput('4')">4<span class="shift-hint">matrix</span></button>
-                <button class="skey" onclick="csInput('5')">5<span class="shift-hint">vector</span></button>
-                <button class="skey" onclick="csInput('6')">6<span class="shift-hint">stats</span></button>
-                <button class="skey ac" onclick="csInput('AC')">AC</button>
-
-                <button class="skey" onclick="csInput('1')">1<span class="shift-hint">STAT</span></button>
-                <button class="skey" onclick="csInput('2')">2<span class="shift-hint">CMPLX</span></button>
-                <button class="skey" onclick="csInput('3')">3<span class="shift-hint">BASE</span></button>
-                <button class="skey op" onclick="csInput('*')">×</button>
-
-                <button class="skey" onclick="csInput('0')">0<span class="shift-hint">RND</span></button>
-                <button class="skey" onclick="csInput('.')">.<span class="shift-hint">Int</span></button>
-                <button class="skey op" onclick="csInput('Math.PI')">π<span class="shift-hint">e</span></button>
-                <button class="skey op" onclick="csInput('-')">-</button>
-
-                <button class="skey" onclick="csInput('Ans')">Ans<span class="shift-hint">DRG</span></button>
-                <button class="skey op" onclick="csInput('/100')">%<span class="shift-hint">;</span></button>
-                <button class="skey eq" onclick="csCalculate()">=</button>
-                <button class="skey op" onclick="csInput('+')">+</button>
-            </div>
+            <div class="instruction-badge">💡 Hover over the calculator to rotate it in 3D!</div>
         </div>
     </div>
 
@@ -231,51 +165,6 @@
             totalCredits = 0;
             document.getElementById('courseList').innerHTML = '';
             document.getElementById('result').innerHTML = '';
-        }
-
-        let csExpression = "";
-        let csLastAns = "0";
-
-        function csInput(val) {
-            const screen = document.getElementById('csScreen');
-
-            if (val === 'AC') {
-                csExpression = "";
-                screen.innerText = "0";
-                return;
-            }
-
-            if (val === 'DEL') {
-                csExpression = csExpression.slice(0, -1);
-                screen.innerText = csExpression === "" ? "0" : csExpression;
-                return;
-            }
-
-            if (val === 'Ans') {
-                csExpression += csLastAns;
-            } else if (['SHIFT', 'ALPHA', 'MODE', '▲', '▼'].includes(val)) {
-                return;
-            } else {
-                if (csExpression === "0" && val !== '.') {
-                    csExpression = val;
-                } else {
-                    csExpression += val;
-                }
-            }
-            screen.innerText = csExpression;
-        }
-
-        function csCalculate() {
-            const screen = document.getElementById('csScreen');
-            try {
-                let evaluated = eval(csExpression.replace(/Math\.PI/g, Math.PI));
-                csLastAns = Number.isFinite(evaluated) ? evaluated.toString() : "Math Error";
-                screen.innerText = csLastAns;
-                csExpression = csLastAns;
-            } catch (err) {
-                screen.innerText = "Syntax Error";
-                csExpression = "";
-            }
         }
     </script>
 </body>
