@@ -144,7 +144,7 @@
 
     <header>
         <h1>Interactive 3D Device & Academic GPA System</h1>
-        <p>Rotate the 3D device in full 360° space, use the calculator, and sync step-by-step arithmetic operations directly into your GPA ledger.</p>
+        <p>Rotate the clean 3D device in full 360° space, use the calculator, and sync step-by-step arithmetic operations directly into your GPA ledger.</p>
     </header>
 
     <div class="main-container">
@@ -179,7 +179,7 @@
             <div id="courseList" style="margin-top: 15px; max-height: 220px; overflow-y: auto;"></div>
         </div>
 
-        <!-- RIGHT: True 3D Rotating Device with Interactive Calculator Screen -->
+        <!-- RIGHT: True 3D Rotating Clean Device with Interactive Calculator Screen -->
         <div class="calculator-3d-wrapper">
             <div id="webgl-container"></div>
             <div class="instruction-badge">🖱️ Drag to Rotate 3D Device 360° &bull; Click Buttons to Calculate</div>
@@ -407,41 +407,13 @@
         screenMesh.position.z = 0.125;
         deviceGroup.add(screenMesh);
 
-        // Back Panel
+        // Clean Back Panel (Cameras completely removed)
         const backGeo = new THREE.PlaneGeometry(2.35, 4.50);
         const backMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.7 });
         const backPanel = new THREE.Mesh(backGeo, backMat);
         backPanel.position.z = -0.125;
         backPanel.rotation.y = Math.PI;
         deviceGroup.add(backPanel);
-
-        // Camera Rings on Back
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.1, metalness: 0.95 });
-        const lensGlassMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.05, metalness: 0.99 });
-        const flashMat = new THREE.MeshBasicMaterial({ color: 0xfffaed });
-
-        const backCameras = [
-            { x: -0.55, y: 1.70, r: 0.14 },
-            { x: -0.55, y: 1.25, r: 0.14 },
-            { x: -0.55, y: 0.80, r: 0.14 }
-        ];
-
-        backCameras.forEach(pos => {
-            const ring = new THREE.Mesh(new THREE.CylinderGeometry(pos.r, pos.r, 0.04, 32), ringMat);
-            ring.rotation.x = Math.PI / 2;
-            const glass = new THREE.Mesh(new THREE.CylinderGeometry(pos.r*0.75, pos.r*0.75, 0.045, 32), lensGlassMat);
-            glass.rotation.x = Math.PI / 2;
-
-            ring.position.set(pos.x, pos.y, -0.145);
-            glass.position.set(pos.x, pos.y, -0.145);
-            deviceGroup.add(ring);
-            deviceGroup.add(glass);
-        });
-
-        const flashMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16), flashMat);
-        flashMesh.rotation.x = Math.PI / 2;
-        flashMesh.position.set(-0.05, 1.70, -0.145);
-        deviceGroup.add(flashMesh);
 
         scene.add(deviceGroup);
 
