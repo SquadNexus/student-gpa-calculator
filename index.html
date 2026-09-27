@@ -71,7 +71,7 @@
             font-size: 0.85rem; 
         }
 
-        /* Right 3D Calculator Viewport Wrapper */
+        /* Right 3D Calculator Viewport Wrapper Styles */
         .calculator-3d-wrapper {
             position: relative;
             width: 380px;
@@ -84,7 +84,12 @@
             flex-shrink: 0;
         }
 
-        #webgl-container { width: 100%; height: 100%; cursor: grab; }
+        #webgl-container { 
+            width: 100%; 
+            height: 100%; 
+            display: block;
+            cursor: grab; 
+        }
         #webgl-container:active { cursor: grabbing; }
 
         /* Accurate 2D LCD Screen Overlay aligned to 3D Model Screen slot */
@@ -281,7 +286,7 @@
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
-        // Build CATIGA Model Group with subtle realistic pitch/tilt
+        // Build CATIGA Model Group with subtle realistic tilt
         const catigaGroup = new THREE.Group();
         catigaGroup.rotation.x = 0.05;
         catigaGroup.rotation.y = -0.05;
@@ -301,7 +306,7 @@
         faceplate.position.z = 0.01;
         catigaGroup.add(faceplate);
 
-        // Helper function to create text-labeled button materials
+        // Helper function to create text-labeled button materials via Canvas Textures
         function createButtonMaterial(text, bgColor, textColor = '#ffffff') {
             const canvas = document.createElement('canvas');
             canvas.width = 128;
@@ -358,7 +363,7 @@
 
         const interactiveButtons = [];
 
-        // Generate 3D button meshes with safe vertical distribution mapping
+        // Generate 3D button meshes
         layout.forEach((row, rIndex) => {
             let rowWidth = row.reduce((acc, item) => acc + item.w + 0.03, -0.03);
             let startX = -rowWidth / 2 + row[0].w / 2;
@@ -369,7 +374,6 @@
                 let mat = createButtonMaterial(btnData.label, btnData.col);
                 let btnMesh = new THREE.Mesh(btnGeo, mat);
                 
-                // Perfectly balanced vertical scaling spacing across the 4.25 faceplate height
                 let yOffset = 1.25 - (rIndex * 0.19);
 
                 btnMesh.position.set(xPos, yOffset, 0.04);
