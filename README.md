@@ -3,7 +3,7 @@
 A clean, responsive, and easy-to-use single-page web application designed to help students calculate their semester Grade Point Average (GPA) quickly.
 
 ## 🔗 Live Demo
-Check out the live application here: [gpa-calculator](https://github.com/SquadNexus/student-gpa-calculator)
+Check out the live application here: [Students gpa calculator](https://github.com/SquadNexus/student-gpa-calculator)
 ## ✨ Features
 * **Modern Dark Theme UI:** Sleek, distraction-free interface optimized for readability.
 * **Dynamic Calculations:** Instantly computes cumulative semester GPA as you add courses.
