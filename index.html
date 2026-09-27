@@ -263,14 +263,17 @@
             }
         }
 
-        // Three.js Setup
+        // Three.js Setup with Safe Dimension Fallbacks
         const container = document.getElementById('webgl-container');
+        const width = container.clientWidth || 380;
+        const height = container.clientHeight || 640;
+
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
         camera.position.set(0, 0, 5.7);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(width, height);
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
@@ -432,11 +435,11 @@
 
         // Responsive resize handling
         window.addEventListener('resize', () => {
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            camera.aspect = width / height;
+            const w = container.clientWidth || 380;
+            const h = container.clientHeight || 640;
+            camera.aspect = w / h;
             camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
+            renderer.setSize(w, h);
         });
     </script>
 </body>
