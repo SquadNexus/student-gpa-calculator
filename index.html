@@ -40,30 +40,6 @@
             cursor: crosshair;
         }
 
-        /* Live Calculator LCD Screen Overlay (Synced with GPA Calculation) */
-        .calc-lcd-overlay {
-            position: absolute;
-            top: 125px;
-            left: 55px;
-            width: 330px;
-            height: 105px;
-            background: #8fa096;
-            color: #111;
-            border: 3px solid #1c2025;
-            border-radius: 6px;
-            padding: 8px;
-            box-sizing: border-box;
-            font-family: monospace;
-            pointer-events: none;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .lcd-top-row { font-size: 0.65rem; font-weight: bold; color: #2c3e50; display: flex; justify-content: space-between; border-bottom: 1px solid #78877e; padding-bottom: 2px; }
-        .lcd-main-row { font-size: 1.1rem; font-weight: bold; text-align: right; overflow: hidden; }
-        .lcd-gpa-row { font-size: 0.8rem; font-weight: bold; color: #8b0000; text-align: right; }
-
         .instruction-badge { 
             position: absolute; 
             bottom: 15px; 
@@ -112,29 +88,51 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: 3D Casio Model with Right-Click Drag & Live GPA Screen Display -->
+        <!-- RIGHT: 3D Casio Model with Baked-in Screen Data & Right-Click Drag -->
         <div class="calculator-wrapper">
             <div id="webgl-container"></div>
-            
-            <!-- Live Screen Overlay showing GPA calculation and results -->
-            <div class="calc-lcd-overlay">
-                <div class="lcd-top-row">
-                    <span>Math DEG</span>
-                    <span>STAT</span>
-                </div>
-                <div class="lcd-main-row" id="calcFormula">Sum(Pts × Cr) / Sum(Cr)</div>
-                <div class="lcd-gpa-row" id="calcAnswer">GPA: 0.00</div>
-            </div>
-
             <div class="instruction-badge">🖱️ Hold & drag RIGHT mouse button to rotate 3D Casio</div>
         </div>
     </div>
 
     <!-- JavaScript Execution Engine -->
     <script>
-        // --- GPA & CALCULATOR SYNC LOGIC ---
+        // --- GPA LOGIC & DYNAMIC TEXTURE GENERATION ---
         let totalPoints = 0;
         let totalCredits = 0;
+        let currentFormula = "Sum(Pts × Cr) / Sum(Cr)";
+        let currentAnswer = "GPA: 0.00";
+
+        let casioTexture, calculatorMesh, canvasCtx, baseImage;
+
+        function updateCalculatorScreen() {
+            if (!canvasCtx || !baseImage) return;
+
+            // 1. Redraw the original Casio background image onto the dynamic canvas
+            canvasCtx.drawImage(baseImage, 0, 0, 512, 1024);
+
+            // 2. Draw live calculator screen background (the greenish LCD area)
+            canvasCtx.fillStyle = "#8fa096";
+            canvasCtx.fillRect(55, 145, 400, 110);
+            canvasCtx.strokeStyle = "#222";
+            canvasCtx.lineWidth = 4;
+            canvasCtx.strokeRect(55, 145, 400, 110);
+
+            // 3. Render live text onto the LCD screen
+            canvasCtx.fillStyle = "#111";
+            canvasCtx.font = "bold 20px monospace";
+            canvasCtx.fillText("Math DEG  STAT", 70, 175);
+
+            canvasCtx.font = "bold 22px monospace";
+            canvasCtx.fillText(currentFormula, 70, 205);
+
+            canvasCtx.fillStyle = "#900";
+            canvasCtx.font = "bold 24px monospace";
+            canvasCtx.fillText(currentAnswer, 70, 238);
+
+            // 4. Tell Three.js that the texture has updated so it renders on the 3D model
+            if (casioTexture) casioTexture.needsUpdate = true;
+        }
 
         function addCourse() {
             const nameField = document.getElementById('courseName');
@@ -152,13 +150,15 @@
 
             const gpa = (totalPoints / totalCredits).toFixed(2);
             
-            // Update UI
             document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
             document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
 
-            // Send calculation details directly to the 3D Casio Calculator Screen
-            document.getElementById('calcFormula').innerText = `${totalPoints} Pts / ${totalCredits} Cr`;
-            document.getElementById('calcAnswer').innerText = `SEM GPA = ${gpa}`;
+            // Update variables for the 3D model screen
+            currentFormula = `${totalPoints} Pts / ${totalCredits} Cr`;
+            currentAnswer = `SEM GPA = ${gpa}`;
+
+            // Refresh the texture printed on the 3D calculator
+            updateCalculatorScreen();
 
             nameField.value = '';
         }
@@ -166,12 +166,13 @@
         function resetGPA() {
             totalPoints = 0;
             totalCredits = 0;
+            currentFormula = "Sum(Pts × Cr) / Sum(Cr)";
+            currentAnswer = "GPA: 0.00";
+            
             document.getElementById('courseList').innerHTML = '';
             document.getElementById('result').innerHTML = '';
             
-            // Reset Calculator Screen
-            document.getElementById('calcFormula').innerText = "Sum(Pts × Cr) / Sum(Cr)";
-            document.getElementById('calcAnswer').innerText = "GPA: 0.00";
+            updateCalculatorScreen();
         }
 
         // --- THREE.JS 3D RENDERER CONFIGURATION ---
@@ -186,21 +187,19 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
 
-        // Configure OrbitControls to rotate ONLY when dragging with the RIGHT mouse button
+        // Right-click drag configuration
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.minDistance = 3;
         controls.maxDistance = 9;
         
-        // Map mouse buttons: Left = None/Disabled for rotation, Right = Rotate 3D Model
         controls.mouseButtons = {
             LEFT: THREE.MOUSE.NONE,
             MIDDLE: THREE.MOUSE.DOLLY,
             RIGHT: THREE.MOUSE.ROTATE
         };
 
-        // Lighting setup
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
         scene.add(ambientLight);
 
@@ -208,24 +207,33 @@
         pointLight.position.set(4, 5, 4);
         scene.add(pointLight);
 
-        // Load your Casio texture image (ensure casio.png is in the same folder)
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load('casio.png', (texture) => {
-            texture.generateMipmaps = true;
-            texture.minFilter = THREE.LinearMipmapLinearFilter;
+        // Setup Dynamic Canvas Texture Mapping
+        const dynCanvas = document.createElement('canvas');
+        dynCanvas.width = 512;
+        dynCanvas.height = 1024;
+        canvasCtx = dynCanvas.getContext('2d');
+
+        baseImage = new Image();
+        baseImage.src = 'casio.png'; // Make sure casio.png is in the same folder
+        baseImage.onload = () => {
+            updateCalculatorScreen();
+
+            casioTexture = new THREE.CanvasTexture(dynCanvas);
+            casioTexture.generateMipmaps = true;
+            casioTexture.minFilter = THREE.LinearMipmapLinearFilter;
 
             const geometry = new THREE.BoxGeometry(2.3, 4.4, 0.28);
             
             const materials = [
-                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Right side
-                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Left side
-                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Top side
-                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }), // Bottom side
-                new THREE.MeshStandardMaterial({ map: texture, roughness: 0.3 }),    // Front face (casio.png)
-                new THREE.MeshStandardMaterial({ color: 0x0a0b0d, roughness: 0.5 })  // Back face
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }),
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }),
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }),
+                new THREE.MeshStandardMaterial({ color: 0x121417, roughness: 0.4 }),
+                new THREE.MeshStandardMaterial({ map: casioTexture, roughness: 0.3 }), // Front face with live screen data
+                new THREE.MeshStandardMaterial({ color: 0x0a0b0d, roughness: 0.5 })
             ];
 
-            const calculatorMesh = new THREE.Mesh(geometry, materials);
+            calculatorMesh = new THREE.Mesh(geometry, materials);
             scene.add(calculatorMesh);
 
             calculatorMesh.rotation.x = 0.15;
@@ -237,7 +245,7 @@
                 renderer.render(scene, camera);
             }
             animate();
-        });
+        };
 
         window.addEventListener('resize', () => {
             const width = container.clientWidth;
