@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPA Calculator & True 3D Phone Calculator</title>
+    <title>Fully Interactive 3D Device & GPA Calculator with Step-by-Step History</title>
     
     <!-- Load Three.js and OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -12,84 +12,102 @@
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            background: #f4f7f6; 
-            color: #333; 
+            background: #0f172a; 
+            color: #f8fafc; 
             padding: 20px; 
-            max-width: 1200px; 
+            max-width: 1250px; 
             margin: auto; 
         }
 
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; color: #38bdf8; }
+        header p { color: #94a3b8; font-size: 0.95rem; margin-top: 5px; }
+
         .main-container { 
             display: flex; 
-            gap: 40px; 
+            gap: 30px; 
             flex-wrap: wrap; 
-            align-items: center; 
+            align-items: flex-start; 
             justify-content: center; 
         }
 
-        /* GPA Card Styling */
+        /* GPA Calculator Card */
         .card { 
-            background: #ffffff; 
+            background: #1e293b; 
             padding: 25px; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
-            border: 1px solid #e1e4e8;
+            border-radius: 16px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4); 
+            border: 1px solid #334155;
             flex: 1; 
-            min-width: 320px; 
-            max-width: 400px; 
+            min-width: 340px; 
+            max-width: 440px; 
         }
 
-        .card h2 { margin-top: 0; color: #111; }
-        label { font-weight: bold; font-size: 0.85rem; color: #444; }
+        .card h2 { margin-top: 0; color: #f1f5f9; font-size: 1.3rem; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+        label { font-weight: bold; font-size: 0.85rem; color: #cbd5e1; display: block; margin-top: 12px; }
         input, select { 
             width: 100%; 
-            padding: 10px; 
-            margin: 8px 0 15px 0; 
-            background: #f9fafb; 
-            border: 1px solid #d1d5db; 
-            color: #333; 
-            border-radius: 6px; 
+            padding: 12px; 
+            margin: 6px 0 10px 0; 
+            background: #0f172a; 
+            border: 1px solid #475569; 
+            color: #f8fafc; 
+            border-radius: 8px; 
             box-sizing: border-box; 
+            font-size: 0.95rem;
         }
-        button { 
-            background: #0066cc; 
+        input:focus, select:focus { border-color: #38bdf8; outline: none; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .action-btn { 
+            background: #0284c7; 
             color: white; 
             border: none; 
             padding: 12px; 
-            width: 100%; 
-            border-radius: 6px; 
+            flex: 1;
+            border-radius: 8px; 
             cursor: pointer; 
             font-weight: bold; 
-            margin-top: 5px; 
+            transition: background 0.2s;
         }
-        button:hover { background: #0052a3; }
-        .btn-danger { background: #dc3545; }
-        .btn-danger:hover { background: #b02a37; }
+        .action-btn:hover { background: #0ea5e9; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
 
-        #result { 
-            margin-top: 20px; 
-            font-size: 1.2rem; 
+        #gpaResult { 
+            margin-top: 15px; 
+            font-size: 1.25rem; 
             text-align: center; 
-            color: #198754; 
-            font-weight: bold; 
+            color: #4ade80; 
+            font-weight: bold;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
         }
 
         .course-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #f1f3f5; 
-            padding: 8px 12px; 
-            margin-top: 6px; 
-            border-radius: 6px; 
+            background: #0f172a; 
+            padding: 10px 14px; 
+            margin-top: 8px; 
+            border-radius: 8px; 
             font-size: 0.85rem; 
-            border: 1px solid #e9ecef;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
+        .course-row span { color: #e2e8f0; }
+        .course-row .operation-detail { color: #38bdf8; font-family: monospace; font-size: 0.8rem; }
 
         /* --- TRUE 3D VIEWPORT CONTAINER --- */
         .calculator-3d-wrapper {
             position: relative;
-            width: 420px;
+            width: 440px;
             height: 720px;
             background: transparent;
             flex-shrink: 0;
@@ -105,34 +123,41 @@
 
         .instruction-badge {
             position: absolute;
-            bottom: 5px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            color: #0066cc;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            color: #38bdf8;
             font-weight: bold;
             pointer-events: none;
-            border: 1px solid #d1d5db;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 85%;
         }
     </style>
 </head>
 <body>
 
+    <header>
+        <h1>Interactive 3D Device & Academic GPA System</h1>
+        <p>Rotate the 3D device in full 360° space, use the calculator, and sync step-by-step arithmetic operations directly into your GPA ledger.</p>
+    </header>
+
     <div class="main-container">
         
-        <!-- LEFT: GPA Calculator Card (Syncs automatically with 3D Phone Calculator) -->
+        <!-- LEFT: GPA Calculator Card with Step-by-Step Operation Tracking -->
         <div class="card">
-            <h2>GPA & Calculator Sync</h2>
-            <p style="color: #666; font-size: 0.9rem;">Calculations performed on the 3D phone sync here automatically.</p>
+            <h2>Academic GPA Ledger</h2>
+            <p style="color: #94a3b8; font-size: 0.85rem;">Calculations performed on the 3D device sync here with full step-by-step operation logs.</p>
             
-            <label>Course Name / Synced Calculation</label>
-            <input type="text" id="courseName" placeholder="Synced from 3D Phone...">
+            <label>Course Name / Synced Operation</label>
+            <input type="text" id="courseName" placeholder="Synced calculation...">
             
-            <label>Grade & Points</label>
+            <label>Grade Points</label>
             <select id="gradePoints">
                 <option value="5">A (5 Points)</option>
                 <option value="4">B+ (4 Points)</option>
@@ -145,25 +170,28 @@
             <label>Credit Hours / Units</label>
             <input type="number" id="credits" value="3" min="1" max="10">
 
-            <button onclick="addCourse()">Add Course From Sync</button>
-            <button class="btn-danger" onclick="resetGPA()">Reset GPA</button>
+            <div class="btn-group">
+                <button class="action-btn" onclick="addCourse()">Add Course Entry</button>
+                <button class="action-btn btn-danger" onclick="resetGPA()">Reset Ledger</button>
+            </div>
             
-            <div id="courseList" style="margin-top: 15px; font-size: 0.85rem; color: #444;"></div>
-            <div id="result"></div>
+            <div id="gpaResult">Current GPA: 0.00</div>
+            <div id="courseList" style="margin-top: 15px; max-height: 220px; overflow-y: auto;"></div>
         </div>
 
-        <!-- RIGHT: True 3D Rotating Phone Device (S25 Style with Calculator Screen & Buttons mapped on body) -->
+        <!-- RIGHT: True 3D Rotating Device with Interactive Calculator Screen -->
         <div class="calculator-3d-wrapper">
             <div id="webgl-container"></div>
-            <div class="instruction-badge">🖱️ Drag to Rotate 3D Phone 360° (Front, Back & Sides)</div>
+            <div class="instruction-badge">🖱️ Drag to Rotate 3D Device 360° &bull; Click Buttons to Calculate</div>
         </div>
 
     </div>
 
     <script>
-        // --- GPA CALCULATOR LOGIC ---
+        // --- GPA CALCULATOR STATE & LOGIC ---
         let totalPoints = 0;
         let totalCredits = 0;
+        let lastOperationDetails = "Initial Setup: 0";
 
         function addCourse() {
             const name = document.getElementById('courseName').value || "Calculation Entry";
@@ -180,99 +208,112 @@
 
             const gpa = (totalPoints / totalCredits).toFixed(2);
             
-            document.getElementById('courseList').innerHTML += `<div class="course-row"><span>✔️ ${name} (${credits} Cr)</span><span>Pts: ${points}</span></div>`;
-            document.getElementById('result').innerHTML = `Current Semester GPA: ${gpa}`;
+            const listEl = document.getElementById('courseList');
+            const row = document.createElement('div');
+            row.className = 'course-row';
+            row.innerHTML = `
+                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                    <span>📚 ${name}</span>
+                    <span style="color:#4ade80;">Pts: ${points} | Cr: ${credits}</span>
+                </div>
+                <div class="operation-detail">Op Log: ${lastOperationDetails}</div>
+            `;
+            listEl.prepend(row);
+            
+            document.getElementById('gpaResult').innerHTML = `Current GPA: ${gpa}`;
+            document.getElementById('courseName').value = '';
         }
 
         function resetGPA() {
             totalPoints = 0;
             totalCredits = 0;
             document.getElementById('courseList').innerHTML = '';
-            document.getElementById('result').innerHTML = '';
+            document.getElementById('gpaResult').innerHTML = 'Current GPA: 0.00';
         }
 
-        // --- CALCULATOR ENGINE MAPPED ONTO 3D PHONE ---
-        let calcExpression = "25×4";
-        let calcResultOutput = "100"; 
+        // --- CALCULATOR ENGINE ---
+        let calcExpression = "150+50";
+        let calcResultOutput = "200"; 
+        let lastStepsLog = "150 + 50 = 200";
 
         const calcButtons = [
-            { label: 'AC', val: 'AC', x: 20, y: 150, w: 105, h: 50, bg: '#e74c3c', col: '#fff' },
-            { label: '(', val: '(', x: 135, y: 150, w: 105, h: 50, bg: '#34495e', col: '#fff' },
-            { label: ')', val: ')', x: 250, y: 150, w: 105, h: 50, bg: '#34495e', col: '#fff' },
-            { label: '÷', val: '/', x: 365, y: 150, w: 125, h: 50, bg: '#f39c12', col: '#fff' },
+            { label: 'AC', val: 'AC', x: 20, y: 150, w: 105, h: 50, bg: '#ef4444', col: '#fff' },
+            { label: '(', val: '(', x: 135, y: 150, w: 105, h: 50, bg: '#334155', col: '#fff' },
+            { label: ')', val: ')', x: 250, y: 150, w: 105, h: 50, bg: '#334155', col: '#fff' },
+            { label: '÷', val: '/', x: 365, y: 150, w: 125, h: 50, bg: '#f59e0b', col: '#fff' },
 
-            { label: '7', val: '7', x: 20, y: 210, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '8', val: '8', x: 135, y: 210, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '9', val: '9', x: 250, y: 210, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '×', val: '*', x: 365, y: 210, w: 125, h: 60, bg: '#f39c12', col: '#fff' },
+            { label: '7', val: '7', x: 20, y: 210, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '8', val: '8', x: 135, y: 210, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '9', val: '9', x: 250, y: 210, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '×', val: '*', x: 365, y: 210, w: 125, h: 60, bg: '#f59e0b', col: '#fff' },
 
-            { label: '4', val: '4', x: 20, y: 280, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '5', val: '5', x: 135, y: 280, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '6', val: '6', x: 250, y: 280, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '-', val: '-', x: 365, y: 280, w: 125, h: 60, bg: '#f39c12', col: '#fff' },
+            { label: '4', val: '4', x: 20, y: 280, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '5', val: '5', x: 135, y: 280, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '6', val: '6', x: 250, y: 280, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '-', val: '-', x: 365, y: 280, w: 125, h: 60, bg: '#f59e0b', col: '#fff' },
 
-            { label: '1', val: '1', x: 20, y: 350, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '2', val: '2', x: 135, y: 350, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '3', val: '3', x: 250, y: 350, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '+', val: '+', x: 365, y: 350, w: 125, h: 60, bg: '#f39c12', col: '#fff' },
+            { label: '1', val: '1', x: 20, y: 350, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '2', val: '2', x: 135, y: 350, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '3', val: '3', x: 250, y: 350, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '+', val: '+', x: 365, y: 350, w: 125, h: 60, bg: '#f59e0b', col: '#fff' },
 
-            { label: '0', val: '0', x: 20, y: 420, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '.', val: '.', x: 135, y: 420, w: 105, h: 60, bg: '#2c3e50', col: '#fff' },
-            { label: '⌫', val: 'DEL', x: 250, y: 420, w: 105, h: 60, bg: '#d35400', col: '#fff' },
-            { label: '=', val: '=', x: 365, y: 420, w: 125, h: 60, bg: '#27ae60', col: '#fff' }
+            { label: '0', val: '0', x: 20, y: 420, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '.', val: '.', x: 135, y: 420, w: 105, h: 60, bg: '#1e293b', col: '#fff' },
+            { label: '⌫', val: 'DEL', x: 250, y: 420, w: 105, h: 60, bg: '#c2410c', col: '#fff' },
+            { label: '=', val: '=', x: 365, y: 420, w: 125, h: 60, bg: '#10b981', col: '#fff' }
         ];
 
-        // Dynamic Canvas Texture mapped onto the 3D Phone Screen
-        const phoneCanvas = document.createElement('canvas');
-        phoneCanvas.width = 512;
-        phoneCanvas.height = 512;
-        const pCtx = phoneCanvas.getContext('2d');
-        const phoneTexture = new THREE.CanvasTexture(phoneCanvas);
-        phoneTexture.generateMipmaps = true;
-        phoneTexture.minFilter = THREE.LinearMipmapLinearFilter;
+        // Dynamic Canvas Texture for 3D Screen Rendering
+        const deviceCanvas = document.createElement('canvas');
+        deviceCanvas.width = 512;
+        deviceCanvas.height = 512;
+        const dCtx = deviceCanvas.getContext('2d');
+        const deviceTexture = new THREE.CanvasTexture(deviceCanvas);
+        deviceTexture.generateMipmaps = true;
+        deviceTexture.minFilter = THREE.LinearMipmapLinearFilter;
 
-        function redrawPhoneUI() {
-            // Background Phone App Theme
-            pCtx.fillStyle = '#1e272e';
-            pCtx.fillRect(0, 0, phoneCanvas.width, phoneCanvas.height);
+        function redrawDeviceUI() {
+            // App background
+            dCtx.fillStyle = '#0f172a';
+            dCtx.fillRect(0, 0, deviceCanvas.width, deviceCanvas.height);
 
             // Screen Box
-            pCtx.fillStyle = '#d2f8d2';
-            pCtx.fillRect(20, 25, 470, 105);
-            pCtx.strokeStyle = '#2f3640';
-            pCtx.lineWidth = 3;
-            pCtx.strokeRect(20, 25, 470, 105);
+            dCtx.fillStyle = '#020617';
+            dCtx.fillRect(20, 20, 470, 115);
+            dCtx.strokeStyle = '#334155';
+            dCtx.lineWidth = 3;
+            dCtx.strokeRect(20, 20, 470, 115);
 
-            // Expression
-            pCtx.fillStyle = '#353b48';
-            pCtx.font = 'bold 22px monospace';
-            pCtx.fillText(calcExpression, 35, 65);
+            // Expression / Steps view
+            dCtx.fillStyle = '#94a3b8';
+            dCtx.font = 'bold 20px monospace';
+            dCtx.fillText(calcExpression, 35, 55);
 
-            // Result
-            pCtx.fillStyle = '#000000';
-            pCtx.font = 'bold 36px monospace';
-            pCtx.textAlign = 'right';
-            pCtx.fillText(calcResultOutput, 475, 110);
-            pCtx.textAlign = 'left';
+            // Result view
+            dCtx.fillStyle = '#38bdf8';
+            dCtx.font = 'bold 36px monospace';
+            dCtx.textAlign = 'right';
+            dCtx.fillText(calcResultOutput, 475, 110);
+            dCtx.textAlign = 'left';
 
-            // Keypad
+            // Keypad buttons
             calcButtons.forEach(btn => {
-                pCtx.fillStyle = btn.bg;
-                pCtx.fillRect(btn.x, btn.y, btn.w, btn.h);
-                pCtx.strokeStyle = '#ffffff';
-                pCtx.lineWidth = 1;
-                pCtx.strokeRect(btn.x, btn.y, btn.w, btn.h);
+                dCtx.fillStyle = btn.bg;
+                dCtx.fillRect(btn.x, btn.y, btn.w, btn.h);
+                dCtx.strokeStyle = '#475569';
+                dCtx.lineWidth = 1;
+                dCtx.strokeRect(btn.x, btn.y, btn.w, btn.h);
 
-                pCtx.fillStyle = btn.col || '#ffffff';
-                pCtx.font = 'bold 20px Arial, sans-serif';
-                pCtx.textAlign = 'center';
-                pCtx.textBaseline = 'middle';
-                pCtx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2);
+                dCtx.fillStyle = btn.col || '#ffffff';
+                dCtx.font = 'bold 20px Arial, sans-serif';
+                dCtx.textAlign = 'center';
+                dCtx.textBaseline = 'middle';
+                dCtx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2);
             });
 
-            phoneTexture.needsUpdate = true;
+            deviceTexture.needsUpdate = true;
         }
-        redrawPhoneUI();
+        redrawDeviceUI();
 
         function handleCalcInput(val) {
             if (val === 'AC') {
@@ -281,29 +322,33 @@
             } else if (val === 'DEL') {
                 calcExpression = calcExpression.slice(0, -1);
             } else {
-                if (calcExpression === "25×4" || calcExpression === "0") calcExpression = "";
+                if (calcExpression === "150+50" || calcExpression === "0") calcExpression = "";
                 calcExpression += val;
             }
-            redrawPhoneUI();
+            redrawDeviceUI();
         }
 
         function handleCalculate() {
             try {
-                let evalStr = calcExpression.replace(/÷/g, '/').replace(/×/g, '*');
-                let evaluated = eval(evalStr);
+                let cleanExp = calcExpression.replace(/÷/g, '/').replace(/×/g, '*');
+                let evaluated = eval(cleanExp);
                 calcResultOutput = Number.isFinite(evaluated) ? evaluated.toString() : "Error";
                 
-                // Automatically sync result into GPA calculator input field
-                document.getElementById('courseName').value = `Phone Calc: ${calcExpression} = ${calcResultOutput}`;
+                // Record operation details with full calculation steps
+                lastOperationDetails = `${calcExpression} = ${calcResultOutput}`;
+                
+                // Automatically sync calculation and operations to GPA input field
+                document.getElementById('courseName').value = `Calc: ${lastOperationDetails}`;
             } catch (err) {
                 calcResultOutput = "Error";
+                lastOperationDetails = `${calcExpression} (Error)`;
             }
-            redrawPhoneUI();
+            redrawDeviceUI();
         }
 
-        // --- THREE.JS 3D SCENE SETUP ---
+        // --- THREE.JS 3D SCENE & DEVICE SETUP ---
         const container = document.getElementById('webgl-container');
-        const width = container.clientWidth || 420;
+        const width = container.clientWidth || 440;
         const height = container.clientHeight || 720;
 
         const scene = new THREE.Scene();
@@ -321,7 +366,7 @@
         controls.minDistance = 3.5;
         controls.maxDistance = 7.5;
 
-        // Lighting for 3D depth and metallic casing reflections
+        // Lighting
         scene.add(new THREE.AmbientLight(0xffffff, 1.5));
         const dirLight = new THREE.DirectionalLight(0xffffff, 2.2);
         dirLight.position.set(5, 10, 7);
@@ -331,10 +376,10 @@
         backLight.position.set(-5, -5, -7);
         scene.add(backLight);
 
-        // 3D Phone Group
-        const phoneGroup = new THREE.Group();
+        // 3D Device Group
+        const deviceGroup = new THREE.Group();
 
-        // Extruded 3D Phone Body Shape (Samsung S25 Ultra style with rounded corners & physical thickness)
+        // Extruded 3D Phone Body Shape
         const shape = new THREE.Shape();
         const pw = 2.6, ph = 4.8, r = 0.18;
         shape.moveTo(-pw/2 + r, -ph/2);
@@ -348,31 +393,30 @@
         shape.quadraticCurveTo(-pw/2, -ph/2, -pw/2 + r, -ph/2);
 
         const extrudeSettings = { depth: 0.22, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.03, bevelThickness: 0.03 };
-        const phoneGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        phoneGeo.center();
+        const deviceGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        deviceGeo.center();
 
-        // Titanium Slate Phone Body Material
-        const phoneMat = new THREE.MeshStandardMaterial({ color: 0x34495e, roughness: 0.2, metalness: 0.85 });
-        const phoneBody = new THREE.Mesh(phoneGeo, phoneMat);
-        phoneGroup.add(phoneBody);
+        const chassisMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.2, metalness: 0.85 });
+        const deviceBody = new THREE.Mesh(deviceGeo, chassisMat);
+        deviceGroup.add(deviceBody);
 
-        // Front Screen Plane mapped with Calculator UI
+        // Front Screen Plane
         const screenGeo = new THREE.PlaneGeometry(2.35, 4.50);
-        const screenMat = new THREE.MeshBasicMaterial({ map: phoneTexture });
+        const screenMat = new THREE.MeshBasicMaterial({ map: deviceTexture });
         const screenMesh = new THREE.Mesh(screenGeo, screenMat);
         screenMesh.position.z = 0.125;
-        phoneGroup.add(screenMesh);
+        deviceGroup.add(screenMesh);
 
-        // Back Panel Design
+        // Back Panel
         const backGeo = new THREE.PlaneGeometry(2.35, 4.50);
-        const backMat = new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.3, metalness: 0.7 });
+        const backMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.7 });
         const backPanel = new THREE.Mesh(backGeo, backMat);
         backPanel.position.z = -0.125;
         backPanel.rotation.y = Math.PI;
-        phoneGroup.add(backPanel);
+        deviceGroup.add(backPanel);
 
-        // S25 Style Back Camera Lens Modules
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.95 });
+        // Camera Rings on Back
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.1, metalness: 0.95 });
         const lensGlassMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.05, metalness: 0.99 });
         const flashMat = new THREE.MeshBasicMaterial({ color: 0xfffaed });
 
@@ -390,19 +434,18 @@
 
             ring.position.set(pos.x, pos.y, -0.145);
             glass.position.set(pos.x, pos.y, -0.145);
-            phoneGroup.add(ring);
-            phoneGroup.add(glass);
+            deviceGroup.add(ring);
+            deviceGroup.add(glass);
         });
 
-        // Flash Module on Back
         const flashMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16), flashMat);
         flashMesh.rotation.x = Math.PI / 2;
         flashMesh.position.set(-0.05, 1.70, -0.145);
-        phoneGroup.add(flashMesh);
+        deviceGroup.add(flashMesh);
 
-        scene.add(phoneGroup);
+        scene.add(deviceGroup);
 
-        // Click interaction directly on the 3D rotating phone screen buttons
+        // Raycasting for direct clicks on the 3D screen
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
@@ -417,8 +460,8 @@
 
                 if (intersects.length > 0) {
                     const uv = intersects[0].uv;
-                    const clickX = uv.x * phoneCanvas.width;
-                    const clickY = (1 - uv.y) * phoneCanvas.height;
+                    const clickX = uv.x * deviceCanvas.width;
+                    const clickY = (1 - uv.y) * deviceCanvas.height;
 
                     for (let btn of calcButtons) {
                         if (clickX >= btn.x && clickX <= btn.x + btn.w && clickY >= btn.y && clickY <= btn.y + btn.h) {
@@ -442,7 +485,7 @@
         animate();
 
         window.addEventListener('resize', () => {
-            const w = container.clientWidth || 420;
+            const w = container.clientWidth || 440;
             const h = container.clientHeight || 720;
             camera.aspect = w / h;
             camera.updateProjectionMatrix();
