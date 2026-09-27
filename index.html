@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student GPA & 3D Interactive Calculator</title>
-    
-    <!-- Link External Stylesheet -->
+    <title>Student GPA & Samsung Ultra Calculator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -40,79 +38,87 @@
             <div id="result"></div>
         </div>
 
-        <!-- RIGHT: Pure CSS 3D Interactive Calculator Model -->
+        <!-- RIGHT: Samsung Galaxy Ultra Phone Chassis 3D Calculator -->
         <div class="calculator-scene">
-            <div class="calculator-3d-body">
+            <div class="samsung-ultra-phone">
                 
-                <!-- Calculator Branding Header -->
-                <div class="calc-brand">
-                    <span>CATIGA</span>
-                    <span class="model-sub">CS-991EX ClassWiz</span>
-                </div>
+                <!-- Phone Speaker / Punch-hole Camera Notch Area -->
+                <div class="phone-speaker"></div>
+                <div class="punch-hole-camera"></div>
 
-                <!-- Built-in LCD Display Screen directly on the 3D model -->
-                <div class="calc-lcd-screen">
-                    <div class="lcd-top-row">
-                        <span>M S Setup</span>
-                        <span>DEG</span>
+                <div class="calculator-inner-content">
+                    <!-- Calculator Branding Header -->
+                    <div class="calc-brand">
+                        <span>SAMSUNG ULTRA CALC</span>
+                        <span class="model-sub">CS-991EX</span>
                     </div>
-                    <div class="lcd-main-display" id="calcScreen">0</div>
+
+                    <!-- Built-in LCD Display Screen -->
+                    <div class="calc-lcd-screen">
+                        <div class="lcd-top-row">
+                            <span>M S Setup</span>
+                            <span>DEG</span>
+                        </div>
+                        <div class="lcd-main-display" id="calcScreen">0</div>
+                    </div>
+
+                    <!-- Functional Keypad Grid -->
+                    <div class="calc-keypad-grid">
+                        <button class="btn-action" onclick="calcInput('SHIFT')">SHIFT</button>
+                        <button class="btn-action" onclick="calcInput('ALPHA')">ALPHA</button>
+                        <button class="btn-menu" onclick="calcInput('MENU')">MENU</button>
+                        <button class="btn-nav" onclick="calcInput('▲')">▲</button>
+
+                        <button class="btn-op" onclick="calcInput('Math.sqrt(')">√</button>
+                        <button class="btn-op" onclick="calcInput('**3')">x³</button>
+                        <button class="btn-op" onclick="calcInput('**')">x^y</button>
+                        <button class="btn-nav" onclick="calcInput('▼')">▼</button>
+
+                        <button class="btn-op" onclick="calcInput('Math.log(')">ln</button>
+                        <button class="btn-op" onclick="calcInput('(-1)*')">(-)</button>
+                        <button class="btn-op" onclick="calcInput('Math.sin(')">sin</button>
+                        <button class="btn-op" onclick="calcInput('Math.cos(')">cos</button>
+
+                        <button class="btn-op" onclick="calcInput('Math.tan(')">tan</button>
+                        <button class="btn-op" onclick="calcInput('(')">(</button>
+                        <button class="btn-op" onclick="calcInput(')')">)</button>
+                        <button class="btn-op" onclick="calcInput('/')">÷</button>
+
+                        <button class="btn-num" onclick="calcInput('7')">7</button>
+                        <button class="btn-num" onclick="calcInput('8')">8</button>
+                        <button class="btn-num" onclick="calcInput('9')">9</button>
+                        <button class="btn-del" onclick="calcInput('DEL')">DEL</button>
+
+                        <button class="btn-num" onclick="calcInput('4')">4</button>
+                        <button class="btn-num" onclick="calcInput('5')">5</button>
+                        <button class="btn-num" onclick="calcInput('6')">6</button>
+                        <button class="btn-ac" onclick="calcInput('AC')">AC</button>
+
+                        <button class="btn-num" onclick="calcInput('1')">1</button>
+                        <button class="btn-num" onclick="calcInput('2')">2</button>
+                        <button class="btn-num" onclick="calcInput('3')">3</button>
+                        <button class="btn-op" onclick="calcInput('*')">×</button>
+
+                        <button class="btn-num" onclick="calcInput('0')">0</button>
+                        <button class="btn-num" onclick="calcInput('.')">.</button>
+                        <button class="btn-op" onclick="calcInput('Math.PI')">π</button>
+                        <button class="btn-op" onclick="calcInput('-')">-</button>
+
+                        <button class="btn-num" onclick="calcInput('Ans')">Ans</button>
+                        <button class="btn-op" onclick="calcInput('/100')">%</button>
+                        <button class="btn-eq" onclick="calculateResult()">=</button>
+                        <button class="btn-op" onclick="calcInput('+')">+</button>
+                    </div>
                 </div>
 
-                <!-- Fully Visible, Functional 3D Keypad Grid -->
-                <div class="calc-keypad-grid">
-                    <button class="btn-action" onclick="calcInput('SHIFT')">SHIFT</button>
-                    <button class="btn-action" onclick="calcInput('ALPHA')">ALPHA</button>
-                    <button class="btn-menu" onclick="calcInput('MENU')">MENU</button>
-                    <button class="btn-nav" onclick="calcInput('▲')">▲</button>
-
-                    <button class="btn-op" onclick="calcInput('Math.sqrt(')">√</button>
-                    <button class="btn-op" onclick="calcInput('**3')">x³</button>
-                    <button class="btn-op" onclick="calcInput('**')">x^y</button>
-                    <button class="btn-nav" onclick="calcInput('▼')">▼</button>
-
-                    <button class="btn-op" onclick="calcInput('Math.log(')">ln</button>
-                    <button class="btn-op" onclick="calcInput('(-1)*')">(-)</button>
-                    <button class="btn-op" onclick="calcInput('Math.sin(')">sin</button>
-                    <button class="btn-op" onclick="calcInput('Math.cos(')">cos</button>
-
-                    <button class="btn-op" onclick="calcInput('Math.tan(')">tan</button>
-                    <button class="btn-op" onclick="calcInput('(')">(</button>
-                    <button class="btn-op" onclick="calcInput(')')">)</button>
-                    <button class="btn-op" onclick="calcInput('/')">÷</button>
-
-                    <button class="btn-num" onclick="calcInput('7')">7</button>
-                    <button class="btn-num" onclick="calcInput('8')">8</button>
-                    <button class="btn-num" onclick="calcInput('9')">9</button>
-                    <button class="btn-del" onclick="calcInput('DEL')">DEL</button>
-
-                    <button class="btn-num" onclick="calcInput('4')">4</button>
-                    <button class="btn-num" onclick="calcInput('5')">5</button>
-                    <button class="btn-num" onclick="calcInput('6')">6</button>
-                    <button class="btn-ac" onclick="calcInput('AC')">AC</button>
-
-                    <button class="btn-num" onclick="calcInput('1')">1</button>
-                    <button class="btn-num" onclick="calcInput('2')">2</button>
-                    <button class="btn-num" onclick="calcInput('3')">3</button>
-                    <button class="btn-op" onclick="calcInput('*')">×</button>
-
-                    <button class="btn-num" onclick="calcInput('0')">0</button>
-                    <button class="btn-num" onclick="calcInput('.')">.</button>
-                    <button class="btn-op" onclick="calcInput('Math.PI')">π</button>
-                    <button class="btn-op" onclick="calcInput('-')">-</button>
-
-                    <button class="btn-num" onclick="calcInput('Ans')">Ans</button>
-                    <button class="btn-op" onclick="calcInput('/100')">%</button>
-                    <button class="btn-eq" onclick="calculateResult()">=</button>
-                    <button class="btn-op" onclick="calcInput('+')">+</button>
-                </div>
+                <!-- Phone Home Bar Indicator -->
+                <div class="phone-home-bar"></div>
 
             </div>
         </div>
 
     </div>
 
-    <!-- Link External Script -->
     <script src="script.js"></script>
 </body>
 </html>
